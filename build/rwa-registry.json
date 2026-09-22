@@ -1,0 +1,291 @@
+{
+  "_comment": "Opinion layer — backing_type taxonomy, trust tier, editorial one-liners. Slugs match DefiLlama pool `project` field. pool_project / pool_projects map to different DefiLlama slugs when they diverge.",
+
+  "blackrock-buidl": {
+    "name": "BlackRock BUIDL",
+    "issuer": "BlackRock / Securitize",
+    "backing_type": "government-debt",
+    "trust_tier": 1,
+    "tier_overrides": null,
+    "wrapper": "regulated-fund",
+    "jurisdiction": "US",
+    "redemption": "daily",
+    "chains": ["ethereum", "avalanche", "optimism", "arbitrum", "polygon"],
+    "one_liner": "BlackRock's tokenized US Treasury fund. Daily redemptions, SEC-registered, Securitize as transfer agent.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "circle-usyc": {
+    "name": "Hashnote USYC",
+    "issuer": "Hashnote / Circle",
+    "backing_type": "government-debt",
+    "trust_tier": 1,
+    "tier_overrides": null,
+    "wrapper": "regulated-fund",
+    "jurisdiction": "US",
+    "redemption": "daily",
+    "chains": ["ethereum", "solana"],
+    "one_liner": "Short-duration US Treasury fund via Hashnote. Institutional-grade, regulated wrapper, now under Circle.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "ondo-yield-assets": {
+    "name": "Ondo USDY / OUSG",
+    "issuer": "Ondo Finance",
+    "backing_type": "government-debt",
+    "trust_tier": 1,
+    "tier_overrides": null,
+    "wrapper": "regulated-fund",
+    "jurisdiction": "US",
+    "redemption": "daily",
+    "chains": ["ethereum", "solana", "mantle", "arbitrum", "sui"],
+    "one_liner": "Ondo's US Treasury-backed yield tokens. USDY is permissionless on supported chains; OUSG is permissioned. Daily redemptions.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "invesco-ustb": {
+    "name": "Invesco USTB",
+    "issuer": "Invesco / Securitize",
+    "backing_type": "government-debt",
+    "trust_tier": 1,
+    "tier_overrides": null,
+    "wrapper": "regulated-fund",
+    "jurisdiction": "US",
+    "redemption": "daily",
+    "chains": ["ethereum"],
+    "one_liner": "Invesco's tokenized short-term Treasury bond ETF. Institutional pedigree, Securitize-distributed.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "openeden-tbill": {
+    "name": "OpenEden TBILL",
+    "issuer": "OpenEden",
+    "backing_type": "government-debt",
+    "trust_tier": 2,
+    "tier_overrides": null,
+    "wrapper": "regulated-fund",
+    "jurisdiction": "BVI",
+    "redemption": "daily",
+    "chains": ["ethereum", "arbitrum"],
+    "one_liner": "Tokenized US T-bill vault. Known issuer, regulated but BVI-domiciled — one notch below US-regulated wrappers.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "centrifuge": {
+    "pool_project": "centrifuge-protocol",
+    "name": "Centrifuge",
+    "issuer": "Centrifuge",
+    "backing_type": "private-credit",
+    "trust_tier": 2,
+    "tier_overrides": null,
+    "wrapper": "on-chain-pool",
+    "jurisdiction": "US",
+    "redemption": "epoch-based",
+    "chains": ["ethereum"],
+    "one_liner": "Real-world credit pools on-chain — invoices, trade finance, structured credit. Epoch-based redemptions; counterparty risk on each pool.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "maple": {
+    "name": "Maple Finance",
+    "issuer": "Maple",
+    "backing_type": "private-credit",
+    "trust_tier": 2,
+    "tier_overrides": "DefiLlama tags as 'Lending' — reclassified as private-credit because loans go to institutional borrowers (real-world credit), not on-chain collateralised lending.",
+    "wrapper": "on-chain-pool",
+    "jurisdiction": "BVI",
+    "redemption": "variable",
+    "chains": ["ethereum", "solana", "base"],
+    "one_liner": "Institutional lending to real-world borrowers. Previously had defaults (2022); v2 restructured with better underwriting. Still private credit risk.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "securitize": {
+    "pool_projects": ["securitize-tokenized-aaa-clo-fund", "apollo-diversified-credit-securitize-fund"],
+    "name": "Securitize Funds",
+    "issuer": "Securitize",
+    "backing_type": "private-credit",
+    "trust_tier": 2,
+    "tier_overrides": null,
+    "wrapper": "regulated-fund",
+    "jurisdiction": "US",
+    "redemption": "varies",
+    "chains": ["ethereum", "avalanche"],
+    "one_liner": "Tokenized credit funds — Apollo CLO, Hamilton Lane senior credit. Institutional managers, Securitize as platform. Accredited investors only.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "huma-finance-v2": {
+    "name": "Huma Finance",
+    "issuer": "Huma",
+    "backing_type": "private-credit",
+    "trust_tier": 3,
+    "tier_overrides": null,
+    "wrapper": "on-chain-pool",
+    "jurisdiction": "US",
+    "redemption": "variable",
+    "chains": ["solana"],
+    "one_liner": "Payment financing and receivables on Solana. Newer protocol, growing TVL but limited track record. Private credit risk.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "midas-rwa": {
+    "name": "Midas RWA",
+    "issuer": "Midas",
+    "backing_type": "government-debt",
+    "trust_tier": 2,
+    "tier_overrides": null,
+    "wrapper": "regulated-fund",
+    "jurisdiction": "EU",
+    "redemption": "daily",
+    "chains": ["ethereum"],
+    "one_liner": "Euro and USD Treasury-backed tokens. EU-regulated issuer, multiple backing strategies including T-bills and basis yield.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "ethena": {
+    "pool_project": "ethena-usde",
+    "name": "Ethena USDe / sUSDe",
+    "issuer": "Ethena Labs",
+    "backing_type": "basis-trade/synthetic",
+    "trust_tier": 4,
+    "tier_overrides": "USDtb is partially backed by BUIDL, but the yield mechanism is synthetic (funding rate arbitrage). The delta-neutral basis trade is NOT a real-world asset — stays tier 4.",
+    "wrapper": "none",
+    "jurisdiction": "BVI",
+    "redemption": "instant",
+    "chains": ["ethereum"],
+    "one_liner": "Delta-neutral basis trade — earns funding rates, NOT backed by real-world assets. Often appears in RWA listings but is a synthetic yield product.",
+    "mislabel": true,
+    "lane": "main"
+  },
+
+  "ethena-usdtb": {
+    "name": "Ethena USDtb",
+    "issuer": "Ethena Labs",
+    "backing_type": "basis-trade/synthetic",
+    "trust_tier": 4,
+    "tier_overrides": "Partially backed by BUIDL (BlackRock), but yield comes from the same basis-trade mechanism as USDe. The BUIDL backing does not make this an RWA — the yield source is synthetic.",
+    "wrapper": "none",
+    "jurisdiction": "BVI",
+    "redemption": "instant",
+    "chains": ["ethereum"],
+    "one_liner": "Marketed as 'institutional USDe' with BUIDL backing, but yield is still from basis trades. Not a real-world asset despite the packaging.",
+    "mislabel": true,
+    "lane": "main"
+  },
+
+  "usual-usd0": {
+    "name": "Usual USD0",
+    "issuer": "Usual",
+    "backing_type": "government-debt",
+    "trust_tier": 2,
+    "tier_overrides": "Backed by T-bills but through a novel protocol structure with governance token. Less established than tier-1 issuers.",
+    "wrapper": "protocol",
+    "jurisdiction": "EU",
+    "redemption": "instant",
+    "chains": ["ethereum"],
+    "one_liner": "Treasury-backed stablecoin with yield redistribution via USUAL governance token. T-bill backing is real, but protocol structure is newer.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "stusdt": {
+    "name": "stUSDT",
+    "issuer": "stUSDT / Justin Sun",
+    "backing_type": "government-debt",
+    "trust_tier": 3,
+    "tier_overrides": "Claims T-bill backing but opaque structure, tied to Justin Sun ecosystem. Auditing and transparency significantly below tier-1/2 standards.",
+    "wrapper": "protocol",
+    "jurisdiction": "unknown",
+    "redemption": "instant",
+    "chains": ["tron", "ethereum"],
+    "one_liner": "Claims US Treasury backing but opaque issuer structure. Proceed with caution — transparency far below institutional standards.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "mountain-protocol": {
+    "name": "Mountain USDM",
+    "issuer": "Mountain Protocol",
+    "backing_type": "government-debt",
+    "trust_tier": 2,
+    "tier_overrides": null,
+    "wrapper": "regulated-fund",
+    "jurisdiction": "Bermuda",
+    "redemption": "daily",
+    "chains": ["ethereum", "base", "arbitrum", "optimism", "polygon"],
+    "one_liner": "Rebasing yield-bearing stablecoin backed by short-term US Treasuries. Bermuda-regulated, daily NAV updates.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "re": {
+    "name": "Re (reUSD)",
+    "issuer": "Re",
+    "backing_type": "private-credit",
+    "trust_tier": 3,
+    "tier_overrides": null,
+    "wrapper": "protocol",
+    "jurisdiction": "unknown",
+    "redemption": "variable",
+    "chains": ["ethereum"],
+    "one_liner": "Reinsurance-backed yield protocol. Novel backing type (reinsurance premiums). Limited track record, higher risk.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "realt-tokens": {
+    "name": "RealT",
+    "issuer": "RealT",
+    "backing_type": "real-estate",
+    "trust_tier": null,
+    "tier_overrides": null,
+    "wrapper": "LLC",
+    "jurisdiction": "US",
+    "redemption": "secondary-market",
+    "chains": ["ethereum", "gnosis"],
+    "one_liner": "Tokenized US rental properties. Each token is a share in an LLC holding a single property. Rental yield distributed weekly.",
+    "mislabel": false,
+    "lane": "real-estate"
+  },
+
+  "lofty": {
+    "name": "Lofty",
+    "issuer": "Lofty",
+    "backing_type": "real-estate",
+    "trust_tier": null,
+    "tier_overrides": null,
+    "wrapper": "LLC",
+    "jurisdiction": "US",
+    "redemption": "secondary-market",
+    "chains": ["algorand"],
+    "one_liner": "Fractional US rental real estate. Similar model to RealT but on Algorand. Rental income distributed to token holders.",
+    "mislabel": false,
+    "lane": "real-estate"
+  },
+
+  "ondo-global-markets": {
+    "name": "Ondo Global Markets",
+    "issuer": "Ondo Finance",
+    "backing_type": "equity",
+    "trust_tier": null,
+    "tier_overrides": null,
+    "wrapper": "regulated-fund",
+    "jurisdiction": "US",
+    "redemption": "market-hours",
+    "chains": ["ethereum"],
+    "one_liner": "Tokenized US equities — TSLA, NVDA, etc. on-chain. Not a yield product; equity exposure only.",
+    "mislabel": false,
+    "lane": "equity"
+  }
+}
