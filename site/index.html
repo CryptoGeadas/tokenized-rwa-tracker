@@ -1,83 +1,60 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<!doctype html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Tokenized RWA Tracker</title>
+  <meta name="description" content="A trust filter for tokenized real-world assets. Classified by what actually backs each fund — not by the marketing label.">
+  <script>document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark";</script>
   <link rel="icon" href="logo.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500;600&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="brand.css">
-  <style>
-    .shell {
-      max-width: 640px;
-      margin: var(--s-16) auto;
-      padding: 0 var(--s-4);
-      text-align: center;
-    }
-    .shell img { width: 74px; margin-bottom: var(--s-6); }
-    .shell h1 { margin-bottom: var(--s-2); }
-    .shell .subtitle {
-      font-family: var(--accent-face);
-      font-size: 18px;
-      color: var(--muted);
-      margin-bottom: var(--s-8);
-    }
-    .status {
-      padding: var(--s-6);
-      text-align: left;
-    }
-    .status dt {
-      font-family: var(--display);
-      font-weight: 600;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-      margin-bottom: var(--s-1);
-    }
-    .status dd {
-      margin: 0 0 var(--s-4);
-      font-size: 15px;
-    }
-    .error { color: var(--error); }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="shell">
-    <img src="logo.svg" alt="BG">
-    <h1>Tokenized RWA Tracker</h1>
-    <p class="subtitle">Trust filter for tokenized real-world assets</p>
-    <div class="panel status" id="status">
-      <p class="muted">Loading data&hellip;</p>
+  <header class="wrap top">
+    <div class="brand">
+      <img class="mark" src="logo.svg" alt="BG" width="37" height="25">
+      <span class="wordmark">RWA Tracker</span>
     </div>
-  </div>
-  <script>
-    (async () => {
-      const el = document.getElementById("status");
-      try {
-        const res = await fetch("data/latest.json");
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const d = await res.json();
-        el.innerHTML = `
-          <dl>
-            <dt>Generated</dt>
-            <dd>${new Date(d.generatedAt).toLocaleString()}</dd>
-            <dt>Main stage funds</dt>
-            <dd>${d.stats.mainStageCount}</dd>
-            <dt>Secondary lane funds</dt>
-            <dd>${d.stats.secondaryCount}</dd>
-            <dt>Unclassified (>$5M TVL)</dt>
-            <dd>${d.stats.unclassifiedCount}</dd>
-            <dt>Source</dt>
-            <dd><a href="${d.source}" target="_blank">${d.source}</a></dd>
-          </dl>`;
-      } catch (e) {
-        el.innerHTML = `<p class="error">Failed to load data: ${e.message}</p>
-          <p class="muted">Run <code>node build/build.mjs</code> to generate the data snapshot.</p>`;
-      }
-    })();
-  </script>
+    <nav class="topnav">
+      <button id="theme" class="btn btn-ghost btn-sm" aria-label="Toggle theme">
+        <span class="theme-dark">&#9790;</span><span class="theme-light">&#9728;</span>
+      </button>
+    </nav>
+  </header>
+
+  <section class="wrap hero">
+    <h1 class="serif hero-line">Where can I park my dollars on-chain &mdash; and is that yield real?</h1>
+    <p class="sub">
+      A trust filter for tokenized real-world assets. Every fund
+      <strong>classified by what actually backs it</strong> &mdash; not by the marketing label.
+      Government bonds, private credit, or synthetic basis trades disguised as RWA.
+    </p>
+  </section>
+
+  <section class="wrap" id="scatter-section">
+    <div class="section-head">
+      <h2>Yield vs Trust</h2>
+      <span class="label">main stage &mdash; dollar / euro / credit</span>
+    </div>
+    <div class="scatter-wrap panel">
+      <div id="scatter-chart"></div>
+      <div class="scatter-tooltip"></div>
+    </div>
+    <div class="scatter-legend">
+      <span><span class="dot-legend gov"></span> Government debt</span>
+      <span><span class="dot-legend credit"></span> Private credit</span>
+      <span><span class="dot-legend synth"></span> Basis trade / synthetic</span>
+      <span class="legend-note">Dot size = TVL &middot; Left = higher trust</span>
+    </div>
+  </section>
+
+  <footer class="wrap" id="foot"></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>

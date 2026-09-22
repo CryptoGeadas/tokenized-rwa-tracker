@@ -1,0 +1,203 @@
+const ESC_MAP = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ESC_MAP[c]);
+const fmtPct = (n) => (n == null ? "—" : `${n.toFixed(2)}%`);
+const fmtTvl = (n) =>
+  n >= 1e9 ? `$${(n / 1e9).toFixed(2)}B` : n >= 1e6 ? `$${(n / 1e6).toFixed(1)}M` : `$${Math.round(n / 1e3)}K`;
+
+const BACKING_COLORS = {
+  "government-debt":      { fill: "rgba(59,130,246,0.7)",  stroke: "#3B82F6", label: "Gov debt" },
+  "private-credit":       { fill: "rgba(245,158,11,0.7)",  stroke: "#F59E0B", label: "Credit" },
+  "basis-trade/synthetic": { fill: "rgba(239,68,68,0.7)",  stroke: "#EF4444", label: "Synthetic" },
+};
+
+const $ = (s) => document.querySelector(s);
+const state = { data: null };
+
+// ─── Data loading ──────────────────────────────────────────────────────────
+
+async function load() {
+  try {
+    const res = await fetch("./data/latest.json", { cache: "no-cache" });
+    state.data = await res.json();
+  } catch {
+    $("#scatter-section").innerHTML = `<p style="color:var(--muted);padding:20px">No data — run <code>node build/build.mjs</code> first.</p>`;
+    return;
+  }
+  renderScatter();
+  renderFooter();
+}
+
+// ─── D3 scatter chart ──────────────────────────────────────────────────────
+
+function renderScatter() {
+  const container = $("#scatter-chart");
+  container.innerHTML = "";
+
+  const funds = state.data.mainStage.filter((f) => f.apyBase != null);
+  if (!funds.length) return;
+
+  const rect = container.getBoundingClientRect();
+  const W = Math.max(rect.width, 320);
+  const H = 420;
+  const PAD = { top: 30, right: 30, bottom: 55, left: 60 };
+  const plotW = W - PAD.left - PAD.right;
+  const plotH = H - PAD.top - PAD.bottom;
+
+  const maxYield = Math.max(...funds.map((f) => f.apyBase)) * 1.15;
+  const maxTvl = Math.max(...funds.map((f) => f.tvl));
+  const minR = 7, maxR = 34;
+
+  const isDark = document.documentElement.dataset.theme === "dark";
+  const textColor = isDark ? "#9CA3B0" : "#6B7482";
+  const gridColor = isDark ? "rgba(42,48,64,0.6)" : "rgba(224,228,236,0.6)";
+  const axisColor = isDark ? "#5A6472" : "#9CA3B0";
+
+  const svg = d3.select(container)
+    .append("svg")
+    .attr("class", "scatter-svg")
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .attr("preserveAspectRatio", "xMidYMid meet");
+
+  const yScale = d3.scaleLinear().domain([0, maxYield]).range([PAD.top + plotH, PAD.top]);
+  const rScale = (tvl) => minR + (Math.sqrt(tvl) / Math.sqrt(maxTvl)) * (maxR - minR);
+  const zoneW = plotW / 4;
+  const tierX = (tier) => PAD.left + zoneW * (tier - 1) + zoneW / 2;
+
+  // horizontal grid
+  const yTicks = d3.range(0, maxYield, maxYield / 4).concat(maxYield);
+  svg.selectAll(".grid-line")
+    .data(yTicks)
+    .join("line")
+    .attr("x1", PAD.left).attr("x2", W - PAD.right)
+    .attr("y1", (d) => yScale(d)).attr("y2", (d) => yScale(d))
+    .attr("stroke", gridColor).attr("stroke-width", 1);
+
+  // vertical tier dividers
+  for (let t = 1; t < 4; t++) {
+    svg.append("line")
+      .attr("x1", PAD.left + zoneW * t).attr("x2", PAD.left + zoneW * t)
+      .attr("y1", PAD.top).attr("y2", PAD.top + plotH)
+      .attr("stroke", gridColor).attr("stroke-dasharray", "4,4");
+  }
+
+  // y-axis labels
+  svg.selectAll(".y-label")
+    .data(yTicks)
+    .join("text")
+    .attr("x", PAD.left - 8).attr("y", (d) => yScale(d) + 4)
+    .attr("text-anchor", "end")
+    .attr("fill", textColor).attr("font-size", 11).attr("font-family", "Inter, sans-serif")
+    .text((d) => d.toFixed(1) + "%");
+
+  // y-axis title
+  svg.append("text")
+    .attr("transform", `translate(14, ${PAD.top + plotH / 2}) rotate(-90)`)
+    .attr("text-anchor", "middle")
+    .attr("fill", axisColor).attr("font-size", 10)
+    .attr("font-family", "Sora, sans-serif").attr("font-weight", 600)
+    .text("YIELD (apyBase)");
+
+  // tier zone labels
+  const tierLabels = [
+    { tier: 1, line1: "Tier 1", line2: "High trust" },
+    { tier: 2, line1: "Tier 2", line2: "Moderate" },
+    { tier: 3, line1: "Tier 3", line2: "Low trust" },
+    { tier: 4, line1: "Tier 4", line2: "Mislabeled" },
+  ];
+  tierLabels.forEach((t) => {
+    const cx = tierX(t.tier);
+    svg.append("text").attr("x", cx).attr("y", H - 24).attr("text-anchor", "middle")
+      .attr("fill", axisColor).attr("font-size", 10)
+      .attr("font-family", "Sora, sans-serif").attr("font-weight", 600)
+      .text(t.line1);
+    svg.append("text").attr("x", cx).attr("y", H - 10).attr("text-anchor", "middle")
+      .attr("fill", textColor).attr("font-size", 9).attr("font-family", "Inter, sans-serif")
+      .text(t.line2);
+  });
+
+  // seeded jitter so dots don't jump on re-render
+  const jitterSeed = {};
+  funds.forEach((f, i) => { jitterSeed[f.slug] = ((i * 2654435761) % 1000) / 1000 - 0.5; });
+
+  // dots
+  const tooltip = $(".scatter-tooltip");
+  const dots = svg.selectAll(".dot")
+    .data(funds)
+    .join("g")
+    .attr("class", "dot")
+    .attr("transform", (f) => {
+      const jitter = jitterSeed[f.slug] * zoneW * 0.5;
+      const x = tierX(f.trust_tier ?? 4) + jitter;
+      const y = yScale(f.apyBase);
+      return `translate(${x},${y})`;
+    });
+
+  dots.append("circle")
+    .attr("r", (f) => rScale(f.tvl))
+    .attr("fill", (f) => (BACKING_COLORS[f.backing_type] || BACKING_COLORS["private-credit"]).fill)
+    .attr("stroke", (f) => (BACKING_COLORS[f.backing_type] || BACKING_COLORS["private-credit"]).stroke)
+    .attr("stroke-width", 1.5)
+    .style("cursor", "pointer");
+
+  // mislabel markers
+  dots.filter((f) => f.mislabel)
+    .append("text")
+    .attr("y", (f) => -rScale(f.tvl) - 5)
+    .attr("text-anchor", "middle")
+    .attr("fill", "#EF4444").attr("font-size", 10)
+    .attr("font-family", "Sora, sans-serif").attr("font-weight", 700)
+    .text("NOT RWA");
+
+  // tooltip events
+  dots.on("mouseenter", function (event, f) {
+    const mislabelLine = f.mislabel ? `<div class="tt-mislabel">⚠ NOT AN RWA</div>` : "";
+    tooltip.innerHTML =
+      `<div class="tt-name">${esc(f.name)}</div>${mislabelLine}` +
+      `<div class="tt-row">${esc(f.issuer)} · Tier ${f.trust_tier}</div>` +
+      `<div class="tt-row">${fmtPct(f.apyBase)} · ${fmtTvl(f.tvl)}</div>`;
+    tooltip.classList.add("visible");
+  })
+  .on("mousemove", function (event) {
+    const wrap = $(".scatter-wrap").getBoundingClientRect();
+    let left = event.clientX - wrap.left + 14;
+    let top = event.clientY - wrap.top - 20;
+    // keep tooltip inside the panel
+    const tw = tooltip.offsetWidth;
+    const th = tooltip.offsetHeight;
+    if (left + tw > wrap.width - 8) left = event.clientX - wrap.left - tw - 14;
+    if (top + th > wrap.height - 8) top = wrap.height - th - 8;
+    if (top < 4) top = 4;
+    tooltip.style.left = left + "px";
+    tooltip.style.top = top + "px";
+  })
+  .on("mouseleave", () => { tooltip.classList.remove("visible"); });
+}
+
+// ─── Footer ────────────────────────────────────────────────────────────────
+
+function renderFooter() {
+  const d = state.data;
+  const when = new Date(d.generatedAt);
+  const ageH = Math.round((Date.now() - when) / 3.6e6);
+  const s = d.stats;
+  $("#foot").innerHTML = `
+    ${s.mainStageCount} main-stage · ${s.secondaryCount} secondary · ${s.unclassifiedCount} unclassified ·
+    data ${ageH}h old (${when.toISOString().slice(0, 16).replace("T", " ")} UTC) ·
+    source <a href="https://defillama.com">DefiLlama</a> ·
+    <a href="./data/latest.json">raw JSON</a> ·
+    <a href="methodology.html">methodology</a>
+    <div style="margin-top:6px;color:var(--tertiary)">Classification is editorial opinion, not financial advice.</div>`;
+}
+
+// ─── Theme toggle ──────────────────────────────────────────────────────────
+
+$("#theme").addEventListener("click", () => {
+  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem("theme", next); } catch {}
+  if (state.data) renderScatter();
+});
+
+window.addEventListener("resize", () => { if (state.data) renderScatter(); });
+
+load();

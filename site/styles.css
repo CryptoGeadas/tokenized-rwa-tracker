@@ -1,0 +1,60 @@
+/* RWA Tracker — app-specific styles. Uses BG brand tokens (brand.css). */
+
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+
+/* top bar */
+.top { display: flex; align-items: center; justify-content: space-between; padding-top: 24px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand .mark { display: block; }
+.wordmark { font-family: var(--display); font-weight: 700; font-size: 17px; letter-spacing: -0.01em; }
+.topnav { display: flex; align-items: center; gap: 16px; }
+#theme .theme-dark, #theme .theme-light { font-size: 14px; line-height: 1; }
+:root[data-theme="dark"] #theme .theme-light { display: none; }
+:root:not([data-theme="dark"]) #theme .theme-dark { display: none; }
+
+/* hero */
+.hero { padding-top: 28px; }
+.hero-line { font-size: 34px; line-height: 1.15; max-width: 760px; color: var(--text); }
+.sub { margin: 12px 0 0; color: var(--muted); max-width: 720px; font-size: 15px; }
+.sub strong { color: var(--text); font-weight: 600; }
+
+/* section heads */
+.section-head { display: flex; align-items: baseline; gap: 12px; margin: 36px 0 14px; }
+.section-head h2 { font-size: 18px; }
+
+/* scatter */
+.scatter-wrap { position: relative; padding: 16px; overflow: hidden; }
+.scatter-svg { width: 100%; display: block; }
+.scatter-legend {
+  display: flex; gap: 20px; flex-wrap: wrap; margin-top: 10px;
+  align-items: center; font-size: 13px; color: var(--muted);
+}
+.dot-legend {
+  display: inline-block; width: 10px; height: 10px;
+  border-radius: 50%; margin-right: 4px; vertical-align: middle;
+}
+.dot-legend.gov { background: var(--accent); }
+.dot-legend.credit { background: var(--warning); }
+.dot-legend.synth { background: var(--error); }
+.legend-note { color: var(--tertiary); font-size: 12px; margin-left: auto; }
+
+.scatter-tooltip {
+  position: absolute; pointer-events: none; z-index: 20;
+  background: var(--elevated); border: 1px solid var(--border); border-radius: var(--r-btn);
+  padding: 8px 12px; font: 400 13px var(--body); color: var(--text);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3); white-space: nowrap;
+  opacity: 0; transition: opacity 120ms ease;
+}
+.scatter-tooltip.visible { opacity: 1; }
+.scatter-tooltip .tt-name { font-weight: 600; }
+.scatter-tooltip .tt-mislabel { color: var(--error); font-weight: 700; font-size: 11px; }
+.scatter-tooltip .tt-row { color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+/* footer */
+footer { margin: 44px 0 64px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--border); padding-top: 18px; }
+
+@media (max-width: 760px) {
+  .hero-line { font-size: 26px; }
+  .scatter-legend { flex-direction: column; gap: 6px; }
+  .legend-note { margin-left: 0; }
+}
