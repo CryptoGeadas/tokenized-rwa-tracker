@@ -50,6 +50,56 @@
 .scatter-tooltip .tt-mislabel { color: var(--error); font-weight: 700; font-size: 11px; }
 .scatter-tooltip .tt-row { color: var(--muted); font-size: 12px; margin-top: 2px; }
 
+/* trust filter table */
+.tbl { width: 100%; border-collapse: separate; border-spacing: 0; }
+.tbl th {
+  font: 600 10px var(--display); text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--muted); padding: 8px 12px; text-align: left; cursor: pointer;
+  user-select: none; transition: color var(--ease); border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; background: var(--bg); z-index: 2;
+}
+.tbl th:hover { color: var(--text); }
+.tbl th.active { color: var(--accent); }
+.tbl th.num { text-align: right; }
+.caret { font-size: 8px; margin-left: 3px; }
+.tbl td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: middle; }
+.tbl tbody tr { transition: background var(--ease); }
+.tbl tbody tr:hover { background: var(--accent-tint); }
+.tbl .num { text-align: right; font-variant-numeric: tabular-nums; }
+.tbl .name-cell { font-weight: 600; }
+.tbl .issuer-cell { color: var(--muted); font-size: 13px; }
+.tbl .yield-cell { font-weight: 600; font-variant-numeric: tabular-nums; }
+.tbl .tvl-cell { color: var(--muted); font-variant-numeric: tabular-nums; }
+.tbl .chains-cell { color: var(--tertiary); font-size: 12px; }
+
+/* backing type badges */
+.bt { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; font-family: var(--display); }
+.bt-gov { color: var(--accent); }
+.bt-credit { color: var(--warning); }
+.bt-synth { color: var(--error); }
+
+/* trust tier badges */
+.tier {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 22px; border-radius: var(--r-badge);
+  font: 700 12px var(--display);
+}
+.tier-1 { background: color-mix(in srgb, var(--success) 14%, transparent); color: var(--success); }
+.tier-2 { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+.tier-3 { background: color-mix(in srgb, var(--warning) 14%, transparent); color: var(--warning); }
+.tier-4 { background: color-mix(in srgb, var(--error) 20%, transparent); color: var(--error); }
+
+/* mislabel badge */
+.mislabel-badge {
+  display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px;
+  border-radius: var(--r-badge); font: 700 10px var(--display); text-transform: uppercase;
+  letter-spacing: 0.03em; color: var(--error);
+  background: color-mix(in srgb, var(--error) 14%, transparent);
+}
+
+/* one-liner column */
+.oneliner { color: var(--muted); font-size: 13px; max-width: 320px; line-height: 1.4; }
+
 /* footer */
 footer { margin: 44px 0 64px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--border); padding-top: 18px; }
 
@@ -57,4 +107,5 @@ footer { margin: 44px 0 64px; color: var(--muted); font-size: 12px; border-top: 
   .hero-line { font-size: 26px; }
   .scatter-legend { flex-direction: column; gap: 6px; }
   .legend-note { margin-left: 0; }
+  .tbl .oneliner, .tbl .chains-cell, .tbl .issuer-cell { display: none; }
 }

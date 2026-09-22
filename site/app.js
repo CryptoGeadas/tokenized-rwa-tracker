@@ -11,7 +11,7 @@ const BACKING_COLORS = {
 };
 
 const $ = (s) => document.querySelector(s);
-const state = { data: null };
+const state = { data: null, sortKey: "trust_tier", sortDir: "asc" };
 
 // ─── Data loading ──────────────────────────────────────────────────────────
 
@@ -24,6 +24,7 @@ async function load() {
     return;
   }
   renderScatter();
+  renderTable();
   renderFooter();
 }
 
@@ -173,6 +174,72 @@ function renderScatter() {
   .on("mouseleave", () => { tooltip.classList.remove("visible"); });
 }
 
+// ─── Trust filter table ────────────────────────────────────────────────────
+
+const COLS = [
+  { key: "name", label: "Fund" },
+  { key: "issuer", label: "Issuer", cls: "issuer-cell" },
+  { key: "backing_type", label: "Backing" },
+  { key: "apyBase", label: "Yield", cls: "num" },
+  { key: "tvl", label: "TVL", cls: "num" },
+  { key: "chains", label: "Chains", cls: "chains-cell" },
+  { key: "trust_tier", label: "Tier", cls: "num" },
+  { key: "one_liner", label: "What you're actually holding" },
+];
+
+function sortVal(f, key) {
+  if (key === "name") return (f.name || "").toLowerCase();
+  if (key === "issuer") return (f.issuer || "").toLowerCase();
+  if (key === "backing_type") return f.backing_type || "";
+  if (key === "chains") return (f.chains || []).length;
+  if (key === "one_liner") return (f.one_liner || "").toLowerCase();
+  return f[key] ?? -Infinity;
+}
+
+function backingBadge(type) {
+  const c = BACKING_COLORS[type];
+  if (!c) return esc(type);
+  return `<span class="bt ${c.label === "Gov debt" ? "bt-gov" : c.label === "Credit" ? "bt-credit" : "bt-synth"}">${esc(c.label)}</span>`;
+}
+
+function tierBadge(tier) {
+  if (tier == null) return "—";
+  return `<span class="tier tier-${tier}">${tier}</span>`;
+}
+
+function renderTable() {
+  const funds = state.data.mainStage.slice();
+  const dir = state.sortDir === "asc" ? 1 : -1;
+  funds.sort((a, b) => {
+    const va = sortVal(a, state.sortKey), vb = sortVal(b, state.sortKey);
+    if (va < vb) return -dir;
+    if (va > vb) return dir;
+    return (b.tvl || 0) - (a.tvl || 0);
+  });
+
+  const ths = COLS.map((c) => {
+    const active = state.sortKey === c.key;
+    const caret = active ? (state.sortDir === "asc" ? "&#9650;" : "&#9660;") : "";
+    return `<th class="${c.cls || ""} ${active ? "active" : ""}" data-sort="${c.key}">${c.label}<span class="caret">${caret}</span></th>`;
+  }).join("");
+
+  const rows = funds.map((f) => {
+    const mislabelBadge = f.mislabel ? ` <span class="mislabel-badge">⚠ Not RWA</span>` : "";
+    return `<tr>
+      <td class="name-cell">${esc(f.name)}${mislabelBadge}</td>
+      <td class="issuer-cell">${esc(f.issuer)}</td>
+      <td>${backingBadge(f.backing_type)}</td>
+      <td class="num yield-cell">${fmtPct(f.apyBase)}</td>
+      <td class="num tvl-cell">${fmtTvl(f.tvl)}</td>
+      <td class="chains-cell">${(f.chains || []).length}</td>
+      <td class="num">${tierBadge(f.trust_tier)}</td>
+      <td class="oneliner">${esc(f.one_liner)}</td>
+    </tr>`;
+  }).join("");
+
+  $("#table-container").innerHTML = `<table class="tbl"><thead><tr>${ths}</tr></thead><tbody>${rows}</tbody></table>`;
+}
+
 // ─── Footer ────────────────────────────────────────────────────────────────
 
 function renderFooter() {
@@ -188,6 +255,18 @@ function renderFooter() {
     <a href="methodology.html">methodology</a>
     <div style="margin-top:6px;color:var(--tertiary)">Classification is editorial opinion, not financial advice.</div>`;
 }
+
+// ─── Event handlers ───────────────────────────────────────────────────────
+
+document.addEventListener("click", (e) => {
+  const th = e.target.closest(".tbl th[data-sort]");
+  if (th) {
+    const key = th.dataset.sort;
+    if (state.sortKey === key) state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
+    else { state.sortKey = key; state.sortDir = "asc"; }
+    renderTable();
+  }
+});
 
 // ─── Theme toggle ──────────────────────────────────────────────────────────
 
