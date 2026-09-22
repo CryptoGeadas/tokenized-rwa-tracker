@@ -25,6 +25,7 @@ async function load() {
   }
   renderScatter();
   renderTable();
+  renderUnclassified();
   renderFooter();
 }
 
@@ -238,6 +239,42 @@ function renderTable() {
   }).join("");
 
   $("#table-container").innerHTML = `<table class="tbl"><thead><tr>${ths}</tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+// ─── Unclassified section ──────────────────────────────────────────────────
+
+const UNCL_VISIBLE = 15;
+
+function renderUnclassified() {
+  const items = state.data.unclassified || [];
+  const section = $("#unclassified-section");
+  if (!items.length) { section.style.display = "none"; return; }
+  section.style.display = "block";
+
+  state.unclExpanded = false;
+
+  const renderRows = (list) => list.map((u) =>
+    `<div class="uncl-row"><span class="uncl-name">${esc(u.name)}</span><span class="uncl-chains">${(u.chains || []).join(", ")}</span><span class="uncl-tvl">${fmtTvl(u.tvl)}</span></div>`
+  ).join("");
+
+  const listEl = $("#unclassified-list");
+  const toggleBtn = $("#uncl-toggle");
+
+  const update = () => {
+    const visible = state.unclExpanded ? items : items.slice(0, UNCL_VISIBLE);
+    listEl.innerHTML = renderRows(visible);
+    if (items.length > UNCL_VISIBLE) {
+      toggleBtn.style.display = "inline-flex";
+      toggleBtn.textContent = state.unclExpanded
+        ? "Show less"
+        : `Show ${items.length - UNCL_VISIBLE} more`;
+    } else {
+      toggleBtn.style.display = "none";
+    }
+  };
+
+  toggleBtn.onclick = () => { state.unclExpanded = !state.unclExpanded; update(); };
+  update();
 }
 
 // ─── Footer ────────────────────────────────────────────────────────────────

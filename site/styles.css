@@ -100,6 +100,25 @@
 /* one-liner column */
 .oneliner { color: var(--muted); font-size: 13px; max-width: 320px; line-height: 1.4; }
 
+/* unclassified callout */
+.callout-box {
+  background: color-mix(in srgb, var(--warning) 8%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--warning) 30%, var(--border));
+  border-radius: var(--r-panel); padding: 20px; margin: 36px 0;
+}
+.callout-head { display: flex; align-items: center; gap: 8px; }
+.callout-icon { font-size: 18px; color: var(--warning); }
+.callout-head h2 { font-size: 16px; color: var(--warning); }
+.callout-sub { color: var(--muted); font-size: 13px; margin: 6px 0 14px; }
+.uncl-row {
+  display: flex; align-items: center; gap: 16px; padding: 8px 0;
+  border-bottom: 1px solid var(--border); font-size: 14px;
+}
+.uncl-row:last-child { border-bottom: 0; }
+.uncl-name { font-weight: 600; flex: 1; }
+.uncl-chains { color: var(--tertiary); font-size: 12px; }
+.uncl-tvl { color: var(--muted); font-variant-numeric: tabular-nums; }
+
 /* footer */
 footer { margin: 44px 0 64px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--border); padding-top: 18px; }
 
