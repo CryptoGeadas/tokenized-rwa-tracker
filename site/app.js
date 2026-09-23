@@ -14,7 +14,7 @@ const BACKING_COLORS = {
 };
 
 const $ = (s) => document.querySelector(s);
-const state = { data: null, sortKey: "trust_tier", sortDir: "asc" };
+const state = { data: null, sortKey: "trust_tier", sortDir: "asc", expandedSlug: null };
 
 // ─── Data loading ──────────────────────────────────────────────────────────
 
@@ -230,7 +230,8 @@ function renderTable() {
 
   const rows = funds.map((f) => {
     const mislabelBadge = f.mislabel ? ` <span class="mislabel-badge">⚠ Not RWA</span>` : "";
-    return `<tr>
+    const isOpen = state.expandedSlug === f.slug;
+    const row = `<tr data-slug="${esc(f.slug)}" class="${isOpen ? "expanded" : ""}">
       <td class="name-cell">${esc(f.name)}${mislabelBadge}</td>
       <td class="issuer-cell">${esc(f.issuer)}</td>
       <td>${backingBadge(f.backing_type)}</td>
@@ -240,6 +241,7 @@ function renderTable() {
       <td class="num">${tierBadge(f.trust_tier)}</td>
       <td class="oneliner">${esc(f.one_liner)}</td>
     </tr>`;
+    return isOpen ? row + renderDetailCard(f) : row;
   }).join("");
 
   $("#table-container").innerHTML = `<table class="tbl"><thead><tr>${ths}</tr></thead><tbody>${rows}</tbody></table>`;
@@ -279,6 +281,68 @@ function renderUnclassified() {
 
   toggleBtn.onclick = () => { state.unclExpanded = !state.unclExpanded; update(); };
   update();
+}
+
+// ─── Detail card (drill-down) ─────────────────────────────────────────────
+
+const WRAPPER_LABELS = {
+  "regulated-fund": "Regulated fund",
+  "on-chain-pool": "On-chain pool",
+  protocol: "Protocol",
+  none: "None",
+};
+
+const REDEMPTION_LABELS = {
+  daily: "Daily",
+  instant: "Instant",
+  "epoch-based": "Epoch-based",
+  variable: "Variable",
+  "secondary-market": "Secondary market",
+  "market-hours": "Market hours",
+};
+
+function renderDetailCard(f) {
+  const tierHtml = f.trust_tier != null
+    ? `${tierBadge(f.trust_tier)} <span style="margin-left:6px;font-size:13px;color:var(--muted)">Tier ${f.trust_tier}</span>`
+    : `<span style="font-size:13px;color:var(--muted)">Not rated</span>`;
+  const overrideHtml = f.tier_overrides
+    ? `<div class="override-note">${esc(f.tier_overrides)}</div>`
+    : "";
+  const mislabelHtml = f.mislabel
+    ? `<div class="detail-item"><div class="dk">Mislabel</div><div class="dv"><span class="mislabel-badge">&#9888; Not RWA</span></div></div>`
+    : "";
+
+  return `<tr class="detail-row"><td colspan="${COLS.length}">
+    <div class="detail-card">
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="dk">Trust Tier</div>
+          <div class="dv">${tierHtml}${overrideHtml}</div>
+        </div>
+        <div class="detail-item">
+          <div class="dk">Wrapper</div>
+          <div class="dv">${esc(WRAPPER_LABELS[f.wrapper] || f.wrapper || "—")}</div>
+        </div>
+        <div class="detail-item">
+          <div class="dk">Jurisdiction</div>
+          <div class="dv">${esc(f.jurisdiction || "—")}</div>
+        </div>
+        <div class="detail-item">
+          <div class="dk">Redemption</div>
+          <div class="dv">${esc(REDEMPTION_LABELS[f.redemption] || f.redemption || "—")}</div>
+        </div>
+        <div class="detail-item">
+          <div class="dk">Chains</div>
+          <div class="dv">${(f.chains || []).map((c) => esc(c)).join(", ") || "—"}</div>
+        </div>
+        ${mislabelHtml}
+        <div class="detail-item full">
+          <div class="dk">What you're actually holding</div>
+          <div class="dv editorial">${esc(f.one_liner || "—")}</div>
+        </div>
+      </div>
+    </div>
+  </td></tr>`;
 }
 
 // ─── Secondary lane tables ────────────────────────────────────────────────
@@ -348,6 +412,13 @@ document.addEventListener("click", (e) => {
     const key = th.dataset.sort;
     if (state.sortKey === key) state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
     else { state.sortKey = key; state.sortDir = "asc"; }
+    renderTable();
+    return;
+  }
+  const tr = e.target.closest(".tbl tbody tr[data-slug]");
+  if (tr) {
+    const slug = tr.dataset.slug;
+    state.expandedSlug = state.expandedSlug === slug ? null : slug;
     renderTable();
   }
 });

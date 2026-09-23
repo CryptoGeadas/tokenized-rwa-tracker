@@ -100,6 +100,19 @@
   background: color-mix(in srgb, var(--error) 14%, transparent);
 }
 
+/* detail card (drill-down) */
+.detail-row td { padding: 0; border-bottom: 1px solid var(--accent); }
+.detail-card { background: var(--elevated); padding: 20px; border-left: 3px solid var(--accent); }
+.detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.detail-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-badge); padding: 10px 12px; }
+.detail-item.full { grid-column: 1 / -1; }
+.dk { font: 600 10px var(--display); text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px; }
+.dv { font-size: 14px; color: var(--text); line-height: 1.5; }
+.editorial { font-family: var(--accent-face); font-size: 16px; line-height: 1.5; font-style: italic; color: var(--text); }
+.override-note { font-size: 12px; color: var(--warning); margin-top: 6px; font-style: italic; }
+.tbl tbody tr[data-slug] { cursor: pointer; }
+.tbl tbody tr.expanded { background: var(--accent-tint); }
+
 /* one-liner column */
 .oneliner { color: var(--muted); font-size: 13px; max-width: 320px; line-height: 1.4; }
 
@@ -156,5 +169,6 @@ footer { margin: 44px 0 64px; color: var(--muted); font-size: 12px; border-top: 
   .scatter-legend { flex-direction: column; gap: 6px; }
   .legend-note { margin-left: 0; }
   .tbl .oneliner, .tbl .chains-cell, .tbl .issuer-cell { display: none; }
+  .detail-grid { grid-template-columns: 1fr; }
   .lane-tbl .oneliner, .lane-tbl .chains-cell { display: none; }
 }
