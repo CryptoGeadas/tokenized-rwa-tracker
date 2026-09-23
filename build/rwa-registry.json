@@ -77,7 +77,7 @@
   },
 
   "centrifuge": {
-    "pool_project": "centrifuge-protocol",
+    "pool_projects": ["centrifuge-protocol"],
     "name": "Centrifuge",
     "issuer": "Centrifuge",
     "backing_type": "private-credit",
@@ -154,7 +154,7 @@
   },
 
   "ethena": {
-    "pool_project": "ethena-usde",
+    "pool_projects": ["ethena-usde"],
     "name": "Ethena USDe / sUSDe",
     "issuer": "Ethena Labs",
     "backing_type": "basis-trade/synthetic",

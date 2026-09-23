@@ -1,4 +1,4 @@
-import { writeFile, mkdir } from "node:fs/promises";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { runPipeline } from "./pipeline.mjs";
@@ -10,18 +10,24 @@ const OUT = join(SITE, "data", "latest.json");
 const POOLS_FEED = "https://yields.llama.fi/pools";
 const PROTOCOLS_FEED = "https://api.llama.fi/protocols";
 
+async function fetchJSON(url) {
+  console.log("fetching", url, "…");
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`${url} → ${res.status}`);
+  return res.json();
+}
+
 async function main() {
-  console.log("fetching", PROTOCOLS_FEED, "…");
-  const protocols = await (await fetch(PROTOCOLS_FEED)).json();
-  console.log(`  ${protocols.length} protocols`);
+  const [protocols, { data: pools }, registry] = await Promise.all([
+    fetchJSON(PROTOCOLS_FEED),
+    fetchJSON(POOLS_FEED),
+    readFile(join(HERE, "rwa-registry.json"), "utf8").then(JSON.parse),
+  ]);
+  delete registry._comment;
 
-  console.log("fetching", POOLS_FEED, "…");
-  const res = await fetch(POOLS_FEED);
-  if (!res.ok) throw new Error(`feed ${res.status}`);
-  const { data: pools } = await res.json();
-  console.log(`  ${pools.length} pools`);
+  console.log(`  ${protocols.length} protocols · ${pools.length} pools`);
 
-  const result = await runPipeline(pools, protocols);
+  const result = runPipeline(registry, pools, protocols);
 
   const payload = {
     generatedAt: new Date().toISOString(),

@@ -1,8 +1,3 @@
-import { readFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
-
-const HERE = dirname(fileURLToPath(import.meta.url));
 const TVL_FLOOR = 5_000_000;
 
 function bestPool(pools) {
@@ -12,15 +7,10 @@ function bestPool(pools) {
   return source.sort((a, b) => (b.tvlUsd || 0) - (a.tvlUsd || 0))[0];
 }
 
-export async function runPipeline(allPools, protocols) {
-  const registry = JSON.parse(await readFile(join(HERE, "rwa-registry.json"), "utf8"));
-  delete registry._comment;
-
+export function runPipeline(registry, allPools, protocols) {
   const poolSlugsFor = (slug) => {
     const e = registry[slug];
-    if (!e) return [slug];
-    if (e.pool_projects) return e.pool_projects;
-    if (e.pool_project) return [e.pool_project];
+    if (e?.pool_projects) return e.pool_projects;
     return [slug];
   };
 
