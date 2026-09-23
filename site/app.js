@@ -5,9 +5,12 @@ const fmtTvl = (n) =>
   n >= 1e9 ? `$${(n / 1e9).toFixed(2)}B` : n >= 1e6 ? `$${(n / 1e6).toFixed(1)}M` : `$${Math.round(n / 1e3)}K`;
 
 const BACKING_COLORS = {
-  "government-debt":      { fill: "rgba(59,130,246,0.7)",  stroke: "#3B82F6", label: "Gov debt" },
-  "private-credit":       { fill: "rgba(245,158,11,0.7)",  stroke: "#F59E0B", label: "Credit" },
-  "basis-trade/synthetic": { fill: "rgba(239,68,68,0.7)",  stroke: "#EF4444", label: "Synthetic" },
+  "government-debt":       { fill: "rgba(59,130,246,0.7)",  stroke: "#3B82F6", label: "Gov debt",    badge: "bt-gov" },
+  "private-credit":        { fill: "rgba(245,158,11,0.7)",  stroke: "#F59E0B", label: "Credit",      badge: "bt-credit" },
+  "basis-trade/synthetic": { fill: "rgba(239,68,68,0.7)",   stroke: "#EF4444", label: "Synthetic",   badge: "bt-synth" },
+  "real-estate":           { fill: "rgba(16,185,129,0.7)",  stroke: "#10B981", label: "Real estate", badge: "bt-realestate" },
+  "commodity":             { fill: "rgba(139,92,246,0.7)",   stroke: "#8B5CF6", label: "Commodity",   badge: "bt-commodity" },
+  "equity":                { fill: "rgba(59,130,246,0.7)",   stroke: "#3B82F6", label: "Equity",      badge: "bt-equity" },
 };
 
 const $ = (s) => document.querySelector(s);
@@ -26,6 +29,7 @@ async function load() {
   renderScatter();
   renderTable();
   renderUnclassified();
+  renderSecondary();
   renderFooter();
 }
 
@@ -200,7 +204,7 @@ function sortVal(f, key) {
 function backingBadge(type) {
   const c = BACKING_COLORS[type];
   if (!c) return esc(type);
-  return `<span class="bt ${c.label === "Gov debt" ? "bt-gov" : c.label === "Credit" ? "bt-credit" : "bt-synth"}">${esc(c.label)}</span>`;
+  return `<span class="bt ${c.badge}">${esc(c.label)}</span>`;
 }
 
 function tierBadge(tier) {
@@ -275,6 +279,49 @@ function renderUnclassified() {
 
   toggleBtn.onclick = () => { state.unclExpanded = !state.unclExpanded; update(); };
   update();
+}
+
+// ─── Secondary lane tables ────────────────────────────────────────────────
+
+const LANE_LABELS = { "real-estate": "Real Estate", commodity: "Commodity", equity: "Equity" };
+const LANE_COLS = [
+  { key: "name", label: "Fund" },
+  { key: "issuer", label: "Issuer" },
+  { key: "backing_type", label: "Backing" },
+  { key: "tvl", label: "TVL", cls: "num" },
+  { key: "chains", label: "Chains", cls: "chains-cell" },
+  { key: "one_liner", label: "One-liner" },
+];
+
+function renderSecondary() {
+  const lanes = state.data.secondaryLanes || {};
+  const section = $("#secondary-section");
+  const container = $("#secondary-lanes");
+
+  const laneKeys = Object.keys(lanes).filter((k) => lanes[k].length > 0);
+  if (!laneKeys.length) { section.style.display = "none"; return; }
+  section.style.display = "block";
+
+  container.innerHTML = laneKeys.map((key) => {
+    const funds = lanes[key].slice().sort((a, b) => (b.tvl || 0) - (a.tvl || 0)).slice(0, 10);
+    const ths = LANE_COLS.map((c) =>
+      `<th class="${c.cls || ""}">${c.label}</th>`
+    ).join("");
+    const rows = funds.map((f) =>
+      `<tr>
+        <td class="name-cell">${esc(f.name)}</td>
+        <td>${esc(f.issuer)}</td>
+        <td>${backingBadge(f.backing_type)}</td>
+        <td class="num">${fmtTvl(f.tvl)}</td>
+        <td class="chains-cell">${(f.chains || []).join(", ")}</td>
+        <td class="oneliner">${esc(f.one_liner)}</td>
+      </tr>`
+    ).join("");
+    return `<div class="lane-block">
+      <div class="lane-title">${LANE_LABELS[key] || key} <span class="lane-count">${funds.length} fund${funds.length !== 1 ? "s" : ""}</span></div>
+      <table class="lane-tbl"><thead><tr>${ths}</tr></thead><tbody>${rows}</tbody></table>
+    </div>`;
+  }).join("");
 }
 
 // ─── Footer ────────────────────────────────────────────────────────────────

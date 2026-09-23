@@ -77,6 +77,9 @@
 .bt-gov { color: var(--accent); }
 .bt-credit { color: var(--warning); }
 .bt-synth { color: var(--error); }
+.bt-realestate { color: var(--success); }
+.bt-commodity { color: var(--info); }
+.bt-equity { color: var(--accent); }
 
 /* trust tier badges */
 .tier {
@@ -119,6 +122,32 @@
 .uncl-chains { color: var(--tertiary); font-size: 12px; }
 .uncl-tvl { color: var(--muted); font-variant-numeric: tabular-nums; }
 
+/* secondary lanes */
+.section-head-sm h2 { font-size: 16px; }
+.lane-block { margin-bottom: 28px; }
+.lane-title {
+  font: 600 11px var(--display); text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+}
+.lane-count { font-size: 11px; color: var(--tertiary); font-weight: 400; }
+.lane-tbl { width: 100%; border-collapse: separate; border-spacing: 0; }
+.lane-tbl th {
+  font: 600 10px var(--display); text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--tertiary); padding: 6px 10px; text-align: left;
+  border-bottom: 1px solid var(--border); background: var(--bg);
+}
+.lane-tbl th.num { text-align: right; }
+.lane-tbl td {
+  padding: 8px 10px; border-bottom: 1px solid var(--border);
+  font-size: 13px; vertical-align: middle; color: var(--muted);
+}
+.lane-tbl tbody tr { transition: background var(--ease); }
+.lane-tbl tbody tr:hover { background: var(--accent-tint); }
+.lane-tbl .name-cell { font-weight: 600; color: var(--text); }
+.lane-tbl .num { text-align: right; font-variant-numeric: tabular-nums; }
+.lane-tbl .oneliner { font-size: 12px; max-width: 280px; line-height: 1.4; }
+.lane-tbl .chains-cell { font-size: 11px; color: var(--tertiary); }
+
 /* footer */
 footer { margin: 44px 0 64px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--border); padding-top: 18px; }
 
@@ -127,4 +156,5 @@ footer { margin: 44px 0 64px; color: var(--muted); font-size: 12px; border-top: 
   .scatter-legend { flex-direction: column; gap: 6px; }
   .legend-note { margin-left: 0; }
   .tbl .oneliner, .tbl .chains-cell, .tbl .issuer-cell { display: none; }
+  .lane-tbl .oneliner, .lane-tbl .chains-cell { display: none; }
 }
