@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Methodology — RWA Tracker</title>
+  <meta name="description" content="How the RWA Tracker trust tiers, backing types, and mislabel flags work. Data sources, editorial disclosure, and classification criteria.">
+  <script>document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark";</script>
+  <link rel="icon" href="logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500;600&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="brand.css">
+  <style>
+    .wrap { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+
+    .top { display: flex; align-items: center; justify-content: space-between; padding-top: 24px; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand .mark { display: block; }
+    .wordmark { font-family: var(--display); font-weight: 700; font-size: 17px; letter-spacing: -0.01em; }
+    .topnav { display: flex; align-items: center; gap: 16px; }
+    .back-link { font-family: var(--display); font-size: 13px; font-weight: 600; }
+    #theme .theme-dark, #theme .theme-light { font-size: 14px; line-height: 1; }
+    :root[data-theme="dark"] #theme .theme-light { display: none; }
+    :root:not([data-theme="dark"]) #theme .theme-dark { display: none; }
+
+    .hero { padding: 28px 0 8px; }
+    .hero-line { font-size: 28px; line-height: 1.2; color: var(--text); }
+    .hero-sub { margin: 10px 0 0; color: var(--muted); font-size: 15px; line-height: 1.55; }
+
+    .meth-section { margin: 36px 0 0; }
+    .meth-section h2 { font-size: 18px; margin-bottom: 14px; color: var(--text); }
+    .meth-section h3 { font-size: 15px; margin: 20px 0 8px; color: var(--text); }
+    .meth-section p { color: var(--muted); font-size: 14px; line-height: 1.65; margin: 0 0 12px; }
+    .meth-section ul { color: var(--muted); font-size: 14px; line-height: 1.65; margin: 0 0 12px; padding-left: 20px; }
+    .meth-section li { margin-bottom: 4px; }
+    .meth-section strong { color: var(--text); font-weight: 600; }
+    .meth-section code { font-size: 13px; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; }
+
+    .tier-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
+    .tier-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); padding: 16px; }
+    .tier-card .tier-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .tier-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 30px; height: 24px; border-radius: var(--r-badge);
+      font: 700 13px var(--display);
+    }
+    .tier-badge-1 { background: color-mix(in srgb, var(--success) 14%, transparent); color: var(--success); }
+    .tier-badge-2 { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+    .tier-badge-3 { background: color-mix(in srgb, var(--warning) 14%, transparent); color: var(--warning); }
+    .tier-badge-4 { background: color-mix(in srgb, var(--error) 20%, transparent); color: var(--error); }
+    .tier-card .tier-label { font: 600 14px var(--display); color: var(--text); }
+    .tier-card p { color: var(--muted); font-size: 13px; line-height: 1.55; margin: 0; }
+    .tier-card ul { color: var(--muted); font-size: 13px; line-height: 1.55; margin: 8px 0 0; padding-left: 18px; }
+
+    .backing-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 16px 0; }
+    .backing-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); padding: 16px; display: flex; gap: 14px; align-items: flex-start; }
+    .backing-dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+    .dot-gov { background: var(--accent); }
+    .dot-credit { background: var(--warning); }
+    .dot-synth { background: var(--error); }
+    .backing-card .backing-label { font: 600 14px var(--display); color: var(--text); margin-bottom: 4px; }
+    .backing-card p { color: var(--muted); font-size: 13px; line-height: 1.55; margin: 0; }
+
+    .callout {
+      background: color-mix(in srgb, var(--warning) 8%, var(--surface));
+      border: 1px solid color-mix(in srgb, var(--warning) 30%, var(--border));
+      border-radius: var(--r-panel); padding: 16px 20px; margin: 16px 0;
+    }
+    .callout p { color: var(--muted); font-size: 13px; line-height: 1.55; margin: 0; }
+    .callout strong { color: var(--warning); }
+
+    .disclosure {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-panel); padding: 20px; margin: 16px 0;
+    }
+    .disclosure p { font-family: var(--accent-face); font-size: 16px; line-height: 1.55; font-style: italic; color: var(--text); margin: 0; }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+
+    footer { margin: 44px 0 64px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--border); padding-top: 18px; }
+
+    @media (max-width: 760px) {
+      .hero-line { font-size: 22px; }
+      .tier-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="wrap top">
+    <div class="brand">
+      <img class="mark" src="logo.svg" alt="BG" width="37" height="25">
+      <span class="wordmark">RWA Tracker</span>
+    </div>
+    <nav class="topnav">
+      <a href="index.html" class="back-link">&larr; Back to tracker</a>
+      <button id="theme" class="btn btn-ghost btn-sm" aria-label="Toggle theme">
+        <span class="theme-dark">&#9790;</span><span class="theme-light">&#9728;</span>
+      </button>
+    </nav>
+  </header>
+
+  <section class="wrap hero">
+    <h1 class="serif hero-line">Methodology</h1>
+    <p class="hero-sub">How we classify tokenized real-world assets, what the trust tiers mean, and where the data comes from.</p>
+  </section>
+
+  <div class="wrap">
+
+    <!-- Trust Tier Rubric -->
+    <section class="meth-section">
+      <h2>Trust Tier Rubric</h2>
+      <p>Every main-stage fund is assigned a trust tier from T1 (highest) to T4 (lowest). The tier reflects our editorial assessment of structural risk &mdash; not yield, not TVL, not brand familiarity. Three factors drive the rating:</p>
+      <ul>
+        <li><strong>Wrapper quality</strong> &mdash; Is the fund held in a regulated vehicle (SEC-registered, MiFID, MAS)? Or is it a bare on-chain pool with no legal wrapper?</li>
+        <li><strong>Issuer track record</strong> &mdash; How long has the issuer operated? Have they survived a stress event? Are they backed by institutional capital?</li>
+        <li><strong>Backing transparency</strong> &mdash; Can an investor independently verify what assets back the token? Are there audits, attestations, or on-chain proof-of-reserves?</li>
+      </ul>
+
+      <div class="tier-grid">
+        <div class="tier-card">
+          <div class="tier-head">
+            <span class="tier-badge tier-badge-1">1</span>
+            <span class="tier-label">High Trust</span>
+          </div>
+          <p>Regulated wrapper from a major jurisdiction (US, EU, Singapore). Established institutional issuer with multi-year track record. Transparent backing with regular attestations or on-chain proof.</p>
+          <ul>
+            <li>BlackRock BUIDL, Ondo USDY/OUSG, Hashnote USYC, Invesco USTB</li>
+          </ul>
+        </div>
+
+        <div class="tier-card">
+          <div class="tier-head">
+            <span class="tier-badge tier-badge-2">2</span>
+            <span class="tier-label">Moderate Trust</span>
+          </div>
+          <p>Known issuer with a regulated or semi-regulated wrapper, but in a lesser jurisdiction (BVI, Bermuda) or with a shorter track record. Backing is verifiable but may lack the depth of T1 attestations.</p>
+          <ul>
+            <li>OpenEden TBILL, Maple Finance, Securitize Funds, Usual USD0, Mountain USDM, Midas RWA</li>
+          </ul>
+        </div>
+
+        <div class="tier-card">
+          <div class="tier-head">
+            <span class="tier-badge tier-badge-3">3</span>
+            <span class="tier-label">Low Trust</span>
+          </div>
+          <p>Limited transparency, newer protocol with little track record, or opaque issuer structure. The product may be legitimate but there is not yet enough evidence to rate it higher.</p>
+          <ul>
+            <li>Huma Finance, stUSDT, Re (reUSD)</li>
+          </ul>
+        </div>
+
+        <div class="tier-card">
+          <div class="tier-head">
+            <span class="tier-badge tier-badge-4">4</span>
+            <span class="tier-label">Mislabeled</span>
+          </div>
+          <p>Product appears in RWA listings but is <strong>not actually a real-world asset</strong>. Typically a synthetic yield strategy (basis trades, funding rate arbitrage) marketed under the RWA umbrella.</p>
+          <ul>
+            <li>Ethena USDe/sUSDe, Ethena USDtb</li>
+          </ul>
+        </div>
+      </div>
+
+      <p>Some funds carry a <strong>tier override note</strong> explaining why the assigned tier differs from what a mechanical reading of the criteria would suggest. For example, Maple is tagged as private credit despite DefiLlama categorizing it as &ldquo;Lending&rdquo; &mdash; because its loans go to institutional borrowers (real-world credit), not on-chain collateralized lending.</p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- Backing Type Taxonomy -->
+    <section class="meth-section">
+      <h2>Backing Type Taxonomy</h2>
+      <p>Every fund is classified by what actually backs it &mdash; not by the marketing label. This is the single most important distinction in the tracker, because the backing type determines the risk profile far more than the issuer name or the chain it lives on.</p>
+
+      <div class="backing-grid">
+        <div class="backing-card">
+          <span class="backing-dot dot-gov"></span>
+          <div>
+            <div class="backing-label">Government Debt</div>
+            <p>The token is backed by sovereign bonds, typically short-duration US Treasuries or Euro government debt. This is the lowest-risk backing type: the underlying asset is a government obligation with negligible credit risk. Yield comes from the coupon, not from leverage or DeFi mechanics. The main risks are wrapper quality and redemption friction, not the asset itself.</p>
+          </div>
+        </div>
+
+        <div class="backing-card">
+          <span class="backing-dot dot-credit"></span>
+          <div>
+            <div class="backing-label">Private Credit</div>
+            <p>The token is backed by loans to real-world borrowers &mdash; corporate debt, trade finance, invoices, structured credit, or reinsurance premiums. Higher yield than government debt, but with meaningful counterparty and default risk. The key questions: who are the borrowers, what are the underwriting standards, and what happens in a downturn? Maple&rsquo;s 2022 defaults are a concrete example of this risk materializing.</p>
+          </div>
+        </div>
+
+        <div class="backing-card">
+          <span class="backing-dot dot-synth"></span>
+          <div>
+            <div class="backing-label">Basis Trade / Synthetic</div>
+            <p>The token earns yield from a delta-neutral strategy &mdash; typically longing the spot asset and shorting the perpetual future to capture funding rates. This is <strong>not a real-world asset</strong>. The yield source is entirely on-chain and crypto-native. Products like Ethena USDe appear in RWA trackers because they hold some real-world collateral (e.g., BUIDL), but the yield mechanism is synthetic.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>Secondary Lanes</h3>
+      <p>Three additional backing types exist outside the main dollar/credit stage. These are tracked in lighter-weight tables without trust tier ratings, because the evaluation criteria for real estate, commodities, and equities differ substantially from dollar-denominated yield products.</p>
+      <ul>
+        <li><strong>Real Estate</strong> &mdash; Tokenized property holdings (e.g., RealT, Lofty). Yield comes from rental income. Liquidity is typically limited to secondary markets.</li>
+        <li><strong>Commodity</strong> &mdash; Tokenized exposure to physical commodities (gold, oil, agricultural products).</li>
+        <li><strong>Equity</strong> &mdash; Tokenized stock exposure (e.g., Ondo Global Markets). These are not yield products; they provide equity price exposure on-chain.</li>
+      </ul>
+    </section>
+
+    <hr class="divider">
+
+    <!-- Mislabel Policy -->
+    <section class="meth-section">
+      <h2>Mislabel Policy</h2>
+      <p>A product is flagged as <strong>&ldquo;Not RWA&rdquo;</strong> when its yield source is not a real-world asset, regardless of what collateral it holds or how it markets itself. The flag is editorial judgment, not a regulatory determination.</p>
+
+      <h3>Why Ethena is flagged</h3>
+      <p>Ethena USDe earns yield from funding rate arbitrage &mdash; a crypto-native basis trade. The delta-neutral position (long spot ETH, short perp) is not backed by any real-world asset. Ethena USDtb holds BUIDL (a BlackRock Treasury fund) as partial collateral, but the yield still comes from the same basis-trade mechanism. The BUIDL backing does not make the product an RWA &mdash; it makes it a synthetic strategy with high-quality collateral.</p>
+      <p>Both products carry a Tier 4 rating and the &ldquo;Not RWA&rdquo; badge in the tracker.</p>
+
+      <h3>When would a flag be removed?</h3>
+      <p>If a product&rsquo;s yield source changes to actual real-world assets (e.g., if Ethena launched a separate product backed purely by T-bills with no basis-trade component), that product would be reclassified. The flag follows the yield mechanism, not the brand.</p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- Data Sources -->
+    <section class="meth-section">
+      <h2>Data Sources</h2>
+      <p>All market data (TVL and yield) comes from the <a href="https://defillama.com" target="_blank" rel="noopener">DefiLlama</a> free API. The pipeline runs on a GitHub Actions cron schedule and commits fresh data to the site.</p>
+
+      <h3>How the data pipeline works</h3>
+      <ul>
+        <li>The pipeline fetches DefiLlama&rsquo;s <code>/protocols</code> list and <code>/pools</code> data.</li>
+        <li>Each fund in the hand-curated <code>rwa-registry.json</code> is joined to its DefiLlama pool(s) by project slug (e.g., <code>blackrock-buidl</code>, <code>ondo-yield-assets</code>).</li>
+        <li>TVL is summed across all matching pools. Yield is taken from the largest pool&rsquo;s <code>apyBase</code> field.</li>
+        <li>Protocols that appear in DefiLlama&rsquo;s RWA category but are not in the registry are listed as &ldquo;New &amp; Unclassified&rdquo; (with a $5M TVL floor).</li>
+      </ul>
+
+      <div class="callout">
+        <p><strong>Yield disclaimer:</strong> The yield shown (<code>apyBase</code>) is the fund&rsquo;s headline annual percentage yield as reported to DefiLlama. It is <strong>not</strong> the investor&rsquo;s net yield after wrapper fees, redemption friction, gas costs, or tax. For funds with multiple share classes or redemption tiers, the displayed yield may not match what a specific investor receives.</p>
+      </div>
+
+      <h3>Why pool-level data?</h3>
+      <p>DefiLlama&rsquo;s protocol-level TVL is unreliable for many RWA products &mdash; several major funds (including BUIDL) report $0 at the protocol level. The tracker joins on pool-level data instead, which consistently has both TVL and yield for all major funds.</p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- Editorial Disclosure -->
+    <section class="meth-section">
+      <h2>Editorial Disclosure</h2>
+      <div class="disclosure">
+        <p>This is an opinionated tool. Trust tiers, backing type classifications, mislabel flags, and editorial one-liners reflect the judgment of the authors &mdash; not the consensus of any institution, regulator, or industry body. Classifications may change as new information emerges or as products evolve.</p>
+      </div>
+      <p>This tracker is not financial advice. It does not recommend buying, selling, or holding any product. It does not assess the investment merit of any fund. It classifies products by structural characteristics to help allocators and researchers understand what they are actually looking at.</p>
+      <p>The curated registry (<code>rwa-registry.json</code>) is open source. If you believe a classification is wrong, the data is transparent and the reasoning is documented in the tier override notes and editorial one-liners.</p>
+    </section>
+
+  </div>
+
+  <footer class="wrap">
+    <a href="index.html">&larr; Back to tracker</a>
+    <div style="margin-top:6px;color:var(--tertiary)">Classification is editorial opinion, not financial advice.</div>
+  </footer>
+
+  <script>
+    document.getElementById("theme").addEventListener("click", () => {
+      const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      try { localStorage.setItem("theme", next); } catch {}
+    });
+  </script>
+</body>
+</html>
