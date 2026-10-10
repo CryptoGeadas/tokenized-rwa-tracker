@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-10T04:57:29.735Z",
+  "generatedAt": "2026-10-10T17:06:40.168Z",
   "source": "https://defillama.com",
   "mainStage": [
     {
@@ -20,11 +20,11 @@
       "one_liner": "Institutional lending to real-world borrowers. Previously had defaults (2022); v2 restructured with better underwriting. Still private credit risk.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 3998127041,
-      "apyBase": 5.21183,
+      "tvl": 4010612830,
+      "apyBase": 5.24944,
       "apyReward": 0,
       "apyBase7d": null,
-      "apyMean30d": 5.09858,
+      "apyMean30d": 5.10316,
       "poolCount": 3,
       "symbol": "USDC",
       "poolChain": "Ethereum"
@@ -50,10 +50,10 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 3011800875,
-      "apyBase": 3.4662,
+      "apyBase": 0,
       "apyReward": null,
       "apyBase7d": null,
-      "apyMean30d": 3.38679,
+      "apyMean30d": 3.38539,
       "poolCount": 9,
       "symbol": "BUIDL",
       "poolChain": "Aptos"
@@ -78,11 +78,11 @@
       "one_liner": "Ondo's US Treasury-backed yield tokens. USDY is permissionless on supported chains; OUSG is permissioned. Daily redemptions.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 2537323906,
+      "tvl": 2537333804,
       "apyBase": 3.65,
       "apyReward": null,
       "apyBase7d": 3.75,
-      "apyMean30d": 3.59645,
+      "apyMean30d": 3.5977,
       "poolCount": 11,
       "symbol": "USDY",
       "poolChain": "Ethereum"
@@ -105,10 +105,10 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 2383593871,
-      "apyBase": 3.33371,
+      "apyBase": 3.22801,
       "apyReward": null,
       "apyBase7d": 3.39748,
-      "apyMean30d": 3.25472,
+      "apyMean30d": 3.25656,
       "poolCount": 2,
       "symbol": "USYC",
       "poolChain": "BSC"
@@ -129,11 +129,11 @@
       "one_liner": "Delta-neutral basis trade — earns funding rates, NOT backed by real-world assets. Often appears in RWA listings but is a synthetic yield product.",
       "mislabel": true,
       "lane": "main",
-      "tvl": 1213579610,
-      "apyBase": 4.8581,
+      "tvl": 1212912255,
+      "apyBase": 5.08186,
       "apyReward": null,
       "apyBase7d": null,
-      "apyMean30d": 4.94358,
+      "apyMean30d": 4.94641,
       "poolCount": 1,
       "symbol": "SUSDE",
       "poolChain": "Ethereum"
@@ -154,11 +154,11 @@
       "one_liner": "Real-world credit pools on-chain — invoices, trade finance, structured credit. Epoch-based redemptions; counterparty risk on each pool.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 982463065,
+      "tvl": 982471873,
       "apyBase": 3.62676,
       "apyReward": null,
       "apyBase7d": 3.62676,
-      "apyMean30d": 3.47556,
+      "apyMean30d": 3.4744,
       "poolCount": 26,
       "symbol": "USDS",
       "poolChain": "Ethereum"
@@ -179,11 +179,11 @@
       "one_liner": "Invesco's tokenized short-term Treasury bond ETF. Institutional pedigree, Securitize-distributed.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 595904832,
-      "apyBase": 3.57358,
+      "tvl": 596869010,
+      "apyBase": 3.4537,
       "apyReward": null,
       "apyBase7d": 3.63202,
-      "apyMean30d": 3.57527,
+      "apyMean30d": 3.57261,
       "poolCount": 3,
       "symbol": "USTB",
       "poolChain": "Ethereum"
@@ -204,11 +204,11 @@
       "one_liner": "Treasury-backed stablecoin with yield redistribution via USUAL governance token. T-bill backing is real, but protocol structure is newer.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 516510146,
-      "apyBase": 11.95269,
-      "apyReward": 17.38028,
+      "tvl": 517005795,
+      "apyBase": 11.93368,
+      "apyReward": 16.49572,
       "apyBase7d": null,
-      "apyMean30d": 29.2917,
+      "apyMean30d": 29.23696,
       "poolCount": 6,
       "symbol": "USUALX",
       "poolChain": "Ethereum"
@@ -229,7 +229,7 @@
       "one_liner": "Marketed as 'institutional USDe' with BUIDL backing, but yield is still from basis trades. Not a real-world asset despite the packaging.",
       "mislabel": true,
       "lane": "main",
-      "tvl": 470176647.66797495,
+      "tvl": 470155369.32677495,
       "apyBase": null,
       "apyReward": null,
       "apyBase7d": null,
@@ -254,11 +254,11 @@
       "one_liner": "Euro and USD Treasury-backed tokens. EU-regulated issuer, multiple backing strategies including T-bills and basis yield.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 392866137,
+      "tvl": 393098188,
       "apyBase": 3.73,
       "apyReward": null,
       "apyBase7d": null,
-      "apyMean30d": 3.43914,
+      "apyMean30d": 3.45028,
       "poolCount": 33,
       "symbol": "USDC",
       "poolChain": "Ethereum"
@@ -279,11 +279,11 @@
       "one_liner": "Reinsurance-backed yield protocol. Novel backing type (reinsurance premiums). Limited track record, higher risk.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 311087202,
+      "tvl": 312765597,
       "apyBase": 7.00818,
       "apyReward": null,
       "apyBase7d": null,
-      "apyMean30d": 6.80152,
+      "apyMean30d": 6.80725,
       "poolCount": 2,
       "symbol": "REUSD",
       "poolChain": "Ethereum"
@@ -305,11 +305,11 @@
       "one_liner": "Tokenized credit funds — Apollo CLO, Hamilton Lane senior credit. Institutional managers, Securitize as platform. Accredited investors only.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 183783158,
-      "apyBase": 3.48816,
+      "tvl": 183790033,
+      "apyBase": 3.48846,
       "apyReward": null,
       "apyBase7d": null,
-      "apyMean30d": 4.74251,
+      "apyMean30d": 4.70658,
       "poolCount": 7,
       "symbol": "STAC",
       "poolChain": "Ethereum"
@@ -335,7 +335,7 @@
       "apyBase": 3.7139,
       "apyReward": null,
       "apyBase7d": 4.16354,
-      "apyMean30d": 3.26434,
+      "apyMean30d": 3.27119,
       "poolCount": 3,
       "symbol": "TBL",
       "poolChain": "XRPL"
@@ -357,11 +357,11 @@
       "one_liner": "Claims US Treasury backing but opaque issuer structure. Proceed with caution — transparency far below institutional standards.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 56356233,
+      "tvl": 56361772,
       "apyBase": null,
       "apyReward": null,
       "apyBase7d": null,
-      "apyMean30d": 3.46461,
+      "apyMean30d": 3.46792,
       "poolCount": 2,
       "symbol": "STUSDT",
       "poolChain": "Tron"
@@ -440,7 +440,7 @@
         "one_liner": "Tokenized US rental properties. Each token is a share in an LLC holding a single property. Rental yield distributed weekly.",
         "mislabel": false,
         "lane": "real-estate",
-        "tvl": 155077595.83690616,
+        "tvl": 155068854.7072484,
         "apyBase": null,
         "apyReward": null,
         "apyBase7d": null,
@@ -465,7 +465,7 @@
         "one_liner": "Fractional US rental real estate. Similar model to RealT but on Algorand. Rental income distributed to token holders.",
         "mislabel": false,
         "lane": "real-estate",
-        "tvl": 101160593.88296597,
+        "tvl": 101161165.8794027,
         "apyBase": null,
         "apyReward": null,
         "apyBase7d": null,
@@ -508,27 +508,27 @@
     {
       "slug": "hastra",
       "name": "Hastra",
-      "tvl": 654348364,
+      "tvl": 656723590,
       "chains": [
         "Ethereum"
       ],
-      "apyBase": 6.1194,
+      "apyBase": 6.13451,
       "category": "RWA"
     },
     {
       "slug": "usd-ai",
       "name": "USD AI",
-      "tvl": 545320919,
+      "tvl": 546043306,
       "chains": [
         "Arbitrum"
       ],
-      "apyBase": 6.92,
+      "apyBase": 6.9,
       "category": "RWA"
     },
     {
       "slug": "huma",
       "name": "Huma",
-      "tvl": 400928361.87210864,
+      "tvl": 400823277.10833615,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -536,7 +536,7 @@
     {
       "slug": "anemoy-capital",
       "name": "Anemoy Capital",
-      "tvl": 333502732.9194222,
+      "tvl": 333494634.8548255,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -544,7 +544,7 @@
     {
       "slug": "onre",
       "name": "OnRe",
-      "tvl": 286648532,
+      "tvl": 286567968,
       "chains": [
         "Solana"
       ],
@@ -552,17 +552,9 @@
       "category": "RWA"
     },
     {
-      "slug": "opentrade",
-      "name": "OpenTrade",
-      "tvl": 251163650.06883138,
-      "chains": [],
-      "apyBase": null,
-      "category": "RWA"
-    },
-    {
       "slug": "plume-vaults",
       "name": "Plume Vaults",
-      "tvl": 247659410,
+      "tvl": 251328008,
       "chains": [
         "Plume Mainnet"
       ],
@@ -570,19 +562,27 @@
       "category": "RWA"
     },
     {
+      "slug": "opentrade",
+      "name": "OpenTrade",
+      "tvl": 251160915.86824802,
+      "chains": [],
+      "apyBase": null,
+      "category": "RWA"
+    },
+    {
       "slug": "apyx-protocol",
       "name": "Apyx Protocol",
-      "tvl": 162844523,
+      "tvl": 162082282,
       "chains": [
         "Ethereum"
       ],
-      "apyBase": 13.54214,
+      "apyBase": 13.56192,
       "category": "RWA"
     },
     {
       "slug": "r25",
       "name": "R25",
-      "tvl": 143358905.38590598,
+      "tvl": 143396781.26542354,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -590,7 +590,7 @@
     {
       "slug": "theo-network-thusd",
       "name": "Theo Network thUSD",
-      "tvl": 132191958.36135617,
+      "tvl": 132197003.27265069,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -598,7 +598,7 @@
     {
       "slug": "frax-usd",
       "name": "Frax USD",
-      "tvl": 106707432.31296702,
+      "tvl": 106471693.87646733,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -606,7 +606,7 @@
     {
       "slug": "valos",
       "name": "Valos",
-      "tvl": 105675467.36249693,
+      "tvl": 105678743.2137767,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -614,7 +614,7 @@
     {
       "slug": "sky-rwa",
       "name": "Sky RWA",
-      "tvl": 73849457.03063157,
+      "tvl": 73849324.10148409,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -626,13 +626,13 @@
       "chains": [
         "Ethereum"
       ],
-      "apyBase": 3.7551,
+      "apyBase": 0,
       "category": "RWA"
     },
     {
       "slug": "brickken",
       "name": "Brickken",
-      "tvl": 42363577.53493904,
+      "tvl": 42360629.23601893,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -640,7 +640,7 @@
     {
       "slug": "tangible-rwa",
       "name": "Tangible RWA",
-      "tvl": 41536854.93077678,
+      "tvl": 41532796.200208165,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -648,7 +648,7 @@
     {
       "slug": "kaio",
       "name": "KAIO",
-      "tvl": 39647513.44926117,
+      "tvl": 39646297.74874319,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -660,13 +660,13 @@
       "chains": [
         "Ethereum"
       ],
-      "apyBase": 2.55173,
+      "apyBase": 2.35434,
       "category": "RWA"
     },
     {
       "slug": "matrixdock-stbt",
       "name": "MatrixDock STBT",
-      "tvl": 23611465,
+      "tvl": 23613729,
       "chains": [
         "Ethereum"
       ],
@@ -676,7 +676,7 @@
     {
       "slug": "goldfinger",
       "name": "GoldFinger",
-      "tvl": 23535522.083130106,
+      "tvl": 23533627.435851768,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -692,7 +692,7 @@
     {
       "slug": "clearpool-tpool",
       "name": "Clearpool TPOOL",
-      "tvl": 20944187.679774795,
+      "tvl": 20942233.386537656,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -716,27 +716,27 @@
     {
       "slug": "gaib",
       "name": "GAIB",
-      "tvl": 15800970,
+      "tvl": 15803203,
       "chains": [
         "Ethereum"
       ],
-      "apyBase": 10.82451,
+      "apyBase": 10.81945,
       "category": "RWA"
     },
     {
       "slug": "openeden-usdo",
       "name": "OpenEden USDO",
-      "tvl": 15276574,
+      "tvl": 15277995,
       "chains": [
         "Ethereum"
       ],
-      "apyBase": 3.3954,
+      "apyBase": 3.39509,
       "category": "RWA"
     },
     {
       "slug": "paimon",
       "name": "Paimon",
-      "tvl": 14001349.581145829,
+      "tvl": 14000203.293588579,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -752,7 +752,7 @@
     {
       "slug": "estate-protocol",
       "name": "Estate Protocol",
-      "tvl": 13948903.285154786,
+      "tvl": 13948189.535723789,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -770,7 +770,7 @@
     {
       "slug": "republic-note",
       "name": "Republic Note",
-      "tvl": 12657447.948158344,
+      "tvl": 12657600.549758282,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -778,7 +778,7 @@
     {
       "slug": "solv-rwa",
       "name": "Solv RWA",
-      "tvl": 9398219.380682327,
+      "tvl": 9435736.202319086,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -786,7 +786,7 @@
     {
       "slug": "binaryx-platform",
       "name": "Binaryx Platform",
-      "tvl": 8989302.178764338,
+      "tvl": 8988846.231601771,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -810,17 +810,17 @@
     {
       "slug": "vault-street",
       "name": "Vault Street",
-      "tvl": 7378487,
+      "tvl": 7379243,
       "chains": [
         "Ethereum"
       ],
-      "apyBase": 3.98638,
+      "apyBase": 3.9916,
       "category": "RWA"
     },
     {
       "slug": "defa-by-invoicemate",
       "name": "Defa By InvoiceMate",
-      "tvl": 7188052.333988769,
+      "tvl": 7187677.389479547,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -828,7 +828,7 @@
     {
       "slug": "narausd",
       "name": "NaraUSD",
-      "tvl": 6813026.334809326,
+      "tvl": 6813050.612423891,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -836,7 +836,7 @@
     {
       "slug": "digital-gold",
       "name": "Digital Gold",
-      "tvl": 6728501.746300393,
+      "tvl": 6678299.752783861,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -844,7 +844,7 @@
     {
       "slug": "mansory",
       "name": "Mansory",
-      "tvl": 6623473.923869892,
+      "tvl": 6630031.039615963,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
@@ -852,7 +852,7 @@
     {
       "slug": "brix",
       "name": "Brix",
-      "tvl": 6526486,
+      "tvl": 6521403,
       "chains": [
         "Ethereum"
       ],
@@ -862,7 +862,7 @@
     {
       "slug": "eva-markets",
       "name": "eva Markets",
-      "tvl": 5289684.7238815585,
+      "tvl": 5289369.78555039,
       "chains": [],
       "apyBase": null,
       "category": "RWA"
