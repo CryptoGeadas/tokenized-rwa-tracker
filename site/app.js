@@ -22,7 +22,7 @@ async function load() {
 }
 
 function rerender() {
-  const isDark = document.documentElement.dataset.theme === "dark";
+  const isDark = true; // site is dark only
   renderScatter($("#scatter-chart"), $(".scatter-tooltip"), state.data.mainStage.filter((f) => f.apyBase != null), isDark);
   renderTable($("#table-container"), state.data.mainStage, state.sortKey, state.sortDir, state.expandedSlug);
 }
@@ -119,7 +119,12 @@ function renderFooter() {
     source <a href="https://defillama.com">DefiLlama</a> ·
     <a href="./data/latest.json">raw JSON</a> ·
     <a href="methodology.html">methodology</a>
-    <div style="margin-top:6px;color:var(--tertiary)">Classification is editorial opinion, not financial advice.</div>`;
+    <div style="margin-top:6px">Classification is editorial opinion, not financial advice.</div>`;
+
+  // shared site footer: the tool fills its own data-health line
+  const line = $("[data-tool-dataline]");
+  if (line) line.textContent = `Data as of ${when.toISOString().slice(11, 16)} UTC, ${when.toISOString().slice(0, 10)} · Source: DefiLlama · Funds tracked: ${s.mainStageCount + s.secondaryCount + s.unclassifiedCount} · Not financial advice`;
+  $("[data-tool-dot]")?.classList.toggle("stale", ageH > 36);
 }
 
 // ─── Event handlers ───────────────────────────────────────────────────────
@@ -141,21 +146,9 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// ─── Theme toggle ──────────────────────────────────────────────────────────
-
-$("#theme").addEventListener("click", () => {
-  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-  document.documentElement.dataset.theme = next;
-  try { localStorage.setItem("theme", next); } catch {}
-  if (state.data) {
-    const isDark = next === "dark";
-    renderScatter($("#scatter-chart"), $(".scatter-tooltip"), state.data.mainStage.filter((f) => f.apyBase != null), isDark);
-  }
-});
-
 window.addEventListener("resize", () => {
   if (state.data) {
-    const isDark = document.documentElement.dataset.theme === "dark";
+    const isDark = true; // site is dark only
     renderScatter($("#scatter-chart"), $(".scatter-tooltip"), state.data.mainStage.filter((f) => f.apyBase != null), isDark);
   }
 });

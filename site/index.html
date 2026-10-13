@@ -3,86 +3,137 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tokenized RWA Tracker</title>
+  <meta name="robots" content="noindex, nofollow">
+  <title>Tokenized RWA Tracker · Bernardo Geadas</title>
   <meta name="description" content="A trust filter for tokenized real-world assets. Classified by what actually backs each fund — not by the marketing label.">
-  <script>document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark";</script>
-  <link rel="icon" href="logo.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0c110e">
+  <link rel="icon" href="/logo.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500;600&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="brand.css">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Shared site style, one source of truth on the main site (CryptoGeadas/cryptogeadas.github.io). -->
+  <link rel="stylesheet" href="/site.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="wrap top">
-    <div class="brand">
-      <img class="mark" src="logo.svg" alt="BG" width="37" height="25">
-      <span class="wordmark">RWA Tracker</span>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="ticker" aria-label="Live numbers from my tools">
+      <span class="ticker-label">LIVE</span>
+      <div class="ticker-items" data-ticker>
+        <a class="ticker-item" href="/defi-yield-scanner/" data-tick="scanner"><span class="k">Best stable yield</span><span class="v">—</span><span class="n"></span></a>
+        <a class="ticker-item" href="/tokenized-rwa-tracker/" data-tick="rwa-count"><span class="k">RWA funds classified</span><span class="v">—</span><span class="n"></span></a>
+        <a class="ticker-item" href="/tokenized-rwa-tracker/" data-tick="rwa-unclassified"><span class="k">Unclassified, in review</span><span class="v">—</span><span class="n"></span></a>
+      </div>
+      <span class="ticker-time" data-live-time>● —</span>
     </div>
-    <nav class="topnav">
-      <button id="theme" class="btn btn-ghost btn-sm" aria-label="Toggle theme">
-        <span class="theme-dark">&#9790;</span><span class="theme-light">&#9728;</span>
-      </button>
-    </nav>
+    <div class="site-nav-row">
+      <a class="site-logo" href="/">BERNARDO GEADAS</a>
+      <nav class="site-nav" aria-label="Main">
+        <a href="/#about">About</a>
+        <a href="/#experience">Experience</a>
+        <a href="/tools/" class="is-active">Tools</a>
+        <a href="/#contact">Contact</a>
+      </nav>
+      <span class="site-tagline">PRODUCT × PARTNERSHIPS × COMPLIANCE</span>
+    </div>
   </header>
 
-  <section class="wrap hero">
-    <h1 class="serif hero-line">Where can I park my dollars on-chain &mdash; and is that yield real?</h1>
-    <p class="sub">
-      A trust filter for tokenized real-world assets. Every fund
-      <strong>classified by what actually backs it</strong> &mdash; not by the marketing label.
-      Government bonds, private credit, or synthetic basis trades disguised as RWA.
-    </p>
-  </section>
-
-  <section class="wrap" id="scatter-section">
-    <div class="section-head">
-      <h2>Yield vs Trust</h2>
-      <span class="label">main stage &mdash; dollar / euro / credit</span>
-    </div>
-    <div class="scatter-wrap panel">
-      <div id="scatter-chart"></div>
-      <div class="scatter-tooltip"></div>
-    </div>
-    <div class="scatter-legend">
-      <span><span class="dot-legend gov"></span> Government debt</span>
-      <span><span class="dot-legend credit"></span> Private credit</span>
-      <span><span class="dot-legend synth"></span> Basis trade / synthetic</span>
-      <span class="legend-note">Dot size = TVL &middot; Left = higher trust</span>
-    </div>
-  </section>
-
-  <section class="wrap" id="table-section">
-    <div class="section-head">
-      <h2>Trust Filter</h2>
-      <span class="label">sortable &middot; all main-stage funds</span>
-    </div>
-    <div id="table-container"></div>
-  </section>
-
-  <section class="wrap" id="unclassified-section" style="display:none">
-    <div class="callout-box">
-      <div class="callout-head">
-        <span class="callout-icon">&#9888;</span>
-        <h2>New &amp; Unclassified</h2>
+  <main id="main" class="tool-main">
+    <div class="tool-head">
+      <div class="tool-head-copy">
+        <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">HOME</a><span aria-hidden="true">/</span><a href="/tools/">BUILD LOG</a><span aria-hidden="true">/</span><span aria-current="page">TOKENIZED RWA TRACKER</span></nav>
+        <div class="tool-title"><h1>Tokenized RWA Tracker</h1><span class="badge badge-live">● Live</span></div>
+        <p class="tool-question">"I want to park euros or dollars in real-world yield. Show me what's real, what's risky and what's fake."</p>
       </div>
-      <p class="callout-sub">These RWA protocols crossed $5M TVL on DefiLlama but haven&rsquo;t been reviewed and classified yet. They may be legitimate, mislabeled, or too new to assess.</p>
-      <div id="unclassified-list"></div>
-      <button id="uncl-toggle" class="btn btn-ghost btn-sm" style="display:none;margin-top:12px"></button>
+      <div class="tool-links">
+        <a class="btn btn-sm" href="methodology.html">Methodology</a>
+        <a class="btn btn-sm" href="https://github.com/CryptoGeadas/tokenized-rwa-tracker" rel="noopener" target="_blank">Source ↗</a>
+      </div>
     </div>
-  </section>
 
-  <section class="wrap" id="secondary-section" style="display:none">
-    <div class="section-head section-head-sm">
-      <h2>Secondary Lanes</h2>
-      <span class="label">real estate &middot; commodity &middot; equity</span>
+    <div class="tool-app" id="app">
+      <p class="sub">
+        A trust filter for tokenized real-world assets. Every fund
+        <strong>classified by what actually backs it</strong> &mdash; not by the marketing label.
+        Government bonds, private credit, or synthetic basis trades disguised as RWA.
+      </p>
+
+    <section id="scatter-section">
+      <div class="section-head">
+        <h2>Yield vs Trust</h2>
+        <span class="label">main stage &mdash; dollar / euro / credit</span>
+      </div>
+      <div class="scatter-wrap panel">
+        <div id="scatter-chart"></div>
+        <div class="scatter-tooltip"></div>
+      </div>
+      <div class="scatter-legend">
+        <span><span class="dot-legend gov"></span> Government debt</span>
+        <span><span class="dot-legend credit"></span> Private credit</span>
+        <span><span class="dot-legend synth"></span> Basis trade / synthetic</span>
+        <span class="legend-note">Dot size = TVL &middot; Left = higher trust</span>
+      </div>
+    </section>
+
+    <section id="table-section">
+      <div class="section-head">
+        <h2>Trust Filter</h2>
+        <span class="label">sortable &middot; all main-stage funds</span>
+      </div>
+      <div id="table-container"></div>
+    </section>
+
+    <section id="unclassified-section" style="display:none">
+      <div class="callout-box">
+        <div class="callout-head">
+          <span class="callout-icon">&#9888;</span>
+          <h2>New &amp; Unclassified</h2>
+        </div>
+        <p class="callout-sub">These RWA protocols crossed $5M TVL on DefiLlama but haven&rsquo;t been reviewed and classified yet. They may be legitimate, mislabeled, or too new to assess.</p>
+        <div id="unclassified-list"></div>
+        <button id="uncl-toggle" class="btn btn-sm" style="display:none;margin-top:12px"></button>
+      </div>
+    </section>
+
+    <section id="secondary-section" style="display:none">
+      <div class="section-head section-head-sm">
+        <h2>Secondary Lanes</h2>
+        <span class="label">real estate &middot; commodity &middot; equity</span>
+      </div>
+      <div id="secondary-lanes"></div>
+    </section>
+
+      <div class="tool-legend" id="foot"></div>
     </div>
-    <div id="secondary-lanes"></div>
-  </section>
 
-  <footer class="wrap" id="foot"></footer>
+    <nav class="tool-nav" aria-label="Other tools">
+      <a href="/tools/">← All tools</a>
+      <span><a href="/defi-yield-scanner/">DeFi Yield Scanner →</a><a href="/crypto-fundamentals/">Crypto Fundamentals →</a></span>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer-top">
+      <a class="site-logo" href="/">BERNARDO GEADAS</a>
+      <nav class="site-footer-nav" aria-label="Footer">
+        <a href="/tools/">Tools</a>
+        <a href="/research/unlocks-dont-dump/">Research</a>
+        <a href="mailto:bernardofgeadasj@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/bernardo-geadas" rel="noopener" target="_blank">LinkedIn</a>
+        <a href="https://github.com/CryptoGeadas" rel="noopener" target="_blank">GitHub</a>
+        <a href="https://x.com/Bernardo_Geadas" rel="noopener" target="_blank">X</a>
+      </nav>
+    </div>
+    <div class="site-footer-bottom">
+      <span class="data-line"><span class="dot" data-tool-dot>●</span> <span data-tool-dataline>Source: DefiLlama · Not financial advice</span></span>
+      <span class="credit">© 2026 Bernardo Geadas · Built by hand, no frameworks.</span>
+    </div>
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script type="module" src="/site.js"></script>
   <script type="module" src="app.js"></script>
 </body>
 </html>

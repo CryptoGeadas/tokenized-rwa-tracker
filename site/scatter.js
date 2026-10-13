@@ -15,9 +15,10 @@ export function renderScatter(container, tooltip, funds, isDark) {
   const maxTvl = Math.max(...funds.map((f) => f.tvl));
   const minR = 7, maxR = 34;
 
-  const textColor = isDark ? "#9CA3B0" : "#6B7482";
-  const gridColor = isDark ? "rgba(42,48,64,0.6)" : "rgba(224,228,236,0.6)";
-  const axisColor = isDark ? "#5A6472" : "#9CA3B0";
+  // Dark only (site palette): muted labels, hairline grid.
+  const textColor = "oklch(0.66 0.012 150)";
+  const gridColor = "oklch(0.27 0.01 160)";
+  const axisColor = "oklch(0.66 0.012 150)";
 
   const svg = d3.select(container)
     .append("svg")
@@ -50,14 +51,14 @@ export function renderScatter(container, tooltip, funds, isDark) {
     .join("text")
     .attr("x", PAD.left - 8).attr("y", (d) => yScale(d) + 4)
     .attr("text-anchor", "end")
-    .attr("fill", textColor).attr("font-size", 11).attr("font-family", "Inter, sans-serif")
+    .attr("fill", textColor).attr("font-size", 11).attr("font-family", "JetBrains Mono, monospace")
     .text((d) => d.toFixed(1) + "%");
 
   svg.append("text")
     .attr("transform", `translate(14, ${PAD.top + plotH / 2}) rotate(-90)`)
     .attr("text-anchor", "middle")
     .attr("fill", axisColor).attr("font-size", 10)
-    .attr("font-family", "Sora, sans-serif").attr("font-weight", 600)
+    .attr("font-family", "JetBrains Mono, monospace").attr("font-weight", 600)
     .text("YIELD (apyBase)");
 
   const tierLabels = [
@@ -70,10 +71,10 @@ export function renderScatter(container, tooltip, funds, isDark) {
     const cx = tierX(t.tier);
     svg.append("text").attr("x", cx).attr("y", H - 24).attr("text-anchor", "middle")
       .attr("fill", axisColor).attr("font-size", 10)
-      .attr("font-family", "Sora, sans-serif").attr("font-weight", 600)
+      .attr("font-family", "JetBrains Mono, monospace").attr("font-weight", 600)
       .text(t.line1);
     svg.append("text").attr("x", cx).attr("y", H - 10).attr("text-anchor", "middle")
-      .attr("fill", textColor).attr("font-size", 9).attr("font-family", "Inter, sans-serif")
+      .attr("fill", textColor).attr("font-size", 9).attr("font-family", "JetBrains Mono, monospace")
       .text(t.line2);
   });
 
@@ -103,8 +104,8 @@ export function renderScatter(container, tooltip, funds, isDark) {
     .append("text")
     .attr("y", (f) => -rScale(f.tvl) - 5)
     .attr("text-anchor", "middle")
-    .attr("fill", "#EF4444").attr("font-size", 10)
-    .attr("font-family", "Sora, sans-serif").attr("font-weight", 700)
+    .attr("fill", "oklch(0.68 0.19 25)").attr("font-size", 10)
+    .attr("font-family", "JetBrains Mono, monospace").attr("font-weight", 700)
     .text("NOT RWA");
 
   dots.on("mouseenter", function (event, f) {

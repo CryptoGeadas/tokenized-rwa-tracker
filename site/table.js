@@ -8,7 +8,7 @@ const COLS = [
   { key: "tvl", label: "TVL", cls: "num" },
   { key: "chains", label: "Chains", cls: "chains-cell" },
   { key: "trust_tier", label: "Tier", cls: "num" },
-  { key: "one_liner", label: "What you're actually holding" },
+  { key: "one_liner", label: "What you're actually holding", cls: "oneliner" },
 ];
 
 const WRAPPER_LABELS = {

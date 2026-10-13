@@ -3,109 +3,105 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Methodology — RWA Tracker</title>
+  <meta name="robots" content="noindex, nofollow">
+  <title>Methodology · Tokenized RWA Tracker · Bernardo Geadas</title>
   <meta name="description" content="How the RWA Tracker trust tiers, backing types, and mislabel flags work. Data sources, editorial disclosure, and classification criteria.">
-  <script>document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark";</script>
-  <link rel="icon" href="logo.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0c110e">
+  <link rel="icon" href="/logo.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500;600&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="brand.css">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/site.css">
   <style>
-    .wrap { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+    .doc { max-width: 860px; padding-bottom: 32px; }
+    .doc .hero-sub { margin: 0; color: var(--muted); font-size: 17px; line-height: 1.6; }
 
-    .top { display: flex; align-items: center; justify-content: space-between; padding-top: 24px; }
-    .brand { display: flex; align-items: center; gap: 10px; }
-    .brand .mark { display: block; }
-    .wordmark { font-family: var(--display); font-weight: 700; font-size: 17px; letter-spacing: -0.01em; }
-    .topnav { display: flex; align-items: center; gap: 16px; }
-    .back-link { font-family: var(--display); font-size: 13px; font-weight: 600; }
-    #theme .theme-dark, #theme .theme-light { font-size: 14px; line-height: 1; }
-    :root[data-theme="dark"] #theme .theme-light { display: none; }
-    :root:not([data-theme="dark"]) #theme .theme-dark { display: none; }
-
-    .hero { padding: 28px 0 8px; }
-    .hero-line { font-size: 28px; line-height: 1.2; color: var(--text); }
-    .hero-sub { margin: 10px 0 0; color: var(--muted); font-size: 15px; line-height: 1.55; }
-
-    .meth-section { margin: 36px 0 0; }
-    .meth-section h2 { font-size: 18px; margin-bottom: 14px; color: var(--text); }
-    .meth-section h3 { font-size: 15px; margin: 20px 0 8px; color: var(--text); }
-    .meth-section p { color: var(--muted); font-size: 14px; line-height: 1.65; margin: 0 0 12px; }
-    .meth-section ul { color: var(--muted); font-size: 14px; line-height: 1.65; margin: 0 0 12px; padding-left: 20px; }
+    .meth-section { margin: 44px 0 0; }
+    .meth-section h2 { font-size: clamp(22px, 3vw, 26px); margin-bottom: 14px; }
+    .meth-section h3 { font-size: 17px; margin: 20px 0 8px; }
+    .meth-section p { color: var(--muted); font-size: 15px; line-height: 1.7; margin: 0 0 12px; }
+    .meth-section ul { color: var(--muted); font-size: 15px; line-height: 1.7; margin: 0 0 12px; padding-left: 20px; }
     .meth-section li { margin-bottom: 4px; }
-    .meth-section strong { color: var(--text); font-weight: 600; }
-    .meth-section code { font-size: 13px; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; }
+    .meth-section strong { color: var(--fg); font-weight: 600; }
+    .meth-section a { color: var(--accent); }
+    .meth-section code { font: 13px var(--font-mono); color: var(--fg); background: var(--panel); border: 1px solid var(--border); border-radius: var(--r-ctl); padding: 1px 5px; }
 
     .tier-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
-    .tier-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); padding: 16px; }
+    .tier-card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r-panel); padding: 16px; }
     .tier-card .tier-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
     .tier-badge {
       display: inline-flex; align-items: center; justify-content: center;
-      width: 30px; height: 24px; border-radius: var(--r-badge);
-      font: 700 13px var(--display);
+      width: 30px; height: 24px; border-radius: var(--r-ctl); border: 1px solid currentColor;
+      font: 500 13px var(--font-mono);
     }
-    .tier-badge-1 { background: color-mix(in srgb, var(--success) 14%, transparent); color: var(--success); }
-    .tier-badge-2 { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
-    .tier-badge-3 { background: color-mix(in srgb, var(--warning) 14%, transparent); color: var(--warning); }
-    .tier-badge-4 { background: color-mix(in srgb, var(--error) 20%, transparent); color: var(--error); }
-    .tier-card .tier-label { font: 600 14px var(--display); color: var(--text); }
-    .tier-card p { color: var(--muted); font-size: 13px; line-height: 1.55; margin: 0; }
-    .tier-card ul { color: var(--muted); font-size: 13px; line-height: 1.55; margin: 8px 0 0; padding-left: 18px; }
+    .tier-badge-1 { color: var(--up); }
+    .tier-badge-2 { color: oklch(0.74 0.11 235); }
+    .tier-badge-3 { color: var(--warn); }
+    .tier-badge-4 { color: var(--down); }
+    .tier-card .tier-label { font: 600 16px var(--font-head); color: var(--fg); }
+    .tier-card p { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0; }
+    .tier-card ul { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 8px 0 0; padding-left: 18px; }
 
     .backing-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 16px 0; }
-    .backing-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); padding: 16px; display: flex; gap: 14px; align-items: flex-start; }
+    .backing-card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r-panel); padding: 16px; display: flex; gap: 14px; align-items: flex-start; }
     .backing-dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
     .dot-gov { background: var(--accent); }
-    .dot-credit { background: var(--warning); }
-    .dot-synth { background: var(--error); }
-    .backing-card .backing-label { font: 600 14px var(--display); color: var(--text); margin-bottom: 4px; }
-    .backing-card p { color: var(--muted); font-size: 13px; line-height: 1.55; margin: 0; }
+    .dot-credit { background: var(--warn); }
+    .dot-synth { background: var(--down); }
+    .backing-card .backing-label { font: 600 16px var(--font-head); color: var(--fg); margin-bottom: 4px; }
+    .backing-card p { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0; }
 
-    .callout {
-      background: color-mix(in srgb, var(--warning) 8%, var(--surface));
-      border: 1px solid color-mix(in srgb, var(--warning) 30%, var(--border));
-      border-radius: var(--r-panel); padding: 16px 20px; margin: 16px 0;
-    }
-    .callout p { color: var(--muted); font-size: 13px; line-height: 1.55; margin: 0; }
-    .callout strong { color: var(--warning); }
+    .callout { border: 1px dashed var(--warn); border-radius: var(--r-panel); padding: 16px 20px; margin: 16px 0; }
+    .callout p { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0; }
+    .callout strong { color: var(--warn); }
 
-    .disclosure {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--r-panel); padding: 20px; margin: 16px 0;
-    }
-    .disclosure p { font-family: var(--accent-face); font-size: 16px; line-height: 1.55; font-style: italic; color: var(--text); margin: 0; }
+    .disclosure { background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--r-panel); padding: 20px; margin: 16px 0; }
+    .disclosure p { font-size: 16px; line-height: 1.6; color: var(--fg); margin: 0; }
 
     .divider { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
 
-    footer { margin: 44px 0 64px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--border); padding-top: 18px; }
-
-    @media (max-width: 760px) {
-      .hero-line { font-size: 22px; }
-      .tier-grid { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 760px) { .tier-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-  <header class="wrap top">
-    <div class="brand">
-      <img class="mark" src="logo.svg" alt="BG" width="37" height="25">
-      <span class="wordmark">RWA Tracker</span>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="ticker" aria-label="Live numbers from my tools">
+      <span class="ticker-label">LIVE</span>
+      <div class="ticker-items" data-ticker>
+        <a class="ticker-item" href="/defi-yield-scanner/" data-tick="scanner"><span class="k">Best stable yield</span><span class="v">—</span><span class="n"></span></a>
+        <a class="ticker-item" href="/tokenized-rwa-tracker/" data-tick="rwa-count"><span class="k">RWA funds classified</span><span class="v">—</span><span class="n"></span></a>
+        <a class="ticker-item" href="/tokenized-rwa-tracker/" data-tick="rwa-unclassified"><span class="k">Unclassified, in review</span><span class="v">—</span><span class="n"></span></a>
+      </div>
+      <span class="ticker-time" data-live-time>● —</span>
     </div>
-    <nav class="topnav">
-      <a href="index.html" class="back-link">&larr; Back to tracker</a>
-      <button id="theme" class="btn btn-ghost btn-sm" aria-label="Toggle theme">
-        <span class="theme-dark">&#9790;</span><span class="theme-light">&#9728;</span>
-      </button>
-    </nav>
+    <div class="site-nav-row">
+      <a class="site-logo" href="/">BERNARDO GEADAS</a>
+      <nav class="site-nav" aria-label="Main">
+        <a href="/#about">About</a>
+        <a href="/#experience">Experience</a>
+        <a href="/tools/" class="is-active">Tools</a>
+        <a href="/#contact">Contact</a>
+      </nav>
+      <span class="site-tagline">PRODUCT × PARTNERSHIPS × COMPLIANCE</span>
+    </div>
   </header>
 
-  <section class="wrap hero">
-    <h1 class="serif hero-line">Methodology</h1>
-    <p class="hero-sub">How we classify tokenized real-world assets, what the trust tiers mean, and where the data comes from.</p>
-  </section>
+  <div class="tool-main">
+    <div class="tool-head">
+      <div class="tool-head-copy">
+        <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">HOME</a><span aria-hidden="true">/</span><a href="/tools/">BUILD LOG</a><span aria-hidden="true">/</span><a href="./">TOKENIZED RWA TRACKER</a><span aria-hidden="true">/</span><span aria-current="page">METHODOLOGY</span></nav>
+        <div class="tool-title"><h1>Methodology</h1></div>
+      </div>
+      <div class="tool-links">
+        <a class="btn btn-primary btn-sm" href="./">← Back to tracker</a>
+        <a class="btn btn-sm" href="https://github.com/CryptoGeadas/tokenized-rwa-tracker" rel="noopener" target="_blank">Source ↗</a>
+      </div>
+    </div>
 
-  <div class="wrap">
+  <main class="doc" id="main">
+    <p class="hero-sub">How we classify tokenized real-world assets, what the trust tiers mean, and where the data comes from.</p>
 
     <!-- Trust Tier Rubric -->
     <section class="meth-section">
@@ -258,19 +254,32 @@
       <p>The curated registry (<code>rwa-registry.json</code>) is open source. If you believe a classification is wrong, the data is transparent and the reasoning is documented in the tier override notes and editorial one-liners.</p>
     </section>
 
+  </main>
+
+    <nav class="tool-nav" aria-label="Other tools">
+      <a href="/tools/">← All tools</a>
+      <span><a href="./">Tokenized RWA Tracker →</a></span>
+    </nav>
   </div>
 
-  <footer class="wrap">
-    <a href="index.html">&larr; Back to tracker</a>
-    <div style="margin-top:6px;color:var(--tertiary)">Classification is editorial opinion, not financial advice.</div>
+  <footer class="site-footer">
+    <div class="site-footer-top">
+      <a class="site-logo" href="/">BERNARDO GEADAS</a>
+      <nav class="site-footer-nav" aria-label="Footer">
+        <a href="/tools/">Tools</a>
+        <a href="/research/unlocks-dont-dump/">Research</a>
+        <a href="mailto:bernardofgeadasj@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/bernardo-geadas" rel="noopener" target="_blank">LinkedIn</a>
+        <a href="https://github.com/CryptoGeadas" rel="noopener" target="_blank">GitHub</a>
+        <a href="https://x.com/Bernardo_Geadas" rel="noopener" target="_blank">X</a>
+      </nav>
+    </div>
+    <div class="site-footer-bottom">
+      <span class="data-line"><span class="dot" data-tool-dot>●</span> <span data-tool-dataline>Data: DefiLlama + curated registry · Classification is editorial opinion, not financial advice</span></span>
+      <span class="credit">© 2026 Bernardo Geadas · Built by hand, no frameworks.</span>
+    </div>
   </footer>
 
-  <script>
-    document.getElementById("theme").addEventListener("click", () => {
-      const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-      document.documentElement.dataset.theme = next;
-      try { localStorage.setItem("theme", next); } catch {}
-    });
-  </script>
+  <script type="module" src="/site.js"></script>
 </body>
 </html>
