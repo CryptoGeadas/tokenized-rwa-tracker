@@ -8,7 +8,7 @@
   --violet: oklch(0.72 0.15 300);
 }
 
-.sub { color: var(--muted); max-width: 760px; font-size: 15px; line-height: 1.6; }
+.sub { color: var(--muted); max-width: 760px; font-size: 15px; line-height: 1.65; }
 .sub strong { color: var(--fg); font-weight: 600; }
 
 /* section heads */
@@ -98,7 +98,7 @@
 .detail-item.full { grid-column: 1 / -1; }
 .dk { font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 6px; }
 .dv { font-size: 14px; color: var(--fg); line-height: 1.5; }
-.editorial { font-size: 15px; line-height: 1.6; color: var(--fg); }
+.editorial { font-size: 15px; line-height: 1.65; color: var(--fg); }
 .override-note { font-size: 12px; color: var(--warn); margin-top: 6px; }
 .tbl tbody tr[data-slug] { cursor: pointer; }
 .tbl tbody tr.expanded { background: var(--panel); }
@@ -114,7 +114,7 @@
 .callout-head { display: flex; align-items: center; gap: 8px; }
 .callout-icon { font-size: 18px; color: var(--warn); }
 .callout-head h2 { font-size: clamp(20px, 3vw, 24px); color: var(--warn); }
-.callout-sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 8px 0 14px; }
+.callout-sub { color: var(--muted); font-size: 14px; line-height: 1.65; margin: 8px 0 14px; }
 .uncl-row {
   display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; padding: 8px 0;
   border-bottom: 1px solid var(--border); font-size: 14px;
