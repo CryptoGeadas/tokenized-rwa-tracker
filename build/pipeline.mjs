@@ -3,6 +3,8 @@
 // "smaller fund, not reviewed".
 export const TVL_FLOOR = 5_000_000;
 export const REVIEW_LINE = 50_000_000;
+// Why a registry fund was dropped (registry.mjs turns the last two into warnings).
+export const DROP = { small: "under $5M", noTvl: "no TVL on DefiLlama", notFound: "not found on DefiLlama" };
 
 function bestPool(pools) {
   if (!pools.length) return null;
@@ -81,7 +83,8 @@ export function runPipeline(registry, allPools, protocols) {
 
     if (tvl < TVL_FLOOR) {
       const found = allFundPools.length > 0 || protoMatch != null;
-      dropped.push({ slug, name: entry.name, tvl, reason: found ? "under $5M" : "not found on DefiLlama" });
+      const reason = !found ? DROP.notFound : tvl === 0 ? DROP.noTvl : DROP.small;
+      dropped.push({ slug, name: entry.name, tvl, reason });
       continue;
     }
 

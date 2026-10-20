@@ -123,7 +123,7 @@
     "lane": "main"
   },
 
-  "huma-finance-v2": {
+  "huma": {
     "name": "Huma Finance",
     "issuer": "Huma",
     "backing_type": "private-credit",
@@ -210,21 +210,6 @@
     "redemption": "instant",
     "chains": ["tron", "ethereum"],
     "one_liner": "Claims US Treasury backing but opaque issuer structure. Proceed with caution — transparency far below institutional standards.",
-    "mislabel": false,
-    "lane": "main"
-  },
-
-  "mountain-protocol": {
-    "name": "Mountain USDM",
-    "issuer": "Mountain Protocol",
-    "backing_type": "government-debt",
-    "trust_tier": 2,
-    "tier_overrides": null,
-    "wrapper": "regulated-fund",
-    "jurisdiction": "Bermuda",
-    "redemption": "daily",
-    "chains": ["ethereum", "base", "arbitrum", "optimism", "polygon"],
-    "one_liner": "Rebasing yield-bearing stablecoin backed by short-term US Treasuries. Bermuda-regulated, daily NAV updates.",
     "mislabel": false,
     "lane": "main"
   },
