@@ -6,6 +6,7 @@
   "engines": { "node": ">=22" },
   "scripts": {
     "build": "node build/build.mjs",
-    "test": "node --test build/*.test.mjs"
+    "test": "node --test build/*.test.mjs",
+    "draft": "node build/draft-cli.mjs"
   }
 }
