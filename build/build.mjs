@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { runPipeline, DROP } from "./pipeline.mjs";
 import { checkRegistry, registryWarnings, registryLog } from "./registry.mjs";
+import { fetchFallbackTvl } from "./coingecko.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SITE = join(HERE, "..", "site");
@@ -21,11 +22,11 @@ async function fetchJSON(url) {
 async function main() {
   // Check the registry before fetching, so a registry typo is the error you see.
   const registry = checkRegistry(JSON.parse(await readFile(join(HERE, "rwa-registry.json"), "utf8")));
-  const [protocols, { data: pools }] = await Promise.all([fetchJSON(PROTOCOLS_FEED), fetchJSON(POOLS_FEED)]);
+  const [protocols, { data: pools }, fallback] = await Promise.all([fetchJSON(PROTOCOLS_FEED), fetchJSON(POOLS_FEED), fetchFallbackTvl(registry)]);
 
   console.log(`  ${protocols.length} protocols · ${pools.length} pools`);
 
-  const result = runPipeline(registry, pools, protocols);
+  const result = runPipeline(registry, pools, protocols, fallback);
 
   const payload = {
     generatedAt: new Date().toISOString(),

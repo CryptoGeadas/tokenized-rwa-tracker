@@ -77,3 +77,28 @@ test("a registry fund DefiLlama no longer lists is dropped with its own reason, 
   const why = Object.fromEntries(out.dropped.map((f) => [f.slug, f.reason]));
   assert.deepEqual(why, { gone: "not found on DefiLlama", shrank: "under $5M" });
 });
+
+// ── fallback TVL (#20) ──────────────────────────────────────────────────────
+test("a fund with no DefiLlama TVL takes its fallback TVL, marked with the source", () => {
+  const reg = { ogm: fund({ lane: "equity", backing_type: "equity", trust_tier: null, tvl_source: { coingecko_category: "ondo-tokenized-assets" } }) };
+  const out = runPipeline(reg, [], [{ slug: "ogm", category: "RWA", tvl: null }], { ogm: 1.04e9 });
+  const f = out.secondaryLanes.equity[0];
+  assert.equal(f.tvl, 1.04e9);
+  assert.equal(f.tvlSource, "coingecko");
+  assert.deepEqual(out.dropped, []);
+});
+
+test("DefiLlama TVL always wins over the fallback", () => {
+  const reg = { a: fund({ tvl_source: { coingecko_category: "x" } }) };
+  const fromPools = runPipeline(reg, [pool("a", 70e6)], [proto("a", null)], { a: 9e9 }).mainStage[0];
+  assert.deepEqual([fromPools.tvl, fromPools.tvlSource], [70e6, "defillama"]);
+  assert.equal(runPipeline(reg, [], [proto("a", 80e6)], { a: 9e9 }).mainStage[0].tvl, 80e6);
+});
+
+test("no fallback number (CoinGecko failed or lacks the category) → dropped as 'no TVL on DefiLlama'", () => {
+  const reg = { a: fund({ tvl_source: { coingecko_category: "x" } }) };
+  for (const fallback of [{}, undefined, { a: 0 }, { a: null }]) {
+    const out = runPipeline(reg, [], [proto("a", null)], fallback);
+    assert.deepEqual(out.dropped.map((d) => d.reason), ["no TVL on DefiLlama"], JSON.stringify(fallback));
+  }
+});

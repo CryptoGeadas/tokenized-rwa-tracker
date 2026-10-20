@@ -1,4 +1,4 @@
-import { esc, fmtPct, fmtTvl, backingBadge, tierBadge } from "./fmt.js";
+import { esc, fmtPct, tvlCell, backingBadge, tierBadge } from "./fmt.js";
 
 const COLS = [
   { key: "name", label: "Fund" },
@@ -112,7 +112,7 @@ export function renderTable(container, funds, sortKey, sortDir, expandedSlug) {
       <td class="issuer-cell">${esc(f.issuer)}</td>
       <td>${backingBadge(f.backing_type)}</td>
       <td class="num yield-cell">${fmtPct(f.apyBase)}</td>
-      <td class="num tvl-cell">${fmtTvl(f.tvl)}</td>
+      <td class="num tvl-cell">${tvlCell(f)}</td>
       <td class="chains-cell">${(f.chains || []).length}</td>
       <td class="num">${tierBadge(f.trust_tier)}</td>
       <td class="oneliner">${esc(f.one_liner)}</td>

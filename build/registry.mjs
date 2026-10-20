@@ -19,7 +19,7 @@ export const WRAPPERS = ["regulated-fund", "on-chain-pool", "protocol", "LLC", "
 const SLUG = /^[a-z0-9][a-z0-9.()-]*$/; // a holds item in this form must be a registry slug
 export const LANES = ["main", "real-estate", "commodity", "equity"];
 const REQUIRED = ["name", "issuer", "backing_type", "lane", "one_liner"];
-const KNOWN = new Set([...REQUIRED, "trust_tier", "tier_overrides", "wrapper", "jurisdiction", "redemption", "chains", "mislabel", "pool_projects", "holds"]);
+const KNOWN = new Set([...REQUIRED, "trust_tier", "tier_overrides", "wrapper", "jurisdiction", "redemption", "chains", "mislabel", "pool_projects", "holds", "tvl_source"]);
 const RESERVED = new Set(["__proto__", "constructor", "prototype"]);
 
 export function checkRegistry(raw = {}) {
@@ -35,6 +35,11 @@ export function checkRegistry(raw = {}) {
     if (!Array.isArray(e.chains)) throw new Error(`${at} needs chains (a list)`);
     if (e.pool_projects !== undefined && !(Array.isArray(e.pool_projects) && e.pool_projects.every((p) => typeof p === "string" && p.trim())))
       throw new Error(`${at}: pool_projects must be a list of slugs`);
+    if (e.tvl_source !== undefined) {
+      const t = e.tvl_source, keys = t && typeof t === "object" ? Object.keys(t) : [];
+      if (keys.length !== 1 || keys[0] !== "coingecko_category" || typeof t.coingecko_category !== "string" || !t.coingecko_category.trim())
+        throw new Error(`${at}: tvl_source must be { "coingecko_category": "<category id>" }`);
+    }
     if (typeof e.mislabel !== "boolean") throw new Error(`${at} needs mislabel (true/false)`);
     if (!BACKING_TYPES.includes(e.backing_type)) throw new Error(`${at}: backing_type "${e.backing_type}" is not one of ${BACKING_TYPES.join(", ")}`);
     if (!LANES.includes(e.lane)) throw new Error(`${at}: lane "${e.lane}" is not one of ${LANES.join(", ")}`);

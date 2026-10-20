@@ -161,3 +161,9 @@ test("entry order doesn't matter: a wrapper may come before the fund it holds", 
   assert.doesNotThrow(() => checkRegistry({ vault: wrapper(["buidl"], 2), buidl: entry({ trust_tier: 2 }) }));
   assert.throws(() => checkRegistry({ vault: wrapper(["buidl"], 1), buidl: entry({ trust_tier: 2 }) }), /better than/);
 });
+
+test("tvl_source must name a CoinGecko category", () => {
+  assert.doesNotThrow(() => checkRegistry({ x: entry({ tvl_source: { coingecko_category: "ondo-tokenized-assets" } }) }));
+  for (const bad of ["ondo", {}, { coingecko_category: "" }, { coingecko: "x" }, { coingecko_category: "x", extra: 1 }])
+    assert.throws(() => checkRegistry({ x: entry({ tvl_source: bad }) }), /x.*tvl_source/, JSON.stringify(bad));
+});

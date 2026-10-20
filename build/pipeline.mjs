@@ -13,7 +13,8 @@ function bestPool(pools) {
   return source.sort((a, b) => (b.tvlUsd || 0) - (a.tvlUsd || 0))[0];
 }
 
-export function runPipeline(registry, allPools, protocols) {
+// fallbackTvl: { slug: usd } from a second source (CoinGecko, #20), used only when DefiLlama has no TVL.
+export function runPipeline(registry, allPools, protocols, fallbackTvl = {}) {
   const poolSlugsFor = (slug) => {
     const e = registry[slug];
     if (e?.pool_projects) return e.pool_projects;
@@ -64,7 +65,10 @@ export function runPipeline(registry, allPools, protocols) {
 
     const totalTvl = allFundPools.reduce((s, p) => s + (p.tvlUsd || 0), 0);
     const protoMatch = protocols.find((p) => p.slug === slug) || protocols.find((p) => psSlugs.includes(p.slug));
-    const tvl = totalTvl > 0 ? totalTvl : protoMatch?.tvl || 0;
+    const llamaTvl = totalTvl > 0 ? totalTvl : protoMatch?.tvl || 0;
+    const fallback = entry && llamaTvl === 0 && fallbackTvl?.[slug] > 0 ? fallbackTvl[slug] : 0;
+    const tvl = llamaTvl || fallback;
+    const tvlSource = fallback ? "coingecko" : "defillama";
 
     if (!entry) {
       if (tvl >= TVL_FLOOR && !claimedPoolSlugs.has(slug)) {
@@ -104,6 +108,7 @@ export function runPipeline(registry, allPools, protocols) {
       lane: entry.lane,
       holds: entry.holds?.map((h) => (registry[h] ? { slug: h, name: registry[h].name } : { name: h })),
       tvl,
+      tvlSource,
       apyBase: pool?.apyBase ?? null,
       apyReward: pool?.apyReward ?? null,
       apyBase7d: pool?.apyBase7d ?? null,

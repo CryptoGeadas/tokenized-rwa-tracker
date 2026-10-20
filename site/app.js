@@ -1,4 +1,4 @@
-import { esc, fmtTvl, backingBadge, BACKING_COLORS } from "./fmt.js";
+import { esc, fmtTvl, tvlCell, backingBadge, BACKING_COLORS } from "./fmt.js";
 import { renderScatter } from "./scatter.js";
 import { renderTable } from "./table.js";
 
@@ -120,7 +120,7 @@ function renderSecondary() {
         <td class="name-cell">${esc(f.name)}${f.holds?.length ? `<span class="wrapper-tag" title="Holds other RWA tokens">wrapper</span>` : ""}</td>
         <td>${esc(f.issuer)}</td>
         <td>${backingBadge(f.backing_type)}</td>
-        <td class="num">${fmtTvl(f.tvl)}</td>
+        <td class="num">${tvlCell(f)}</td>
         <td class="chains-cell">${(f.chains || []).join(", ")}</td>
         <td class="oneliner">${esc(f.one_liner)}${f.holds?.length ? `<br>Holds: ${esc(f.holds.map((h) => h.name).join(", "))}` : ""}</td>
       </tr>`

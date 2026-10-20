@@ -130,6 +130,7 @@ a.uncl-name:hover { color: var(--accent); }
 .uncl-chains { color: var(--muted); font-size: 12px; }
 .uncl-tvl { color: var(--muted); font: 13px var(--font-mono); font-variant-numeric: tabular-nums; }
 
+.tvl-src { margin-left: 4px; padding: 0 4px; border: 1px solid var(--border); border-radius: var(--r-ctl); font: 9px var(--font-mono); color: var(--muted); vertical-align: middle; cursor: help; }
 .coverage-line { margin: 14px 0 0; font: 13px var(--font-mono); color: var(--muted); }
 
 /* smaller funds, not reviewed */

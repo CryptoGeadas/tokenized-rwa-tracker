@@ -255,6 +255,7 @@
         <li>The pipeline fetches DefiLlama&rsquo;s <code>/protocols</code> list and <code>/pools</code> data.</li>
         <li>Each fund in the hand-curated <code>rwa-registry.json</code> is joined to its DefiLlama pool(s) by project slug (e.g., <code>blackrock-buidl</code>, <code>ondo-yield-assets</code>).</li>
         <li>TVL is summed across all matching pools. Yield is taken from the largest pool&rsquo;s <code>apyBase</code> field.</li>
+        <li>When DefiLlama reports no TVL for a fund we track (today: Ondo Global Markets, a basket of tokenized stocks), we use the market cap of the matching <a href="https://www.coingecko.com/en/categories" target="_blank" rel="noopener">CoinGecko category</a> instead, marked <strong>CG</strong> next to the number. If CoinGecko has no number either, the fund is hidden rather than shown with a guess.</li>
       </ul>
 
       <h3>Which funds we review</h3>

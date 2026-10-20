@@ -1,6 +1,8 @@
 const ESC_MAP = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
 export const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ESC_MAP[c]);
 export const fmtPct = (n) => (n == null ? "—" : `${n.toFixed(2)}%`);
+// A TVL taken from CoinGecko (DefiLlama has none, #20) is marked so the reader knows the source.
+export const tvlCell = (f) => fmtTvl(f.tvl) + (f.tvlSource === "coingecko" ? ` <span class="tvl-src" title="Market cap from CoinGecko: DefiLlama reports no TVL for this fund">CG</span>` : "");
 export const fmtTvl = (n) =>
   n >= 1e9 ? `$${(n / 1e9).toFixed(2)}B` : n >= 1e6 ? `$${(n / 1e6).toFixed(1)}M` : `$${Math.round(n / 1e3)}K`;
 

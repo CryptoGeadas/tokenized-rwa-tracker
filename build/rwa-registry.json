@@ -271,7 +271,8 @@
     "chains": ["ethereum"],
     "one_liner": "Tokenized US equities — TSLA, NVDA, etc. on-chain. Not a yield product; equity exposure only.",
     "mislabel": false,
-    "lane": "equity"
+    "lane": "equity",
+    "tvl_source": { "coingecko_category": "ondo-tokenized-assets" }
   },
 
   "hastra": {
