@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-20T15:42:05.497Z",
+  "generatedAt": "2026-10-20T15:45:44.614Z",
   "source": "https://defillama.com",
   "mainStage": [
     {
@@ -264,6 +264,31 @@
       "poolChain": "Ethereum"
     },
     {
+      "slug": "huma",
+      "name": "Huma Finance",
+      "issuer": "Huma",
+      "backing_type": "private-credit",
+      "trust_tier": 3,
+      "tier_overrides": null,
+      "wrapper": "on-chain-pool",
+      "jurisdiction": "US",
+      "redemption": "variable",
+      "chains": [
+        "solana"
+      ],
+      "one_liner": "Payment financing and receivables on Solana. Newer protocol, growing TVL but limited track record. Private credit risk.",
+      "mislabel": false,
+      "lane": "main",
+      "tvl": 378634526.8135097,
+      "apyBase": null,
+      "apyReward": null,
+      "apyBase7d": null,
+      "apyMean30d": null,
+      "poolCount": 0,
+      "symbol": null,
+      "poolChain": null
+    },
+    {
       "slug": "re",
       "name": "Re (reUSD)",
       "issuer": "Re",
@@ -446,15 +471,6 @@
       "apyBase": 6.23,
       "category": "RWA",
       "url": "https://defillama.com/protocol/usd-ai"
-    },
-    {
-      "slug": "huma",
-      "name": "Huma",
-      "tvl": 378634526.8135097,
-      "chains": [],
-      "apyBase": null,
-      "category": "RWA",
-      "url": "https://defillama.com/protocol/huma"
     },
     {
       "slug": "anemoy-capital",
@@ -798,32 +814,20 @@
   ],
   "dropped": [
     {
-      "slug": "mountain-protocol",
-      "name": "Mountain USDM",
-      "tvl": 1402575.1481693303,
-      "reason": "under $5M"
-    },
-    {
       "slug": "ondo-global-markets",
       "name": "Ondo Global Markets",
       "tvl": 0,
-      "reason": "under $5M"
-    },
-    {
-      "slug": "huma-finance-v2",
-      "name": "Huma Finance",
-      "tvl": 0,
-      "reason": "not found on DefiLlama"
+      "reason": "no TVL on DefiLlama"
     }
   ],
   "stats": {
-    "mainStageCount": 14,
+    "mainStageCount": 15,
     "secondaryCount": 2,
-    "unclassifiedCount": 13,
+    "unclassifiedCount": 12,
     "coverage": {
       "overLine": 29,
-      "classifiedOverLine": 16,
-      "classifiedTvlShare": 0.8152388326514213
+      "classifiedOverLine": 17,
+      "classifiedTvlShare": 0.8332601102551734
     }
   }
 }
