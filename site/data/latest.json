@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-20T18:47:15.013Z",
+  "generatedAt": "2026-10-20T18:52:02.261Z",
   "source": "https://defillama.com",
   "mainStage": [
     {
@@ -21,6 +21,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 4079253048,
+      "tvlSource": "defillama",
       "apyBase": 5.19041,
       "apyReward": 0,
       "apyBase7d": null,
@@ -50,6 +51,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 2981972988,
+      "tvlSource": "defillama",
       "apyBase": 3.49264,
       "apyReward": null,
       "apyBase7d": null,
@@ -79,6 +81,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 2573096160,
+      "tvlSource": "defillama",
       "apyBase": 3.7,
       "apyReward": null,
       "apyBase7d": 3.75,
@@ -105,6 +108,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 2386193636,
+      "tvlSource": "defillama",
       "apyBase": 3.61777,
       "apyReward": null,
       "apyBase7d": 3.38249,
@@ -130,6 +134,7 @@
       "mislabel": true,
       "lane": "main",
       "tvl": 1203514135,
+      "tvlSource": "defillama",
       "apyBase": 4.89969,
       "apyReward": null,
       "apyBase7d": null,
@@ -155,6 +160,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 979116631,
+      "tvlSource": "defillama",
       "apyBase": 2.59889,
       "apyReward": null,
       "apyBase7d": 2.59889,
@@ -181,6 +187,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 684534696,
+      "tvlSource": "defillama",
       "apyBase": 6.09295,
       "apyReward": null,
       "apyBase7d": null,
@@ -206,6 +213,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 593834444,
+      "tvlSource": "defillama",
       "apyBase": 3.83223,
       "apyReward": null,
       "apyBase7d": 5.1294,
@@ -231,6 +239,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 553895885,
+      "tvlSource": "defillama",
       "apyBase": 6.23,
       "apyReward": null,
       "apyBase7d": null,
@@ -256,6 +265,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 513875317,
+      "tvlSource": "defillama",
       "apyBase": 12.3514,
       "apyReward": 17.97866,
       "apyBase7d": null,
@@ -281,6 +291,7 @@
       "mislabel": true,
       "lane": "main",
       "tvl": 477421568.3664918,
+      "tvlSource": "defillama",
       "apyBase": null,
       "apyReward": null,
       "apyBase7d": null,
@@ -306,6 +317,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 388843551,
+      "tvlSource": "defillama",
       "apyBase": 4.04,
       "apyReward": null,
       "apyBase7d": null,
@@ -331,6 +343,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 378660773.3942218,
+      "tvlSource": "defillama",
       "apyBase": null,
       "apyReward": null,
       "apyBase7d": null,
@@ -356,6 +369,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 355069353,
+      "tvlSource": "defillama",
       "apyBase": 6.80626,
       "apyReward": null,
       "apyBase7d": null,
@@ -383,6 +397,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 332827344.15433174,
+      "tvlSource": "defillama",
       "apyBase": null,
       "apyReward": null,
       "apyBase7d": null,
@@ -408,6 +423,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 282467418,
+      "tvlSource": "defillama",
       "apyBase": 11.02,
       "apyReward": null,
       "apyBase7d": null,
@@ -435,6 +451,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 246721166.5661013,
+      "tvlSource": "defillama",
       "apyBase": null,
       "apyReward": null,
       "apyBase7d": null,
@@ -475,6 +492,7 @@
         }
       ],
       "tvl": 206259948,
+      "tvlSource": "defillama",
       "apyBase": 11.86288,
       "apyReward": null,
       "apyBase7d": null,
@@ -501,6 +519,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 183975630,
+      "tvlSource": "defillama",
       "apyBase": 3.5402,
       "apyReward": null,
       "apyBase7d": null,
@@ -527,6 +546,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 174504291.4255815,
+      "tvlSource": "defillama",
       "apyBase": null,
       "apyReward": null,
       "apyBase7d": null,
@@ -552,6 +572,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 152884053,
+      "tvlSource": "defillama",
       "apyBase": 12.90852,
       "apyReward": null,
       "apyBase7d": null,
@@ -577,6 +598,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 132067362.3271061,
+      "tvlSource": "defillama",
       "apyBase": null,
       "apyReward": null,
       "apyBase7d": null,
@@ -602,6 +624,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 105876615.25974236,
+      "tvlSource": "defillama",
       "apyBase": null,
       "apyReward": null,
       "apyBase7d": null,
@@ -639,6 +662,7 @@
         }
       ],
       "tvl": 103215126.72904179,
+      "tvlSource": "defillama",
       "apyBase": null,
       "apyReward": null,
       "apyBase7d": null,
@@ -665,6 +689,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 83796567,
+      "tvlSource": "defillama",
       "apyBase": 3.61258,
       "apyReward": null,
       "apyBase7d": 3.6777,
@@ -690,6 +715,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 70979850.9917956,
+      "tvlSource": "defillama",
       "apyBase": null,
       "apyReward": null,
       "apyBase7d": null,
@@ -716,6 +742,7 @@
       "mislabel": false,
       "lane": "main",
       "tvl": 56386682,
+      "tvlSource": "defillama",
       "apyBase": null,
       "apyReward": null,
       "apyBase7d": null,
@@ -745,6 +772,7 @@
         "mislabel": false,
         "lane": "real-estate",
         "tvl": 155090175.6326631,
+        "tvlSource": "defillama",
         "apyBase": null,
         "apyReward": null,
         "apyBase7d": null,
@@ -770,6 +798,7 @@
         "mislabel": false,
         "lane": "real-estate",
         "tvl": 101164258.66874737,
+        "tvlSource": "defillama",
         "apyBase": null,
         "apyReward": null,
         "apyBase7d": null,
@@ -780,7 +809,34 @@
       }
     ],
     "commodity": [],
-    "equity": []
+    "equity": [
+      {
+        "slug": "ondo-global-markets",
+        "name": "Ondo Global Markets",
+        "issuer": "Ondo Finance",
+        "backing_type": "equity",
+        "trust_tier": null,
+        "tier_overrides": null,
+        "wrapper": "regulated-fund",
+        "jurisdiction": "US",
+        "redemption": "market-hours",
+        "chains": [
+          "ethereum"
+        ],
+        "one_liner": "Tokenized US equities — TSLA, NVDA, etc. on-chain. Not a yield product; equity exposure only.",
+        "mislabel": false,
+        "lane": "equity",
+        "tvl": 1004889070.326249,
+        "tvlSource": "coingecko",
+        "apyBase": null,
+        "apyReward": null,
+        "apyBase7d": null,
+        "apyMean30d": null,
+        "poolCount": 0,
+        "symbol": null,
+        "poolChain": null
+      }
+    ]
   },
   "unclassified": [],
   "smaller": [
@@ -1035,22 +1091,15 @@
       "url": "https://defillama.com/protocol/eva-markets"
     }
   ],
-  "dropped": [
-    {
-      "slug": "ondo-global-markets",
-      "name": "Ondo Global Markets",
-      "tvl": 0,
-      "reason": "no TVL on DefiLlama"
-    }
-  ],
+  "dropped": [],
   "stats": {
     "mainStageCount": 27,
-    "secondaryCount": 2,
+    "secondaryCount": 3,
     "unclassifiedCount": 0,
     "coverage": {
-      "overLine": 29,
-      "classifiedOverLine": 29,
-      "classifiedTvlShare": 0.9775342402930541
+      "overLine": 30,
+      "classifiedOverLine": 30,
+      "classifiedTvlShare": 0.9785597333739959
     }
   }
 }
