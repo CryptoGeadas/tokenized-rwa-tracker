@@ -102,6 +102,7 @@ export function runPipeline(registry, allPools, protocols) {
       one_liner: entry.one_liner,
       mislabel: entry.mislabel,
       lane: entry.lane,
+      holds: entry.holds?.map((h) => (registry[h] ? { slug: h, name: registry[h].name } : { name: h })),
       tvl,
       apyBase: pool?.apyBase ?? null,
       apyReward: pool?.apyReward ?? null,

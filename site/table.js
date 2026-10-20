@@ -16,6 +16,8 @@ const WRAPPER_LABELS = {
   "on-chain-pool": "On-chain pool",
   protocol: "Protocol",
   none: "None",
+  LLC: "LLC",
+  "token-wrapper": "Wrapper (holds other RWA tokens)",
 };
 
 const REDEMPTION_LABELS = {
@@ -47,6 +49,10 @@ function renderDetailCard(f, colCount) {
     ? `<div class="detail-item"><div class="dk">Mislabel</div><div class="dv"><span class="mislabel-badge">&#9888; Not RWA</span></div></div>`
     : "";
 
+  const holdsHtml = f.holds?.length
+    ? `<div class="detail-item full"><div class="dk">Holds</div><div class="dv">${f.holds.map((h) => esc(h.name)).join(", ")}</div></div>`
+    : "";
+
   return `<tr class="detail-row"><td colspan="${colCount}">
     <div class="detail-card">
       <div class="detail-grid">
@@ -71,6 +77,7 @@ function renderDetailCard(f, colCount) {
           <div class="dv">${(f.chains || []).map((c) => esc(c)).join(", ") || "—"}</div>
         </div>
         ${mislabelHtml}
+        ${holdsHtml}
         <div class="detail-item full">
           <div class="dk">What you're actually holding</div>
           <div class="dv editorial">${esc(f.one_liner || "—")}</div>
@@ -98,9 +105,10 @@ export function renderTable(container, funds, sortKey, sortDir, expandedSlug) {
 
   const rows = sorted.map((f) => {
     const mislabelBadge = f.mislabel ? ` <span class="mislabel-badge">⚠ Not RWA</span>` : "";
+    const wrapperTag = f.holds?.length ? `<span class="wrapper-tag" title="Holds other RWA tokens">wrapper</span>` : "";
     const isOpen = expandedSlug === f.slug;
     const row = `<tr data-slug="${esc(f.slug)}" class="${isOpen ? "expanded" : ""}">
-      <td class="name-cell">${esc(f.name)}${mislabelBadge}</td>
+      <td class="name-cell">${esc(f.name)}${wrapperTag}${mislabelBadge}</td>
       <td class="issuer-cell">${esc(f.issuer)}</td>
       <td>${backingBadge(f.backing_type)}</td>
       <td class="num yield-cell">${fmtPct(f.apyBase)}</td>

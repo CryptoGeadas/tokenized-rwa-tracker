@@ -7,6 +7,7 @@ export const fmtTvl = (n) =>
 // Colours follow the bernardogeadas.com palette (tokens in /site.css).
 const ACCENT = "oklch(0.89 0.2 128)", WARN = "oklch(0.75 0.15 50)", DOWN = "oklch(0.68 0.19 25)";
 const TEAL = "oklch(0.78 0.12 180)", VIOLET = "oklch(0.72 0.15 300)", INFO = "oklch(0.74 0.11 235)";
+const GOLD = "oklch(0.86 0.13 90)", MUTED = "oklch(0.66 0.012 150)";
 const fill = (c) => c.replace(")", " / 0.7)");
 export const BACKING_COLORS = {
   "government-debt":       { fill: fill(ACCENT), stroke: ACCENT, label: "Gov debt",    badge: "bt-gov" },
@@ -15,6 +16,8 @@ export const BACKING_COLORS = {
   "real-estate":           { fill: fill(TEAL),   stroke: TEAL,   label: "Real estate", badge: "bt-realestate" },
   "commodity":             { fill: fill(VIOLET), stroke: VIOLET, label: "Commodity",   badge: "bt-commodity" },
   "equity":                { fill: fill(INFO),   stroke: INFO,   label: "Equity",      badge: "bt-equity" },
+  "insurance":             { fill: fill(GOLD),   stroke: GOLD,   label: "Insurance",   badge: "bt-insurance" },
+  "mixed/other":           { fill: fill(MUTED),  stroke: MUTED,  label: "Mixed/other", badge: "bt-other" },
 };
 
 export function backingBadge(type) {

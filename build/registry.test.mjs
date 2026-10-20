@@ -6,7 +6,7 @@ import { runPipeline } from "./pipeline.mjs";
 
 const entry = (over = {}) => ({
   name: "Fund", issuer: "Issuer", backing_type: "government-debt", trust_tier: 1, lane: "main",
-  one_liner: "Holds T-bills.", chains: ["ethereum"], mislabel: false, ...over,
+  one_liner: "Holds T-bills.", chains: ["ethereum"], mislabel: false, wrapper: "regulated-fund", ...over,
 });
 
 test("a valid registry loads, without its _comment", () => {
@@ -91,4 +91,73 @@ test("reserved slugs and unknown fields fail the build (a typo like trust_teir m
 
 test("a dropped fund with an unknown reason still gives a warning", () => {
   assert.deepEqual(registryWarnings([{ slug: "x", name: "X", tvl: 0, reason: "something new" }]).map((w) => w.id), ["registry-dropped"]);
+});
+
+// ── insurance type and wrapper rule (#14) ───────────────────────────────────
+const wrapper = (holds, trust_tier = 2) => entry({ wrapper: "token-wrapper", holds, trust_tier, one_liner: "Vault holding other RWA tokens." });
+
+test("insurance is an allowed backing type; an unknown type still fails", () => {
+  assert.doesNotThrow(() => checkRegistry({ onre: entry({ backing_type: "insurance", trust_tier: 3 }) }));
+  assert.throws(() => checkRegistry({ x: entry({ backing_type: "reinsurance" }) }), /backing_type "reinsurance"/);
+});
+
+test("a wrapper needs a holds list, and holds is only for wrappers", () => {
+  assert.throws(() => checkRegistry({ vault: entry({ wrapper: "token-wrapper" }) }), /vault.*holds/);
+  assert.throws(() => checkRegistry({ vault: wrapper([]) }), /vault.*holds/);
+  assert.throws(() => checkRegistry({ fund: entry({ holds: ["blackrock-buidl"] }) }), /fund.*holds.*token-wrapper/);
+});
+
+test("a holds item written as a slug must exist in the registry; a plain name is allowed", () => {
+  assert.throws(() => checkRegistry({ vault: wrapper(["no-such-fund"]) }), /vault.*holds "no-such-fund"/);
+  assert.doesNotThrow(() => checkRegistry({ buidl: entry(), vault: wrapper(["buidl", "Janus Henderson JAAA"]) }));
+});
+
+test("a wrapper's tier can't be better than the worst registry fund it holds", () => {
+  const reg = (tier) => ({ buidl: entry({ trust_tier: 1 }), maple: entry({ trust_tier: 2 }), vault: wrapper(["buidl", "maple"], tier) });
+  assert.throws(() => checkRegistry(reg(1)), /vault.*trust_tier 1.*better than.*maple.*2/);
+  assert.doesNotThrow(() => checkRegistry(reg(2)));
+  assert.doesNotThrow(() => checkRegistry(reg(3)));
+});
+
+test("a wrapper holding only outside funds passes on the registry side", () => {
+  assert.doesNotThrow(() => checkRegistry({ vault: wrapper(["Some Offchain Fund"], 1) }));
+});
+
+test("the page gets a wrapper's holdings with registry names resolved", () => {
+  const reg = checkRegistry({ buidl: entry({ name: "BlackRock BUIDL" }), vault: wrapper(["buidl", "Janus Henderson JAAA"]) });
+  const out = runPipeline(reg, [], [{ slug: "buidl", category: "RWA", tvl: 9e8 }, { slug: "vault", category: "RWA", tvl: 9e7 }]);
+  assert.deepEqual(out.mainStage.find((f) => f.slug === "vault").holds, [{ slug: "buidl", name: "BlackRock BUIDL" }, { name: "Janus Henderson JAAA" }]);
+  assert.equal(out.mainStage.find((f) => f.slug === "buidl").holds, undefined);
+});
+
+test("an unrated wrapper in a secondary lane is not flagged by the tier rule", () => {
+  assert.doesNotThrow(() => checkRegistry({ buidl: entry({ lane: "real-estate", backing_type: "real-estate", trust_tier: 2 }), vault: entry({ lane: "real-estate", backing_type: "real-estate", trust_tier: null, wrapper: "token-wrapper", holds: ["buidl"] }) }));
+});
+
+test("a registry fund spelled as a name or in other case can't dodge the tier rule", () => {
+  const reg = (h) => ({ buidl: entry({ name: "BlackRock BUIDL", trust_tier: 2 }), vault: wrapper([h], 1) });
+  for (const h of ["BUIDL", "BlackRock BUIDL", "blackrock buidl"]) assert.throws(() => checkRegistry(reg(h)), /vault.*registry fund "buidl".*slug/, h);
+});
+
+test("a rated wrapper can't hold an unrated registry fund", () => {
+  const reg = { realt: entry({ lane: "real-estate", backing_type: "real-estate", trust_tier: null }), vault: entry({ backing_type: "real-estate", wrapper: "token-wrapper", holds: ["realt"], trust_tier: 1 }) };
+  assert.throws(() => checkRegistry(reg), /vault.*not rated/);
+});
+
+test("the wrapper field must be a known value; bad holds items fail", () => {
+  assert.throws(() => checkRegistry({ x: entry({ wrapper: "token-wraper" }) }), /x.*wrapper "token-wraper"/);
+  for (const holds of [[""], ["  "], [1], [" buidl"], ["buidl", "buidl"], ["vault"]])
+    assert.throws(() => checkRegistry({ buidl: entry(), vault: wrapper(holds) }), /vault/, JSON.stringify(holds));
+});
+
+test("a wrapper is typed by what it holds: one shared type, or mixed/other for a mix", () => {
+  const base = { buidl: entry({ trust_tier: 1 }), maple: entry({ backing_type: "private-credit", trust_tier: 2 }) };
+  assert.throws(() => checkRegistry({ ...base, vault: { ...wrapper(["buidl"], 2), backing_type: "private-credit" } }), /vault.*expected "government-debt"/);
+  assert.throws(() => checkRegistry({ ...base, vault: wrapper(["buidl", "maple"], 2) }), /vault.*expected "mixed\/other"/);
+  assert.doesNotThrow(() => checkRegistry({ ...base, vault: { ...wrapper(["buidl", "maple"], 2), backing_type: "mixed/other" } }));
+});
+
+test("entry order doesn't matter: a wrapper may come before the fund it holds", () => {
+  assert.doesNotThrow(() => checkRegistry({ vault: wrapper(["buidl"], 2), buidl: entry({ trust_tier: 2 }) }));
+  assert.throws(() => checkRegistry({ vault: wrapper(["buidl"], 1), buidl: entry({ trust_tier: 2 }) }), /better than/);
 });

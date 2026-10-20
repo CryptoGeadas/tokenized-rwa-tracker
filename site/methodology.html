@@ -47,6 +47,8 @@
     .backing-dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
     .dot-gov { background: var(--accent); }
     .dot-credit { background: var(--warn); }
+    .dot-insurance { background: var(--gold); }
+    .dot-other { background: var(--muted); }
     .dot-synth { background: var(--down); }
     .backing-card .backing-label { font: 600 16px var(--font-head); color: var(--fg); margin-bottom: 4px; }
     .backing-card p { color: var(--muted); font-size: 14px; line-height: 1.65; margin: 0; }
@@ -182,7 +184,7 @@
           <span class="backing-dot dot-credit"></span>
           <div>
             <div class="backing-label">Private Credit</div>
-            <p>The token is backed by loans to real-world borrowers &mdash; corporate debt, trade finance, invoices, structured credit, or reinsurance premiums. Higher yield than government debt, but with meaningful counterparty and default risk. The key questions: who are the borrowers, what are the underwriting standards, and what happens in a downturn? Maple&rsquo;s 2022 defaults are a concrete example of this risk materializing.</p>
+            <p>The token is backed by loans to real-world borrowers &mdash; corporate debt, trade finance, invoices, structured credit, or loans backed by equipment such as GPUs (the one-liner names the collateral). Higher yield than government debt, but with meaningful counterparty and default risk. The key questions: who are the borrowers, what are the underwriting standards, and what happens in a downturn? Maple&rsquo;s 2022 defaults are a concrete example of this risk materializing.</p>
           </div>
         </div>
 
@@ -193,7 +195,29 @@
             <p>The token earns yield from a delta-neutral strategy &mdash; typically longing the spot asset and shorting the perpetual future to capture funding rates. This is <strong>not a real-world asset</strong>. The yield source is entirely on-chain and crypto-native. Products like Ethena USDe appear in RWA trackers because they hold some real-world collateral (e.g., BUIDL), but the yield mechanism is synthetic.</p>
           </div>
         </div>
+
+        <div class="backing-card">
+          <span class="backing-dot dot-insurance"></span>
+          <div>
+            <div class="backing-label">Insurance</div>
+            <p>The token earns insurance or reinsurance premiums. It loses money when insured events happen &mdash; storms, earthquakes, large claims &mdash; not when borrowers default. That makes its risk different from private credit, even when the yield looks similar.</p>
+          </div>
+        </div>
+
+        <div class="backing-card">
+          <span class="backing-dot dot-other"></span>
+          <div>
+            <div class="backing-label">Mixed / Other</div>
+            <p>A fund whose backing really is a mix of the types above. It is not a place to park funds we haven&rsquo;t thought about: the one-liner always says what the mix is.</p>
+          </div>
+        </div>
       </div>
+
+      <h3>When we add a new type</h3>
+      <p>When a fund has a source of return that no type above describes honestly, we add a new type. We don&rsquo;t squeeze it into an existing group to keep the list short. Insurance was added this way.</p>
+
+      <h3>Wrappers</h3>
+      <p>Some products hold other RWA tokens &mdash; for example a vault that holds BUIDL and USYC. Each wrapper gets its own row, typed by what it holds, with a &ldquo;wrapper&rdquo; tag; its details list what&rsquo;s inside. Its trust tier can never be better than the weakest fund it holds, because you carry that fund&rsquo;s risk plus one more layer: the wrapper&rsquo;s own contracts, manager and redemption path.</p>
 
       <h3>Secondary Lanes</h3>
       <p>Three additional backing types exist outside the main dollar/credit stage. These are tracked in lighter-weight tables without trust tier ratings, because the evaluation criteria for real estate, commodities, and equities differ substantially from dollar-denominated yield products.</p>

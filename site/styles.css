@@ -26,6 +26,8 @@
 .dot-legend.gov { background: var(--accent); }
 .dot-legend.credit { background: var(--warn); }
 .dot-legend.synth { background: var(--down); }
+.dot-legend.insurance { background: var(--gold); }
+.dot-legend.other { background: var(--muted); }
 .legend-note { margin-left: auto; }
 
 .scatter-tooltip {
@@ -71,6 +73,9 @@
 .bt-realestate { color: var(--teal); }
 .bt-commodity { color: var(--violet); }
 .bt-equity { color: var(--info); }
+.bt-insurance { color: var(--gold); }
+.bt-other { color: var(--muted); }
+.wrapper-tag { margin-left: 6px; padding: 1px 6px; border: 1px solid var(--border); border-radius: var(--r-ctl); font: 10px var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); vertical-align: middle; }
 
 /* trust tier badges */
 .tier {

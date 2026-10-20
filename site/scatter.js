@@ -1,5 +1,8 @@
 import { esc, fmtPct, fmtTvl, BACKING_COLORS } from "./fmt.js";
 
+// A type with no color is a bug (build/fmt.test.mjs checks every type has one); draw it hollow, not as another type.
+const UNKNOWN = { fill: "transparent", stroke: "oklch(0.96 0.005 120)" };
+
 export function renderScatter(container, tooltip, funds, isDark) {
   container.innerHTML = "";
   if (!funds.length) return;
@@ -95,8 +98,8 @@ export function renderScatter(container, tooltip, funds, isDark) {
 
   dots.append("circle")
     .attr("r", (f) => rScale(f.tvl))
-    .attr("fill", (f) => (BACKING_COLORS[f.backing_type] || BACKING_COLORS["private-credit"]).fill)
-    .attr("stroke", (f) => (BACKING_COLORS[f.backing_type] || BACKING_COLORS["private-credit"]).stroke)
+    .attr("fill", (f) => (BACKING_COLORS[f.backing_type] || UNKNOWN).fill)
+    .attr("stroke", (f) => (BACKING_COLORS[f.backing_type] || UNKNOWN).stroke)
     .attr("stroke-width", 1.5)
     .style("cursor", "pointer");
 
