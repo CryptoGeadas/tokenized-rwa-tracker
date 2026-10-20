@@ -272,5 +272,187 @@
     "one_liner": "Tokenized US equities — TSLA, NVDA, etc. on-chain. Not a yield product; equity exposure only.",
     "mislabel": false,
     "lane": "equity"
+  },
+
+  "hastra": {
+    "name": "Hastra PRIME",
+    "issuer": "Hastra / Figure",
+    "backing_type": "private-credit",
+    "trust_tier": 3,
+    "tier_overrides": null,
+    "wrapper": "on-chain-pool",
+    "jurisdiction": "US",
+    "redemption": "varies",
+    "chains": ["ethereum", "solana"],
+    "one_liner": "Yield from Figure's home-equity loans (HELOCs), passed on through Hastra's PRIME token. Real US consumer credit from a listed lender; redemption terms are not clearly published.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "usd-ai": {
+    "name": "USD AI (sUSDai)",
+    "issuer": "USD.AI (Permian Labs)",
+    "backing_type": "private-credit",
+    "trust_tier": 3,
+    "tier_overrides": "Calls itself a synthetic dollar, but the yield is from loans to GPU operators plus T-bills, not a basis trade.",
+    "wrapper": "on-chain-pool",
+    "jurisdiction": "US",
+    "redemption": "epoch-based",
+    "chains": ["arbitrum"],
+    "one_liner": "Loans to AI companies, backed by their GPUs (70-80% loan-to-value, Delaware SPV), with the unlent cash in T-bills. Withdrawals go through a queue, not on demand.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "anemoy-capital": {
+    "name": "Anemoy funds (JTRSY and others)",
+    "issuer": "Anemoy Capital / Janus Henderson",
+    "backing_type": "government-debt",
+    "trust_tier": 2,
+    "tier_overrides": null,
+    "wrapper": "regulated-fund",
+    "jurisdiction": "BVI",
+    "redemption": "daily",
+    "chains": ["ethereum", "base", "celo"],
+    "one_liner": "Mostly the Janus Henderson Anemoy Treasury Fund (JTRSY): 0-3 month US T-bills in a BVI-regulated fund, daily USDC redemption, non-US professional investors only. The same issuer also runs smaller credit funds (Apollo credit, AAA CLO).",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "onre": {
+    "name": "OnRe ONyc",
+    "issuer": "OnRe",
+    "backing_type": "insurance",
+    "trust_tier": 3,
+    "tier_overrides": "Reinsurance return on top of crypto-dollar collateral that includes sUSDe (Ethena), so the token carries both risks.",
+    "wrapper": "regulated-fund",
+    "jurisdiction": "Bermuda",
+    "redemption": "variable",
+    "chains": ["solana"],
+    "one_liner": "Reinsurance: the token's value rises as premiums are earned and falls when claims are paid (storms, disasters). The collateral is held in yield-bearing dollars (sUSDe, sUSDS, T-bills, syrupUSDC), so it also carries their risk.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "opentrade": {
+    "name": "OpenTrade vaults",
+    "issuer": "OpenTrade",
+    "backing_type": "government-debt",
+    "trust_tier": 3,
+    "tier_overrides": null,
+    "wrapper": "on-chain-pool",
+    "jurisdiction": "Cayman Islands",
+    "redemption": "daily",
+    "chains": ["avalanche", "ethereum", "plume"],
+    "one_liner": "Stablecoin vaults backed by short US T-bills and money market funds, held through bankruptcy-remote SPVs. Mostly sold white-label inside fintech apps, not bought directly.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "plume-vaults": {
+    "name": "Plume Nest vaults",
+    "issuer": "Plume",
+    "backing_type": "private-credit",
+    "trust_tier": 3,
+    "tier_overrides": null,
+    "wrapper": "token-wrapper",
+    "holds": ["BlackOpal LiquidStone II (Brazilian card receivables, via nOPAL)", "nPRIME vault", "Smaller Nest vaults (T-bills, credit, basis carry)"],
+    "jurisdiction": "unknown",
+    "redemption": "varies",
+    "chains": ["ethereum", "plume", "solana", "binance", "avalanche"],
+    "one_liner": "Vaults that hold other RWA products. About 56% is nOPAL: Brazilian card-installment receivables (BlackOpal). The rest is spread over nPRIME and smaller T-bill, credit and basis-carry vaults.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "r25": {
+    "name": "R25 (rcUSD and credit pools)",
+    "issuer": "R25",
+    "backing_type": "mixed/other",
+    "trust_tier": 3,
+    "tier_overrides": null,
+    "wrapper": "on-chain-pool",
+    "jurisdiction": "unknown",
+    "redemption": "varies",
+    "chains": ["pharos", "sui"],
+    "one_liner": "Two kinds of product: rcUSD, a dollar token backed by tokenized money market funds and stablecoins, and fixed-term pools of emerging-market consumer credit (VRPC). R25 keeps an undisclosed spread.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "apyx-protocol": {
+    "name": "Apyx apxUSD / apyUSD",
+    "issuer": "Apyx",
+    "backing_type": "equity",
+    "trust_tier": 4,
+    "tier_overrides": "Sold as a synthetic dollar, but backed by one company's preferred stock (Strategy's STRC). Traded as low as $0.70 when STRC fell.",
+    "wrapper": "on-chain-pool",
+    "jurisdiction": "unknown",
+    "redemption": "secondary-market",
+    "chains": ["ethereum"],
+    "one_liner": "A 'dollar' backed mostly (~82%) by Strategy's STRC preferred shares; the yield is their dividend. It lost up to 30% of its value when STRC fell, so it does not behave like a dollar.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "theo-network-thusd": {
+    "name": "Theo thUSD",
+    "issuer": "Theo Network",
+    "backing_type": "basis-trade/synthetic",
+    "trust_tier": 3,
+    "tier_overrides": "Delta-neutral like Ethena, but the trade is in physical gold and CME futures, not crypto perps.",
+    "wrapper": "on-chain-pool",
+    "jurisdiction": "unknown",
+    "redemption": "varies",
+    "chains": ["ethereum"],
+    "one_liner": "A dollar token earning a hedged gold carry trade (long physical gold, short CME gold futures, plus gold lending) and T-bills through Theo's thBILL. Minting and redeeming is for whitelisted firms only.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "valos": {
+    "name": "Valos vUSD",
+    "issuer": "Valos",
+    "backing_type": "private-credit",
+    "trust_tier": 3,
+    "tier_overrides": null,
+    "wrapper": "on-chain-pool",
+    "jurisdiction": "EU",
+    "redemption": "varies",
+    "chains": ["monad"],
+    "one_liner": "Loans to large crypto trading firms, run by a Finnish asset manager. Deposits in AUSD on Monad; loan data checked live through Accountable. Real credit risk, but the borrowers are crypto firms, not the real economy.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "frax-usd": {
+    "name": "Frax USD (frxUSD)",
+    "issuer": "Frax Finance",
+    "backing_type": "government-debt",
+    "trust_tier": 2,
+    "tier_overrides": null,
+    "wrapper": "token-wrapper",
+    "holds": ["blackrock-buidl", "WisdomTree WTGXX", "Superstate USTB"],
+    "jurisdiction": "US",
+    "redemption": "daily",
+    "chains": ["ethereum"],
+    "one_liner": "A stablecoin backed 1:1 by tokenized T-bill funds held at approved custodians (WisdomTree, Superstate, BlackRock BUIDL). Yield goes to sfrxUSD holders. Reserve reports are self-published, not audited.",
+    "mislabel": false,
+    "lane": "main"
+  },
+
+  "sky-rwa": {
+    "name": "Sky RWA vaults",
+    "issuer": "Sky (MakerDAO)",
+    "backing_type": "private-credit",
+    "trust_tier": 3,
+    "tier_overrides": null,
+    "wrapper": "LLC",
+    "jurisdiction": "US",
+    "redemption": "secondary-market",
+    "chains": ["ethereum"],
+    "one_liner": "Not something you can buy: the old MakerDAO real-world loan vaults that back USDS (e.g. New Silver real-estate loans, Fortunafi). Shown so you know USDS holds them.",
+    "mislabel": false,
+    "lane": "main"
   }
 }
