@@ -120,9 +120,17 @@
   border-bottom: 1px solid var(--border); font-size: 14px;
 }
 .uncl-row:last-child { border-bottom: 0; }
-.uncl-name { font-weight: 600; flex: 1; min-width: 140px; }
+.uncl-name { font-weight: 600; flex: 1; min-width: 140px; color: var(--fg); text-decoration: none; }
+a.uncl-name:hover { color: var(--accent); }
 .uncl-chains { color: var(--muted); font-size: 12px; }
 .uncl-tvl { color: var(--muted); font: 13px var(--font-mono); font-variant-numeric: tabular-nums; }
+
+.coverage-line { margin: 14px 0 0; font: 13px var(--font-mono); color: var(--muted); }
+
+/* smaller funds, not reviewed */
+.smaller-box { border-top: 1px solid var(--border); margin: 40px 0; padding-top: 14px; }
+.smaller-box summary { cursor: pointer; font: 12px var(--font-mono); text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
+.smaller-box summary:hover { color: var(--fg); }
 
 /* secondary lanes */
 .lane-block { margin-bottom: 28px; overflow-x: auto; }

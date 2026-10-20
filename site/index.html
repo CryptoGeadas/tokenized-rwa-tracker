@@ -83,15 +83,16 @@
         <span class="label">sortable &middot; all main-stage funds</span>
       </div>
       <div id="table-container"></div>
+      <p id="coverage-line" class="coverage-line" style="display:none"></p>
     </section>
 
     <section id="unclassified-section" style="display:none">
       <div class="callout-box">
         <div class="callout-head">
           <span class="callout-icon">&#9888;</span>
-          <h2>New &amp; Unclassified</h2>
+          <h2>New, under review</h2>
         </div>
-        <p class="callout-sub">These RWA protocols crossed $5M TVL on DefiLlama but haven&rsquo;t been reviewed and classified yet. They may be legitimate, mislabeled, or too new to assess.</p>
+        <p class="callout-sub">These RWA funds are over $50M on DefiLlama but we haven&rsquo;t reviewed them yet, so they have no backing type or trust tier. They stay here until they are classified.</p>
         <div id="unclassified-list"></div>
         <button id="uncl-toggle" class="btn btn-sm" style="display:none;margin-top:12px"></button>
       </div>
@@ -103,6 +104,14 @@
         <span class="label">real estate &middot; commodity &middot; equity</span>
       </div>
       <div id="secondary-lanes"></div>
+    </section>
+
+    <section id="smaller-section" style="display:none">
+      <details class="smaller-box">
+        <summary><span id="smaller-summary">Smaller funds, not reviewed</span></summary>
+        <p class="callout-sub">DefiLlama lists these RWA funds between $5M and $50M. We only review funds over $50M, so these have no backing type or trust tier. Follow the link to look one up.</p>
+        <div id="smaller-list"></div>
+      </details>
     </section>
 
       <div class="tool-legend" id="foot"></div>

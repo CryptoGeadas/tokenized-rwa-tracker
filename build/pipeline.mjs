@@ -1,4 +1,8 @@
-const TVL_FLOOR = 5_000_000;
+// $5M floor: nothing under it is shown. $50M review line: every fund at or above it
+// must be classified; an unreviewed fund there is "in review", one below it is a
+// "smaller fund, not reviewed".
+export const TVL_FLOOR = 5_000_000;
+export const REVIEW_LINE = 50_000_000;
 
 function bestPool(pools) {
   if (!pools.length) return null;
@@ -33,6 +37,8 @@ export function runPipeline(registry, allPools, protocols) {
   const mainStage = [];
   const secondaryLanes = { "real-estate": [], commodity: [], equity: [] };
   const unclassified = [];
+  const smaller = [];
+  const dropped = [];
 
   const claimedPoolSlugs = new Set();
   for (const slug of Object.keys(registry)) {
@@ -60,15 +66,22 @@ export function runPipeline(registry, allPools, protocols) {
 
     if (!entry) {
       if (tvl >= TVL_FLOOR && !claimedPoolSlugs.has(slug)) {
-        unclassified.push({
+        (tvl >= REVIEW_LINE ? unclassified : smaller).push({
           slug,
           name: protoMatch?.name || slug,
           tvl,
           chains: pool ? [pool.chain] : [],
           apyBase: pool?.apyBase ?? null,
           category: protoMatch?.category || "RWA",
+          url: `https://defillama.com/protocol/${slug}`,
         });
       }
+      continue;
+    }
+
+    if (tvl < TVL_FLOOR) {
+      const found = allFundPools.length > 0 || protoMatch != null;
+      dropped.push({ slug, name: entry.name, tvl, reason: found ? "under $5M" : "not found on DefiLlama" });
       continue;
     }
 
@@ -105,18 +118,31 @@ export function runPipeline(registry, allPools, protocols) {
 
   mainStage.sort((a, b) => (b.tvl || 0) - (a.tvl || 0));
   unclassified.sort((a, b) => (b.tvl || 0) - (a.tvl || 0));
+  smaller.sort((a, b) => (b.tvl || 0) - (a.tvl || 0));
   for (const lane of Object.values(secondaryLanes)) {
     lane.sort((a, b) => (b.tvl || 0) - (a.tvl || 0));
   }
+
+  const classified = [...mainStage, ...Object.values(secondaryLanes).flat()];
+  const sum = (list) => list.reduce((t, f) => t + (f.tvl || 0), 0);
+  const classifiedTvl = sum(classified), totalTvl = classifiedTvl + sum(unclassified) + sum(smaller);
+  const classifiedOverLine = classified.filter((f) => f.tvl >= REVIEW_LINE).length;
 
   return {
     mainStage,
     secondaryLanes,
     unclassified,
+    smaller,
+    dropped,
     stats: {
       mainStageCount: mainStage.length,
       secondaryCount: Object.values(secondaryLanes).reduce((s, l) => s + l.length, 0),
-      unclassifiedCount: unclassified.length,
+      unclassifiedCount: unclassified.length, // in review: unclassified at or over $50M (read by the website ticker)
+      coverage: {
+        overLine: classifiedOverLine + unclassified.length,
+        classifiedOverLine,
+        classifiedTvlShare: totalTvl > 0 ? classifiedTvl / totalTvl : null,
+      },
     },
   };
 }

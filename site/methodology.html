@@ -231,7 +231,13 @@
         <li>The pipeline fetches DefiLlama&rsquo;s <code>/protocols</code> list and <code>/pools</code> data.</li>
         <li>Each fund in the hand-curated <code>rwa-registry.json</code> is joined to its DefiLlama pool(s) by project slug (e.g., <code>blackrock-buidl</code>, <code>ondo-yield-assets</code>).</li>
         <li>TVL is summed across all matching pools. Yield is taken from the largest pool&rsquo;s <code>apyBase</code> field.</li>
-        <li>Protocols that appear in DefiLlama&rsquo;s RWA category but are not in the registry are listed as &ldquo;New &amp; Unclassified&rdquo; (with a $5M TVL floor).</li>
+      </ul>
+
+      <h3>Which funds we review</h3>
+      <ul>
+        <li><strong>$5M floor.</strong> Nothing under $5M TVL is shown. A classified fund that falls under $5M (for example, one that was wound down) drops off the tables.</li>
+        <li><strong>$50M review line.</strong> Every fund over $50M gets a backing type, a trust tier and a one-liner. A fund that crosses $50M before we have reviewed it is listed as &ldquo;New, under review&rdquo; until it is classified. When nothing is waiting, the page shows a coverage line instead: how many funds over $50M are reviewed and what share of RWA TVL they hold.</li>
+        <li><strong>Smaller funds, not reviewed.</strong> Funds in DefiLlama&rsquo;s RWA category between $5M and $50M that we haven&rsquo;t classified are listed at the bottom of the page, with a link to DefiLlama. We may still classify one when it is interesting, for example a new euro fund.</li>
       </ul>
 
       <div class="callout">

@@ -18,6 +18,7 @@ async function load() {
   rerender();
   renderUnclassified();
   renderSecondary();
+  renderSmaller();
   renderFooter();
 }
 
@@ -31,24 +32,28 @@ function rerender() {
 
 const UNCL_VISIBLE = 15;
 
+const unclRows = (list) => list.map((u) =>
+  `<div class="uncl-row"><a class="uncl-name" href="${esc(u.url || `https://defillama.com/protocol/${u.slug}`)}" rel="noopener" target="_blank">${esc(u.name)} ↗</a><span class="uncl-chains">${esc((u.chains || []).join(", "))}</span><span class="uncl-tvl">${fmtTvl(u.tvl)}</span></div>`
+).join("");
+
+// In review: unclassified funds over $50M. When there are none, the coverage line shows instead.
 function renderUnclassified() {
-  const items = state.data.unclassified || [];
+  // The filter only matters for a snapshot built before the $50M line existed.
+  const items = (state.data.unclassified || []).filter((u) => u.tvl >= 50e6);
   const section = $("#unclassified-section");
+  renderCoverage();
   if (!items.length) { section.style.display = "none"; return; }
   section.style.display = "block";
 
   state.unclExpanded = false;
 
-  const renderRows = (list) => list.map((u) =>
-    `<div class="uncl-row"><span class="uncl-name">${esc(u.name)}</span><span class="uncl-chains">${(u.chains || []).join(", ")}</span><span class="uncl-tvl">${fmtTvl(u.tvl)}</span></div>`
-  ).join("");
 
   const listEl = $("#unclassified-list");
   const toggleBtn = $("#uncl-toggle");
 
   const update = () => {
     const visible = state.unclExpanded ? items : items.slice(0, UNCL_VISIBLE);
-    listEl.innerHTML = renderRows(visible);
+    listEl.innerHTML = unclRows(visible);
     if (items.length > UNCL_VISIBLE) {
       toggleBtn.style.display = "inline-flex";
       toggleBtn.textContent = state.unclExpanded
@@ -61,6 +66,27 @@ function renderUnclassified() {
 
   toggleBtn.onclick = () => { state.unclExpanded = !state.unclExpanded; update(); };
   update();
+}
+
+// Shown only when the build's own numbers say every fund over $50M is classified.
+function renderCoverage() {
+  const el = $("#coverage-line");
+  const c = state.data.stats?.coverage;
+  const allReviewed = c && Array.isArray(state.data.unclassified) && state.data.unclassified.length === 0 && c.overLine === c.classifiedOverLine;
+  if (!allReviewed) { el.style.display = "none"; return; }
+  const share = c.classifiedTvlShare == null ? "share of RWA TVL unknown" : `${Math.round(c.classifiedTvlShare * 100)}% of TVL in RWA funds over $5M`;
+  const day = new Date(state.data.generatedAt).toISOString().slice(0, 10);
+  el.textContent = `All funds over $50M reviewed · ${c.classifiedOverLine} funds, ${share} · checked ${day}`;
+  el.style.display = "block";
+}
+
+function renderSmaller() {
+  const items = state.data.smaller || [];
+  const section = $("#smaller-section");
+  if (!items.length) { section.style.display = "none"; return; }
+  section.style.display = "block";
+  $("#smaller-summary").textContent = `Smaller funds, not reviewed (${items.length})`;
+  $("#smaller-list").innerHTML = unclRows(items);
 }
 
 // ─── Secondary lane tables ────────────────────────────────────────────────
@@ -114,7 +140,7 @@ function renderFooter() {
   const ageH = Math.round((Date.now() - when) / 3.6e6);
   const s = d.stats;
   $("#foot").innerHTML = `
-    ${s.mainStageCount} main-stage · ${s.secondaryCount} secondary · ${s.unclassifiedCount} unclassified ·
+    ${s.mainStageCount} main-stage · ${s.secondaryCount} secondary · ${s.unclassifiedCount} in review ·${Array.isArray(d.smaller) ? ` ${d.smaller.length} smaller, not reviewed ·` : ""}
     data ${ageH}h old (${when.toISOString().slice(0, 16).replace("T", " ")} UTC) ·
     source <a href="https://defillama.com">DefiLlama</a> ·
     <a href="./data/latest.json">raw JSON</a> ·
@@ -123,7 +149,7 @@ function renderFooter() {
 
   // shared site footer: the tool fills its own data-health line
   const line = $("[data-tool-dataline]");
-  if (line) line.textContent = `Data as of ${when.toISOString().slice(11, 16)} UTC, ${when.toISOString().slice(0, 10)} · Source: DefiLlama · Funds tracked: ${s.mainStageCount + s.secondaryCount + s.unclassifiedCount} · Not financial advice`;
+  if (line) line.textContent = `Data as of ${when.toISOString().slice(11, 16)} UTC, ${when.toISOString().slice(0, 10)} · Source: DefiLlama · Funds tracked: ${s.mainStageCount + s.secondaryCount + s.unclassifiedCount + (Array.isArray(d.smaller) ? d.smaller.length : 0)} · Not financial advice`;
   $("[data-tool-dot]")?.classList.toggle("stale", ageH > 36);
 }
 

@@ -42,8 +42,13 @@ async function main() {
     `\nwrote ${OUT}` +
     `\n  main-stage: ${result.stats.mainStageCount}` +
     `\n  secondary:  ${result.stats.secondaryCount}` +
-    `\n  unclassified: ${result.stats.unclassifiedCount}`
+    `\n  in review (over $50M, unclassified): ${result.stats.unclassifiedCount}` +
+    `\n  smaller funds, not reviewed: ${result.smaller.length}`
   );
+  for (const f of result.dropped) {
+    if (f.reason === "under $5M") console.log(`  dropped (under $5M): ${f.name} [${f.slug}] $${(f.tvl / 1e6).toFixed(1)}M`);
+    else console.warn(`  ⚠ registry fund not found on DefiLlama — check its slug: ${f.name} [${f.slug}]`);
+  }
 
   for (const f of result.mainStage) {
     const yld = f.apyBase != null ? f.apyBase.toFixed(2) + "%" : "n/a";
