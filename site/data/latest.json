@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-20T15:45:44.614Z",
+  "generatedAt": "2026-10-20T15:53:17.526Z",
   "source": "https://defillama.com",
   "mainStage": [
     {
@@ -411,7 +411,7 @@
         "one_liner": "Tokenized US rental properties. Each token is a share in an LLC holding a single property. Rental yield distributed weekly.",
         "mislabel": false,
         "lane": "real-estate",
-        "tvl": 155091136.8916074,
+        "tvl": 155089926.34735045,
         "apyBase": null,
         "apyReward": null,
         "apyBase7d": null,
@@ -436,7 +436,7 @@
         "one_liner": "Fractional US rental real estate. Similar model to RealT but on Algorand. Rental income distributed to token holders.",
         "mislabel": false,
         "lane": "real-estate",
-        "tvl": 101144856.45652887,
+        "tvl": 101158514.95165537,
         "apyBase": null,
         "apyReward": null,
         "apyBase7d": null,
@@ -475,7 +475,7 @@
     {
       "slug": "anemoy-capital",
       "name": "Anemoy Capital",
-      "tvl": 333241196.01563245,
+      "tvl": 332828730.15743506,
       "chains": [],
       "apyBase": null,
       "category": "RWA",
@@ -535,7 +535,7 @@
     {
       "slug": "theo-network-thusd",
       "name": "Theo Network thUSD",
-      "tvl": 132054897.77776751,
+      "tvl": 132054898.8357814,
       "chains": [],
       "apyBase": null,
       "category": "RWA",
@@ -720,7 +720,7 @@
     {
       "slug": "solv-rwa",
       "name": "Solv RWA",
-      "tvl": 9287743.27352712,
+      "tvl": 9444148.724982897,
       "chains": [],
       "apyBase": null,
       "category": "RWA",
@@ -767,7 +767,7 @@
     {
       "slug": "narausd",
       "name": "NaraUSD",
-      "tvl": 6819127.366710869,
+      "tvl": 6819676.389840688,
       "chains": [],
       "apyBase": null,
       "category": "RWA",
@@ -827,7 +827,7 @@
     "coverage": {
       "overLine": 29,
       "classifiedOverLine": 17,
-      "classifiedTvlShare": 0.8332601102551734
+      "classifiedTvlShare": 0.8332703425431115
     }
   }
 }
