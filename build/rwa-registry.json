@@ -455,5 +455,34 @@
     "one_liner": "Not something you can buy: the old MakerDAO real-world loan vaults that back USDS (e.g. New Silver real-estate loans, Fortunafi). Shown so you know USDS holds them.",
     "mislabel": false,
     "lane": "main"
+  },
+  "ember": {
+    "name": "Ember vaults",
+    "issuer": "Ember (Bluefin team)",
+    "backing_type": "mixed/other",
+    "trust_tier": 4,
+    "tier_overrides": "About a third of the money is in RWA vaults (Bitwise Premium+, R25 Treasury), but most of it earns crypto yield (RockawayX Y10K, Ember Earn, basis and liquidity vaults), so the platform is rated as not RWA.",
+    "wrapper": "token-wrapper",
+    "holds": [
+      "r25",
+      "hastra",
+      "usd-ai",
+      "huma",
+      "RockawayX Y10K (pre-deposits, launches, curated crypto lending)",
+      "Ember Earn (stablecoin lending spreads, leverage loops, funding-rate trades)",
+      "Smaller crypto vaults (SUI, BLUE, BTC, basis, concentrated liquidity)"
+    ],
+    "jurisdiction": "unknown",
+    "redemption": "varies",
+    "chains": [
+      "ethereum",
+      "sui",
+      "base",
+      "pharos",
+      "monad"
+    ],
+    "one_liner": "A shelf of about 29 vaults run by different managers. About a third is RWA: Bitwise's leveraged vault on Hastra PRIME, sUSDai and Huma PST, and R25's rcUSD. Most of the rest is crypto yield: RockawayX launch deals, lending loops and funding-rate trades.",
+    "mislabel": true,
+    "lane": "main"
   }
 }
