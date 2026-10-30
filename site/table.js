@@ -1,4 +1,5 @@
 import { esc, fmtPct, tvlCell, backingBadge, tierBadge } from "./fmt.js";
+import { flowsCardHtml } from "./flows.js";
 
 const COLS = [
   { key: "name", label: "Fund" },
@@ -38,7 +39,7 @@ function sortVal(f, key) {
   return f[key] ?? -Infinity;
 }
 
-function renderDetailCard(f, colCount) {
+function renderDetailCard(f, colCount, opts) {
   const tierHtml = f.trust_tier != null
     ? `${tierBadge(f.trust_tier)} <span style="margin-left:6px;font-size:13px;color:var(--muted)">Tier ${f.trust_tier}</span>`
     : `<span style="font-size:13px;color:var(--muted)">Not rated</span>`;
@@ -82,12 +83,14 @@ function renderDetailCard(f, colCount) {
           <div class="dk">What you're actually holding</div>
           <div class="dv editorial">${esc(f.one_liner || "—")}</div>
         </div>
+        ${opts.flowsCard ? flowsCardHtml(f) : ""}
       </div>
     </div>
   </td></tr>`;
 }
 
-export function renderTable(container, funds, sortKey, sortDir, expandedSlug) {
+// opts.flowsCard: the snapshot's switch for the Money flows card (#21)
+export function renderTable(container, funds, sortKey, sortDir, expandedSlug, opts = {}) {
   const sorted = funds.slice();
   const dir = sortDir === "asc" ? 1 : -1;
   sorted.sort((a, b) => {
@@ -117,7 +120,7 @@ export function renderTable(container, funds, sortKey, sortDir, expandedSlug) {
       <td class="num">${tierBadge(f.trust_tier)}</td>
       <td class="oneliner">${esc(f.one_liner)}</td>
     </tr>`;
-    return isOpen ? row + renderDetailCard(f, COLS.length) : row;
+    return isOpen ? row + renderDetailCard(f, COLS.length, opts) : row;
   }).join("");
 
   container.innerHTML = `<table class="tbl"><thead><tr>${ths}</tr></thead><tbody>${rows}</tbody></table>`;

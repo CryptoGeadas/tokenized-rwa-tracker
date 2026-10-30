@@ -167,3 +167,10 @@ test("tvl_source must name a CoinGecko category", () => {
   for (const bad of ["ondo", {}, { coingecko_category: "" }, { coingecko: "x" }, { coingecko_category: "x", extra: 1 }])
     assert.throws(() => checkRegistry({ x: entry({ tvl_source: bad }) }), /x.*tvl_source/, JSON.stringify(bad));
 });
+
+test("tokens: a list of { chain, address, decimals, symbol } loads (#21)", () => {
+  const tokens = [{ chain: "ethereum", address: "0x7712c34205737192402172409a8F7ccef8aA2AEc", decimals: 6, symbol: "BUIDL" }];
+  assert.deepEqual(checkRegistry({ x: entry({ tokens }) }).x.tokens, tokens);
+  for (const bad of [{}, [], "0xabc", [{ chain: "ethereum", address: "0x12", decimals: 6, symbol: "A" }], [{ chain: "ethereum", address: tokens[0].address, symbol: "A" }], [{ ...tokens[0], extra: 1 }]])
+    assert.throws(() => checkRegistry({ x: entry({ tokens: bad }) }), /x.*tokens/, JSON.stringify(bad));
+});

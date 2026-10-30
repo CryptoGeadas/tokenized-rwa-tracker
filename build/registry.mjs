@@ -19,7 +19,12 @@ export const WRAPPERS = ["regulated-fund", "on-chain-pool", "protocol", "LLC", "
 const SLUG = /^[a-z0-9][a-z0-9.()-]*$/; // a holds item in this form must be a registry slug
 export const LANES = ["main", "real-estate", "commodity", "equity"];
 const REQUIRED = ["name", "issuer", "backing_type", "lane", "one_liner"];
-const KNOWN = new Set([...REQUIRED, "trust_tier", "tier_overrides", "wrapper", "jurisdiction", "redemption", "chains", "mislabel", "pool_projects", "holds", "tvl_source"]);
+const KNOWN = new Set([...REQUIRED, "trust_tier", "tier_overrides", "wrapper", "jurisdiction", "redemption", "chains", "mislabel", "pool_projects", "holds", "tvl_source", "tokens"]);
+// tokens (#21): the fund's token contracts whose mints and burns are its flows
+const TOKEN_KEYS = ["chain", "address", "decimals", "symbol"];
+const tokenOk = (t) => t && typeof t === "object" && Object.keys(t).length === TOKEN_KEYS.length && TOKEN_KEYS.every((k) => k in t)
+  && typeof t.chain === "string" && t.chain.trim() && /^0x[0-9a-fA-F]{40}$/.test(t.address)
+  && Number.isInteger(t.decimals) && t.decimals >= 0 && t.decimals <= 36 && typeof t.symbol === "string" && t.symbol.trim();
 const RESERVED = new Set(["__proto__", "constructor", "prototype"]);
 
 export function checkRegistry(raw = {}) {
@@ -40,6 +45,8 @@ export function checkRegistry(raw = {}) {
       if (keys.length !== 1 || keys[0] !== "coingecko_category" || typeof t.coingecko_category !== "string" || !t.coingecko_category.trim())
         throw new Error(`${at}: tvl_source must be { "coingecko_category": "<category id>" }`);
     }
+    if (e.tokens !== undefined && !(Array.isArray(e.tokens) && e.tokens.length && e.tokens.every(tokenOk)))
+      throw new Error(`${at}: tokens must be a list of { chain, address (0x + 40 hex), decimals (0-36), symbol }`);
     if (typeof e.mislabel !== "boolean") throw new Error(`${at} needs mislabel (true/false)`);
     if (!BACKING_TYPES.includes(e.backing_type)) throw new Error(`${at}: backing_type "${e.backing_type}" is not one of ${BACKING_TYPES.join(", ")}`);
     if (!LANES.includes(e.lane)) throw new Error(`${at}: lane "${e.lane}" is not one of ${LANES.join(", ")}`);

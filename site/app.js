@@ -4,6 +4,8 @@ import { renderTable } from "./table.js";
 
 const $ = (s) => document.querySelector(s);
 const state = { data: null, sortKey: "trust_tier", sortDir: "asc", expandedSlug: null };
+// the build's switches (#21: Money flows card, off until go-live)
+const tableOpts = () => ({ flowsCard: state.data?.config?.flowsCard === true });
 
 // ─── Data loading ──────────────────────────────────────────────────────────
 
@@ -25,7 +27,7 @@ async function load() {
 function rerender() {
   const isDark = true; // site is dark only
   renderScatter($("#scatter-chart"), $(".scatter-tooltip"), state.data.mainStage.filter((f) => f.apyBase != null), isDark);
-  renderTable($("#table-container"), state.data.mainStage, state.sortKey, state.sortDir, state.expandedSlug);
+  renderTable($("#table-container"), state.data.mainStage, state.sortKey, state.sortDir, state.expandedSlug, tableOpts());
 }
 
 // ─── Unclassified section ──────────────────────────────────────────────────
@@ -161,14 +163,14 @@ document.addEventListener("click", (e) => {
     const key = th.dataset.sort;
     if (state.sortKey === key) state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
     else { state.sortKey = key; state.sortDir = "asc"; }
-    renderTable($("#table-container"), state.data.mainStage, state.sortKey, state.sortDir, state.expandedSlug);
+    renderTable($("#table-container"), state.data.mainStage, state.sortKey, state.sortDir, state.expandedSlug, tableOpts());
     return;
   }
   const tr = e.target.closest(".tbl tbody tr[data-slug]");
   if (tr) {
     const slug = tr.dataset.slug;
     state.expandedSlug = state.expandedSlug === slug ? null : slug;
-    renderTable($("#table-container"), state.data.mainStage, state.sortKey, state.sortDir, state.expandedSlug);
+    renderTable($("#table-container"), state.data.mainStage, state.sortKey, state.sortDir, state.expandedSlug, tableOpts());
   }
 });
 

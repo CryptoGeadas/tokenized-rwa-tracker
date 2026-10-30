@@ -4,10 +4,29 @@ import { dirname, join } from "node:path";
 import { runPipeline, DROP } from "./pipeline.mjs";
 import { checkRegistry, registryWarnings, registryLog } from "./registry.mjs";
 import { fetchFallbackTvl } from "./coingecko.mjs";
+import { withFlows } from "./flows.mjs";
+
+// SWITCH: show the "Money flows" card in open rows (#21). Off until go-live (#33);
+// FLOWS_CARD=1 turns it on for a local build only.
+const FLOWS_CARD = false;
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SITE = join(HERE, "..", "site");
 const OUT = join(SITE, "data", "latest.json");
+const LEDGER = join(HERE, "state", "flows-ledger.json");
+
+// The ledger is written once a day by flows-run.mjs. A missing or unreadable one never
+// fails the build: funds then carry no flows numbers.
+async function loadLedger() {
+  try {
+    const j = JSON.parse(await readFile(LEDGER, "utf8"));
+    if (!j || typeof j !== "object" || Array.isArray(j) || !j.tokens || typeof j.tokens !== "object" || Array.isArray(j.tokens)) throw new Error("not a flows ledger");
+    return j;
+  } catch (e) {
+    console.warn(`  ⚠ flows-ledger.json ${e.code === "ENOENT" ? "missing" : `unreadable (${e.message})`} — no flows numbers this build`);
+    return null;
+  }
+}
 
 const POOLS_FEED = "https://yields.llama.fi/pools";
 const PROTOCOLS_FEED = "https://api.llama.fi/protocols";
@@ -26,11 +45,14 @@ async function main() {
 
   console.log(`  ${protocols.length} protocols · ${pools.length} pools`);
 
-  const result = runPipeline(registry, pools, protocols, fallback);
+  const result = withFlows(runPipeline(registry, pools, protocols, fallback), registry, await loadLedger());
+  const flowsCard = process.env.FLOWS_CARD ? process.env.FLOWS_CARD === "1" : FLOWS_CARD;
+  if (process.env.FLOWS_CARD === "1" && !FLOWS_CARD) console.warn("  ⚠ FLOWS_CARD=1: Money flows card on — local check only, do NOT commit site/data/latest.json from this build");
 
   const payload = {
     generatedAt: new Date().toISOString(),
     source: "https://defillama.com",
+    config: { flowsCard },
     ...result,
   };
 
