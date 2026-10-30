@@ -82,3 +82,26 @@ test("prices: a busy answer is tried again; a listed-but-empty answer is logged 
   assert.deepEqual(await fetchPrices([A], { fetchImpl: empty, sleep: async () => {}, log: { ...quiet, warn: (l) => warns.push(l) } }), { [A]: null });
   assert.match(warns[0], /no USD price/);
 });
+
+test("a token added after the first run starts collecting from the day after the last complete day, without a backfill of its own", async () => {
+  const B = "0x00000000000000000000000000000000000000bb";
+  const first = await runFlows({ ledger: emptyLedger(), tokens: [{ address: A, decimals: 6, symbol: "AAA" }], portal: fakePortal([]), prices: async () => ({ [A]: 1 }), now: NOW, log: quiet });
+  const next = fakePortal([], Date.parse("2026-10-31T03:00:00Z") / 1000);
+  next.finalizedHead = async () => 1500;
+  const r = await runFlows({ ledger: first.ledger, tokens: [{ address: A, decimals: 6, symbol: "AAA" }, { address: B, decimals: 18, symbol: "BBB" }], portal: next, prices: async () => ({ [A]: 1, [B]: 1 }), now: NOW + 86_400_000, log: quiet });
+  assert.deepEqual(next.calls.map((c) => c[0]), ["read"], "no backfill for the new token");
+  assert.equal(r.ledger.tokens[`ethereum:${B}`].firstDay, "2026-10-31", "the run's own day: the day it was added");
+  assert.equal(r.ledger.tokens[`ethereum:${A}`].firstDay, "2026-09-30");
+  assert.deepEqual(fundFlows([{ chain: "ethereum", address: B }], r.ledger), { status: "collecting", since: "2026-10-31", asOf: "2026-10-30" });
+});
+
+test("a second run on the same day does not move a new token's first day earlier", async () => {
+  const B = "0x00000000000000000000000000000000000000bb";
+  const tokens = [{ address: A, decimals: 6, symbol: "AAA" }, { address: B, decimals: 18, symbol: "BBB" }];
+  const first = await runFlows({ ledger: emptyLedger(), tokens: tokens.slice(0, 1), portal: fakePortal([]), prices: async () => ({}), now: NOW, log: quiet });
+  // a rerun later the same day: its last block is still on 30 Oct, so its last complete day is 29 Oct again
+  const rerun = fakePortal([]);
+  rerun.finalizedHead = async () => 1200;
+  const r = await runFlows({ ledger: first.ledger, tokens, portal: rerun, prices: async () => ({}), now: NOW + 3_600_000, log: quiet });
+  assert.equal(r.ledger.tokens[`ethereum:${B}`].firstDay, "2026-10-31", "read from part-way through 30 Oct: 31 Oct is its first full day");
+});

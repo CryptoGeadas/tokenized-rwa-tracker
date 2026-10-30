@@ -71,6 +71,10 @@ export async function runFlows({ ledger, tokens, portal, prices, now = Date.now(
   const fromBlock = backfill ? await portal.blockAt(dataset, (startOfToday - KEEP_DAYS * DAY_MS) / 1000) : last + 1;
   if (fromBlock > head) { log.warn(`  ⚠ ${chain}: no new finalized blocks since ${last}`); return { ledger, bytes: 0 }; }
 
+  // A token new to the ledger is read only from fromBlock, which sits inside the day after the
+  // chain's last complete day: its first full day is the one after that (also on a same-day rerun).
+  const prevAsOf = ledger.chains?.[chain]?.asOf;
+  const newFrom = !backfill && prevAsOf ? shiftDay(prevAsOf, 2) : null;
   const price = await prices(tokens.map((t) => t.address));
   const t0 = Date.now();
   let batches = 0;
@@ -83,7 +87,7 @@ export async function runFlows({ ledger, tokens, portal, prices, now = Date.now(
     const today = shiftDay(utcDay(r.lastTimestamp * 1000), -1);
     ledger = addFlows(ledger, {
       chain, events: r.events, lastBlock: r.lastBlock, today, tracked: tokens, prices: price,
-      backfill: backfill ? utcDay(startOfToday - KEEP_DAYS * DAY_MS) : false,
+      backfill: backfill ? utcDay(startOfToday - KEEP_DAYS * DAY_MS) : false, newFrom,
       updatedAt: r.lastBlock >= head ? new Date(now).toISOString() : null,
     });
   }

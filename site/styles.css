@@ -117,6 +117,7 @@
 .flows-sub small { color: var(--muted); font-weight: 400; }
 .flows-net b.up { color: var(--up); } .flows-net b.down { color: var(--down); }
 .flows-line { margin-top: 10px; font-size: 12px; color: var(--muted); line-height: 1.6; }
+.flows-line.flows-wait { margin-top: 0; font-size: 14px; color: var(--fg); }
 
 /* one-liner column */
 .oneliner { color: var(--muted); font-size: 13px; max-width: 320px; line-height: 1.4; }

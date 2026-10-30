@@ -113,3 +113,85 @@ test("days before a token's first day are never counted", () => {
   const l = backfilled([ev(shiftDay(T, -15), "in", 50), ev(T, "in", 4)], { [A]: 1 }, { backfill: shiftDay(T, -9) });
   assert.equal(fundFlows(fundA, l).in30, 4);
 });
+
+// ── coverage and funds with several tokens (#25) ──
+const tokB = { address: B, decimals: 18, symbol: "BBB" };
+const fundAB = [...fundA, { chain: "ethereum", address: B, decimals: 18, symbol: "BBB" }];
+
+test("coverage: under 7 days is collecting (no numbers); 7–29 is partial since the first day; 30 is full", () => {
+  const at = (days) => fundFlows(fundA, backfilled([ev(T, "in", 1)], { [A]: 1 }, { backfill: shiftDay(T, -(days - 1)) }));
+  assert.deepEqual(at(6), { status: "collecting", since: shiftDay(T, -5), asOf: T });
+  assert.equal(at(7).status, "partial");
+  assert.equal(at(7).since, shiftDay(T, -6));
+  assert.equal(at(7).in30, 1);
+  assert.equal(at(29).status, "partial");
+  assert.equal(at(29).since, shiftDay(T, -28));
+  assert.equal(at(30).status, "full");
+  assert.equal(at(30).since, null);
+});
+
+test("two tokens of one fund are summed into one set of numbers, each at its own price", () => {
+  const l = addFlows(emptyLedger(), { chain: "ethereum", events: [ev(T, "in", 10), ev(T, "out", 4, "0xa"), ev(T, "out", 3, "0xb", B)], lastBlock: 500, today: T,
+    tracked: [tokA, tokB], prices: { [A]: 1, [B]: 2 }, backfill: true });
+  const s = fundFlows(fundAB, l);
+  assert.equal(s.in30, 10);
+  assert.equal(s.out30, 10);
+  assert.equal(s.net30, 0);
+  assert.equal(s.maxOut30, 6, "B's 3 units at $2 is the biggest redemption in dollars");
+  assert.equal(s.maxOutTx, "0xb");
+});
+
+test("a token added later starts from its own first day; its part-day before that is never counted, and the fund's coverage starts at the earliest token", () => {
+  let l = backfilled([ev(T, "in", 1)]); // A: 30 days, as of T
+  const next = shiftDay(T, 1);
+  // B joins on the next run: it was read from part-way through `next`, so its first full day is the day after
+  l = addFlows(l, { chain: "ethereum", events: [ev(next, "in", 100, null, B), ev(next, "in", 5)], lastBlock: 600, today: next, tracked: [tokA, tokB], prices: { [A]: 1, [B]: 1 } });
+  assert.equal(l.tokens[`ethereum:${B}`].firstDay, shiftDay(next, 1));
+  assert.equal(l.tokens[`ethereum:${A}`].firstDay, shiftDay(T, -29), "an existing token keeps its first day");
+  const s = fundFlows(fundAB, l);
+  assert.equal(s.status, "full", "the earliest token decides the coverage");
+  assert.equal(s.in30, 6, "B's part-day before its first full day is not counted");
+});
+
+test("a fund whose only token is new reads collecting since the day it was added, never zero", () => {
+  let l = backfilled([ev(T, "in", 1)]);
+  l = addFlows(l, { chain: "ethereum", events: [], lastBlock: 600, today: shiftDay(T, 1), tracked: [tokA, tokB], prices: {} });
+  assert.deepEqual(fundFlows([fundAB[1]], l), { status: "collecting", since: shiftDay(T, 2), asOf: shiftDay(T, 1) });
+});
+
+test("a new token never starts before tomorrow, even when newFrom is earlier", () => {
+  const l = addFlows(backfilled([]), { chain: "ethereum", events: [], lastBlock: 600, today: shiftDay(T, 3), tracked: [tokA, tokB], prices: {}, newFrom: shiftDay(T, 2) });
+  assert.equal(l.tokens[`ethereum:${B}`].firstDay, shiftDay(T, 4));
+});
+
+test("a token's own first full day is counted", () => {
+  let l = backfilled([ev(T, "in", 1)]);
+  const next = shiftDay(T, 1), day2 = shiftDay(T, 2);
+  l = addFlows(l, { chain: "ethereum", events: [ev(next, "in", 100, null, B), ev(next, "in", 5)], lastBlock: 600, today: next, tracked: [tokA, tokB], prices: { [A]: 1, [B]: 1 } });
+  l = addFlows(l, { chain: "ethereum", events: [ev(day2, "in", 7, null, B)], lastBlock: 700, today: day2, tracked: [tokA, tokB], prices: { [A]: 1, [B]: 1 } });
+  assert.equal(fundFlows(fundAB, l).in30, 13, "A's 1 + 5, and B's 7 on its first full day; never B's part-day 100");
+});
+
+test("a fund total names a token added later and the day it is counted from", () => {
+  let l = backfilled([ev(T, "in", 1)]);
+  l = addFlows(l, { chain: "ethereum", events: [], lastBlock: 600, today: shiftDay(T, 1), tracked: [tokA, tokB], prices: {} });
+  const s = fundFlows(fundAB, l);
+  assert.equal(s.status, "full");
+  assert.deepEqual(s.tokensSince, [{ symbol: "BBB", since: shiftDay(T, 2) }]);
+  assert.equal(fundFlows(fundA, l).tokensSince, undefined, "a fund whose tokens all cover the window names none");
+});
+
+test("a token taken out of tracking is dropped, so it starts fresh if it comes back", () => {
+  let l = backfilled([ev(T, "in", 1)]);
+  l = addFlows(l, { chain: "ethereum", events: [], lastBlock: 600, today: shiftDay(T, 1), tracked: [tokB], prices: {} });
+  assert.equal(l.tokens[`ethereum:${A}`], undefined);
+  l = addFlows(l, { chain: "ethereum", events: [], lastBlock: 700, today: shiftDay(T, 2), tracked: [tokA, tokB], prices: {} });
+  assert.equal(l.tokens[`ethereum:${A}`].firstDay, shiftDay(T, 3));
+  assert.equal(fundFlows(fundA, l).status, "collecting");
+});
+
+test("a ledger token without a well-formed first day gives no numbers, never a full $0 window", () => {
+  const l = backfilled([ev(T, "in", 1)]);
+  delete l.tokens[`ethereum:${A}`].firstDay;
+  assert.equal(fundFlows(fundA, l), null);
+});
