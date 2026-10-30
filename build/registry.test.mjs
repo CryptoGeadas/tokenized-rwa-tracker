@@ -174,3 +174,17 @@ test("tokens: a list of { chain, address, decimals, symbol } loads (#21)", () =>
   for (const bad of [{}, [], "0xabc", [{ chain: "ethereum", address: "0x12", decimals: 6, symbol: "A" }], [{ chain: "ethereum", address: tokens[0].address, symbol: "A" }], [{ ...tokens[0], extra: 1 }]])
     assert.throws(() => checkRegistry({ x: entry({ tokens: bad }) }), /x.*tokens/, JSON.stringify(bad));
 });
+
+test("tokens: an unknown chain or an address used by two funds fails the build (#24)", () => {
+  const t = { chain: "ethereum", address: "0x7712c34205737192402172409a8F7ccef8aA2AEc", decimals: 6, symbol: "BUIDL" };
+  assert.throws(() => checkRegistry({ x: entry({ tokens: [{ ...t, chain: "solana" }] }) }), /x.*tokens.*chain "solana"/);
+  assert.throws(() => checkRegistry({ x: entry({ tokens: [t] }), y: entry({ tokens: [{ ...t, address: t.address.toLowerCase() }] }) }), /0x7712c34205737192402172409a8f7ccef8aa2aec.*both "x" and "y"/);
+  assert.throws(() => checkRegistry({ x: entry({ tokens: [t, { ...t, address: t.address.toLowerCase() }] }) }), /x.*lists the same token twice/);
+  for (const decimals of [-1, 37, 6.5, "6", undefined, null]) assert.throws(() => checkRegistry({ x: entry({ tokens: [{ ...t, decimals }] }) }), /x.*tokens/, String(decimals));
+});
+
+test("token chains are exactly the chains the flows job reads", async () => {
+  const { TOKEN_CHAINS } = await import("./registry.mjs");
+  const { DATASETS } = await import("./flows-job.mjs");
+  assert.deepEqual([...TOKEN_CHAINS].sort(), Object.keys(DATASETS).sort());
+});

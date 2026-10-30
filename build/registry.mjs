@@ -6,7 +6,8 @@
 //     or lane, a missing required field, or a bad trust tier — and on the wrapper rule:
 //     a wrapper (wrapper "token-wrapper") lists what it `holds` (registry slugs, or plain
 //     names for funds outside the registry) and its tier can't be better than the worst
-//     registry fund it holds.
+//     registry fund it holds. A fund's `tokens` (#21) must be well formed, on a chain flows
+//     are read on (TOKEN_CHAINS), listed once, and never shared with another fund.
 //   registryWarnings(dropped) → [{ id, text }] for registry funds DefiLlama no longer
 //     lists, or lists without TVL (a fund that only shrank under $5M is just logged).
 //   registryLog(warnings, env) → lines for the build log (+ ::warning lines in CI)
@@ -20,10 +21,12 @@ const SLUG = /^[a-z0-9][a-z0-9.()-]*$/; // a holds item in this form must be a r
 export const LANES = ["main", "real-estate", "commodity", "equity"];
 const REQUIRED = ["name", "issuer", "backing_type", "lane", "one_liner"];
 const KNOWN = new Set([...REQUIRED, "trust_tier", "tier_overrides", "wrapper", "jurisdiction", "redemption", "chains", "mislabel", "pool_projects", "holds", "tvl_source", "tokens"]);
-// tokens (#21): the fund's token contracts whose mints and burns are its flows
+// tokens (#21): the fund's token contracts whose mints and burns are its flows.
+// TOKEN_CHAINS = the chains the flows job reads (flows-job.mjs DATASETS; a test keeps them equal).
+export const TOKEN_CHAINS = ["ethereum"];
 const TOKEN_KEYS = ["chain", "address", "decimals", "symbol"];
 const tokenOk = (t) => t && typeof t === "object" && Object.keys(t).length === TOKEN_KEYS.length && TOKEN_KEYS.every((k) => k in t)
-  && typeof t.chain === "string" && t.chain.trim() && /^0x[0-9a-fA-F]{40}$/.test(t.address)
+  && typeof t.chain === "string" && /^0x[0-9a-fA-F]{40}$/.test(t.address)
   && Number.isInteger(t.decimals) && t.decimals >= 0 && t.decimals <= 36 && typeof t.symbol === "string" && t.symbol.trim();
 const RESERVED = new Set(["__proto__", "constructor", "prototype"]);
 
@@ -45,8 +48,14 @@ export function checkRegistry(raw = {}) {
       if (keys.length !== 1 || keys[0] !== "coingecko_category" || typeof t.coingecko_category !== "string" || !t.coingecko_category.trim())
         throw new Error(`${at}: tvl_source must be { "coingecko_category": "<category id>" }`);
     }
-    if (e.tokens !== undefined && !(Array.isArray(e.tokens) && e.tokens.length && e.tokens.every(tokenOk)))
-      throw new Error(`${at}: tokens must be a list of { chain, address (0x + 40 hex), decimals (0-36), symbol }`);
+    if (e.tokens !== undefined) {
+      if (!(Array.isArray(e.tokens) && e.tokens.length && e.tokens.every(tokenOk)))
+        throw new Error(`${at}: tokens must be a list of { chain, address (0x + 40 hex), decimals (0-36), symbol }`);
+      const bad = e.tokens.find((t) => !TOKEN_CHAINS.includes(t.chain));
+      if (bad) throw new Error(`${at}: tokens chain "${bad.chain}" is not one flows are read on (${TOKEN_CHAINS.join(", ")})`);
+      const keys = e.tokens.map((t) => `${t.chain}:${t.address.toLowerCase()}`);
+      if (new Set(keys).size !== keys.length) throw new Error(`${at} lists the same token twice`);
+    }
     if (typeof e.mislabel !== "boolean") throw new Error(`${at} needs mislabel (true/false)`);
     if (!BACKING_TYPES.includes(e.backing_type)) throw new Error(`${at}: backing_type "${e.backing_type}" is not one of ${BACKING_TYPES.join(", ")}`);
     if (!LANES.includes(e.lane)) throw new Error(`${at}: lane "${e.lane}" is not one of ${LANES.join(", ")}`);
@@ -62,6 +71,14 @@ export function checkRegistry(raw = {}) {
     } else if (e.holds !== undefined) throw new Error(`${at}: holds is only for wrappers (wrapper "${TOKEN_WRAPPER}")`);
     registry[slug] = e;
   }
+  // One token belongs to one fund: two funds sharing an address would count the same flows twice.
+  const owner = new Map();
+  for (const [slug, e] of Object.entries(registry))
+    for (const t of e.tokens ?? []) {
+      const key = `${t.chain}:${t.address.toLowerCase()}`;
+      if (owner.has(key)) throw new Error(`rwa-registry.json: token ${t.address.toLowerCase()} on ${t.chain} is listed by both "${owner.get(key)}" and "${slug}"`);
+      owner.set(key, slug);
+    }
   // Wrapper rule, once every entry is known (so entry order doesn't matter).
   const bySpelling = new Map();
   for (const [s, e] of Object.entries(registry)) for (const k of [s, e.name]) bySpelling.set(k.toLowerCase(), s);

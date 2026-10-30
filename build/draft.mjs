@@ -68,7 +68,95 @@ const pct = (n) => (Number.isFinite(n) ? `${n.toFixed(2)}%` : "unknown");
 const day = (unix) => (Number.isFinite(unix) ? new Date(unix * 1000).toISOString().slice(0, 10) : null);
 const POOLS_SHOWN = 5;
 
-export function sheetSection({ fund, protocol, pools = [] }, draft) {
+// ── token proposer (#24) ─────────────────────────────────────────────────────
+// Proposes a fund's Ethereum token addresses and decimals by matching the symbols of its
+// DefiLlama pools against CoinGecko's free Ethereum token list. Every token that shares a
+// symbol is listed (the owner picks the fund's own); nothing is written to the registry.
+//   proposeTokens(pools, tokenList) → { status: "matched" | "no-match" | "no-pools" | "no-list", symbols, proposals: [{ chain, address, decimals, symbol, source }] }
+//     tokenList = the list's `tokens` array, or null when it could not be read.
+const ADDRESS = /^0x[0-9a-f]{40}$/i;
+const SYMBOL = /^[A-Za-z0-9.+_-]{1,24}$/; // anything else could break the sheet's Markdown or JSON block
+// Coins a pool holds next to the fund's token (a "USDC-SYRUPUSDC" pool). Never proposed: their
+// mints and burns are the stablecoin's or the wrapper's, not the fund's.
+export const BASE_ASSETS = new Set(["USDC", "USDT", "DAI", "USDS", "PYUSD", "RLUSD", "FDUSD", "USDG", "EURC", "ETH", "WETH", "STETH", "WSTETH", "BTC", "WBTC", "CBBTC"]);
+const poolSymbols = (pools) => [...new Set(pools.flatMap((p) => String(p.symbol ?? "").toUpperCase().split(/[-\s/+]+/)).filter(Boolean))];
+
+export function proposeTokens(pools = [], tokenList) {
+  const all = poolSymbols(pools);
+  const base = all.filter((s) => BASE_ASSETS.has(s)), symbols = all.filter((s) => !BASE_ASSETS.has(s));
+  if (!symbols.length) return { status: "no-pools", symbols, base, proposals: [] };
+  if (!Array.isArray(tokenList)) return { status: "no-list", symbols, base, proposals: [] };
+  const proposals = [], unmatched = [], invalid = [];
+  for (const sym of symbols) {
+    let found = false, bad = false;
+    for (const t of tokenList) {
+      if (String(t?.symbol ?? "").toUpperCase() !== sym) continue;
+      // the list names this symbol but its row can't be used: say so, never "no match"
+      if (!SYMBOL.test(t.symbol) || !ADDRESS.test(t.address) || !Number.isInteger(t.decimals) || t.decimals < 0 || t.decimals > 36) { bad = true; continue; }
+      found = true;
+      if (proposals.some((p) => p.address === t.address.toLowerCase())) continue;
+      proposals.push({ chain: "ethereum", address: t.address.toLowerCase(), decimals: t.decimals, symbol: t.symbol,
+        source: `CoinGecko token list ("${String(t.name ?? "").replace(/\s+/g, " ").trim()}"), matched on pool symbol ${sym}` });
+    }
+    if (!found) (bad ? invalid : unmatched).push(sym);
+  }
+  return { status: proposals.length ? "matched" : "no-match", symbols, base, unmatched, invalid, proposals };
+}
+
+// one Etherscan search per pool symbol (at most three), so the reviewer starts from each
+const etherscanSearch = (syms) => syms.slice(0, 3).map((s) => `[Etherscan: ${md(s)}](https://etherscan.io/search?q=${encodeURIComponent(s)})`).join(", ");
+function tokenLines(pools, tokenList, llama) {
+  const p = proposeTokens(pools, tokenList);
+  const check = p.symbols.length ? etherscanSearch(p.symbols) : llama ? `[DefiLlama](${llama})` : "DefiLlama";
+  const baseLine = p.base.length ? [`  - Not proposed: ${md(p.base.join(", "))} (coins the pools hold next to the fund's token, not the fund's own)`] : [];
+  const invalidLine = p.invalid?.length ? [`  - ${md(p.invalid.join(", "))}: unknown (CoinGecko lists the symbol but its address or decimals are invalid; check ${etherscanSearch(p.invalid)})`] : [];
+  if (p.status === "no-pools") return [`- Ethereum tokens: unknown (no pools on DefiLlama to match; check ${check})`, ...baseLine];
+  if (p.status === "no-list") return [`- Ethereum tokens: unknown (CoinGecko's token list could not be read; check ${check})`, ...baseLine];
+  if (p.status === "no-match") {
+    const nothing = p.unmatched.length ? [`- Ethereum tokens: unknown (no pool symbol matches CoinGecko's Ethereum token list; check ${etherscanSearch(p.unmatched)})`] : ["- Ethereum tokens: unknown"];
+    return [...nothing, ...invalidLine, ...baseLine];
+  }
+  const unmatchedLine = p.unmatched.length ? [`  - ${md(p.unmatched.join(", "))}: unknown (not in CoinGecko's Ethereum token list; check ${etherscanSearch(p.unmatched)})`] : [];
+  const shared = [...new Set(p.proposals.map((t) => t.symbol.toUpperCase()))].filter((s) => p.proposals.filter((t) => t.symbol.toUpperCase() === s).length > 1);
+  const block = { tokens: p.proposals.map(({ chain, address, decimals, symbol }) => ({ chain, address, decimals, symbol })) };
+  return [
+    "- Ethereum tokens (proposed, not a decision):",
+    ...p.proposals.map((t) => `  - ${md(t.symbol)}: [${t.address}](https://etherscan.io/token/${t.address}), decimals ${t.decimals}. Source: ${md(t.source)}.`),
+    ...shared.map((s) => `  - Several tokens share the symbol ${md(s)}: keep only the fund's own.`),
+    ...unmatchedLine,
+    ...invalidLine,
+    ...baseLine,
+    "",
+    "Proposed tokens (copied into the entry only if approved; check each address on Etherscan first):",
+    "",
+    "````json tokens",
+    JSON.stringify(block, null, 2),
+    "````",
+  ];
+}
+
+// The token review (npm run draft -- --tokens): one section per registry fund, for the
+// owner to approve each fund's token addresses before its flows are read.
+//   tokenSheet([{ slug, entry, pools, tokenList }], now) → Markdown
+export function tokenSheet(facts, now = new Date()) {
+  const head = [
+    `# RWA token review — ${now.toISOString().slice(0, 10)}`,
+    "",
+    `${facts.length} registry fund${facts.length === 1 ? "" : "s"} without approved tokens. For each one: check the proposed addresses on Etherscan, then tick one box.`,
+    "Only approved (or changed) token lists are copied into `build/rwa-registry.json`. Reject with a one-line reason when the fund can't be tracked.",
+    "",
+  ].join("\n");
+  const sections = facts.map(({ slug, entry, pools = [], tokenList }) => {
+    const chains = Array.isArray(entry.chains) ? entry.chains : [];
+    const llama = `https://defillama.com/protocol/${encodeURIComponent(slug)}`;
+    const tokens = chains.includes("ethereum") ? tokenLines(pools, tokenList, llama) : [`- Ethereum tokens: unknown (not on Ethereum by the registry's chains; check [DefiLlama](${llama}))`];
+    return [`## ${md(entry.name)}`, "", `- Registry slug: ${md(slug)}`, `- Chains: ${chains.length ? md(chains.join(", ")) : "unknown"}`, ...tokens, "",
+      "Decision:", "- [ ] Approve", "- [ ] Change: ", "- [ ] Reject: ", ""].join("\n");
+  });
+  return head + "\n" + sections.join("\n");
+}
+
+export function sheetSection({ fund, protocol, pools = [], tokenList }, draft) {
   const p = protocol || {};
   const llama = link(fund.url);
   const unknown = `unknown (check ${llama ? `[DefiLlama](${llama})` : "DefiLlama"})`;
@@ -89,6 +177,7 @@ export function sheetSection({ fund, protocol, pools = [] }, draft) {
     `- Audits listed on DefiLlama: ${audits}`,
     `- DefiLlama description: ${p.description ? md(p.description) : unknown}`,
     poolLines.length ? `- Pools on DefiLlama:\n${poolLines.join("\n")}` : `- Pools on DefiLlama: ${unknown}`,
+    ...tokenLines(pools, tokenList, llama),
     "",
     s.backing_type
       ? `**Suggested backing type (not a decision): ${s.backing_type}**, lane ${s.lane}, because the ${md(s.why)}.`
