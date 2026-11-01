@@ -67,50 +67,84 @@ export function addFlows(ledger, { chain, events, lastBlock, today, tracked = []
   return next;
 }
 
-export function fundFlows(tokens, ledger) {
-  if (!ledger || !Array.isArray(tokens) || !tokens.length) return null;
-  const s = { in30: 0, out30: 0, net7: 0, net30: 0, maxOut30: 0, maxOutDay: null, maxOutTx: null };
-  let asOf = null, firstDay = null;
+// Freshness (#26), the DeFi Yield Scanner's rule. Numbers are STALE (shown dimmed, with their
+// "As of" day) when the chain's last complete read (updatedAt) is over 36 h old, or the data's
+// own last day ended over 48 h ago (also covers a ledger without updatedAt), or updatedAt is
+// damaged (it can't prove the numbers are current). The page runs the same rule again with the
+// viewer's clock, so a snapshot that stops publishing never looks current.
+export const STALE_MS = 36 * 3_600_000;
+export const DATA_STALE_MS = 48 * 3_600_000;
+export function freshness(chainInfo, now) {
+  const raw = chainInfo?.updatedAt, asOf = chainInfo?.asOf;
+  const at = typeof raw === "string" ? Date.parse(raw) : NaN;
+  const dataEnd = typeof asOf === "string" && DAY.test(asOf) ? Date.parse(`${asOf}T00:00:00Z`) + DAY_MS : NaN;
+  const stale = (raw != null && !Number.isFinite(at)) || (Number.isFinite(at) && now - at > STALE_MS) || (Number.isFinite(dataEnd) && now - dataEnd > DATA_STALE_MS);
+  return { ...(stale ? { stale: true } : {}), ...(Number.isFinite(at) ? { updatedAt: raw } : {}) };
+}
+
+const num = (x) => typeof x === "number" && Number.isFinite(x);
+
+// now: the build's clock for the stale rule; left out (tests), no freshness fields are added.
+export function fundFlows(tokens, ledger, now = null) {
+  if (!Array.isArray(tokens) || !tokens.length) return null;
+  if (!ledger) return { status: "unavailable" }; // the ledger could not be read
+  let asOf = null, firstDay = null, chainInfo = null;
   for (const tok of tokens) {
     const t = ledger.tokens?.[keyOf(tok.chain, tok.address)];
-    const tokAsOf = ledger.chains?.[tok.chain]?.asOf;
-    if (!t || !tokAsOf || !DAY.test(String(t.firstDay)) || !DAY.test(String(tokAsOf))) return null; // a damaged record: no numbers
-    asOf = !asOf || tokAsOf < asOf ? tokAsOf : asOf;
+    const info = ledger.chains?.[tok.chain];
+    // approved but not read yet (or the chain never read): numbers start with the next update.
+    // It carries the chain's date, so a job that keeps failing turns this stale too.
+    if (!t || !info?.asOf) return { status: "collecting", since: null, ...(DAY.test(String(info?.asOf)) ? { asOf: info.asOf, ...(now == null ? {} : freshness(info, now)) } : {}) };
+    // a damaged record: no numbers and no guessed state
+    if (typeof t !== "object" || !DAY.test(String(t.firstDay)) || !DAY.test(String(info.asOf)) || !t.days || typeof t.days !== "object") return { status: "unavailable" };
+    if (!asOf || info.asOf < asOf) { asOf = info.asOf; chainInfo = info; }
     firstDay = !firstDay || t.firstDay < firstDay ? t.firstDay : firstDay;
   }
+  const fresh = now == null ? {} : freshness(chainInfo, now);
   // Coverage, from the earliest first day of the fund's tokens: under MIN_DAYS full days is
   // "collecting" (no numbers); then "partial" since that day; 30 days is "full".
   // Days not read are never shown as $0.
-  if (daysFrom(firstDay, asOf) < MIN_DAYS) return { status: "collecting", since: firstDay, asOf };
+  if (daysFrom(firstDay, asOf) < MIN_DAYS) return { status: "collecting", since: firstDay, asOf, ...fresh };
   const window30 = shiftDay(asOf, -(KEEP_DAYS - 1)), from7 = shiftDay(asOf, -6);
   const from30 = firstDay > window30 ? firstDay : window30;
+  const usd = { in30: 0, out30: 0, net7: 0, net30: 0, maxOut30: 0, maxOutDay: null, maxOutTx: null };
+  const units = { in30: 0, out30: 0, net7: 0, net30: 0, maxOut30: 0, maxOutDay: null, maxOutTx: null };
+  const unpriced = new Set(); // symbols of tokens with a day without a price in the window
   for (const tok of tokens) {
     const t = ledger.tokens[keyOf(tok.chain, tok.address)];
     for (const [day, d] of Object.entries(t.days)) {
       // each token counts from its own first full day: a part-day read before it is skipped
       if (day < from30 || day < t.firstDay || day > asOf) continue;
-      // no price that day: no dollar numbers at all, never a guessed $1 (#26 shows units instead)
-      if (!Number.isFinite(d.price)) return null;
-      const inUsd = d.in * d.price, outUsd = d.out * d.price, bigUsd = d.maxOut * d.price;
-      s.in30 += inUsd;
-      s.out30 += outUsd;
-      if (day >= from7) s.net7 += inUsd - outUsd;
-      if (bigUsd > s.maxOut30) Object.assign(s, { maxOut30: bigUsd, maxOutDay: day, maxOutTx: d.maxOutTx });
+      if (!d || !num(d.in) || !num(d.out) || !num(d.maxOut)) return { status: "unavailable" }; // a damaged day is never a $0 day
+      // no price that day: no dollar numbers for the fund, never a guessed $1
+      if (!num(d.price)) unpriced.add(tok.symbol);
+      for (const [s, k] of [[units, 1], [usd, num(d.price) ? d.price : 0]]) {
+        s.in30 += d.in * k;
+        s.out30 += d.out * k;
+        if (day >= from7) s.net7 += (d.in - d.out) * k;
+        if (d.maxOut * k > s.maxOut30) Object.assign(s, { maxOut30: d.maxOut * k, maxOutDay: day, maxOutTx: d.maxOutTx });
+      }
     }
   }
-  s.net30 = s.in30 - s.out30;
-  for (const k of ["in30", "out30", "net7", "net30", "maxOut30"]) s[k] = cents(s[k]);
   const full = daysFrom(from30, asOf) >= KEEP_DAYS;
+  const head = { status: full ? "full" : "partial", since: full ? null : from30, asOf };
   // A token added after the fund's first day counts only from its own first day; say so, so a
   // fund total never hides that one token's earlier days were not read.
   const later = tokens.map((tok) => ({ symbol: tok.symbol, since: ledger.tokens[keyOf(tok.chain, tok.address)].firstDay })).filter((x) => x.since > from30);
-  return { status: full ? "full" : "partial", since: full ? null : from30, asOf, ...s, ...(later.length ? { tokensSince: later } : {}) };
+  const tail = { ...(later.length ? { tokensSince: later } : {}), ...fresh };
+  const finish = (s, round) => { s.net30 = s.in30 - s.out30; for (const k of ["in30", "out30", "net7", "net30", "maxOut30"]) s[k] = round(s[k]); return s; };
+  if (unpriced.size) {
+    // one token: its numbers in token units; several: units can't be added up, so no numbers.
+    // `symbols` names only the tokens without a price.
+    return { ...head, noPrice: true, symbols: [...unpriced], ...(tokens.length === 1 ? { units: finish(units, (n) => Math.round(n * 1e6) / 1e6) } : {}), ...tail };
+  }
+  return { ...head, ...finish(usd, cents), ...tail };
 }
 
-export function withFlows(result, registry, ledger) {
+export function withFlows(result, registry, ledger, now = Date.now()) {
   const add = (f) => {
     const tokens = registry[f.slug]?.tokens;
-    return tokens ? { ...f, flows: fundFlows(tokens, ledger) } : f;
+    return tokens ? { ...f, flows: fundFlows(tokens, ledger, now) } : f;
   };
   const lanes = Object.fromEntries(Object.entries(result.secondaryLanes ?? {}).map(([k, v]) => [k, v.map(add)]));
   return { ...result, mainStage: result.mainStage.map(add), secondaryLanes: lanes };

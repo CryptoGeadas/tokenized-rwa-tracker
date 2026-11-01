@@ -72,10 +72,70 @@ test("missing days are never zero: a fund read for under 30 days says since when
   assert.equal(s.in30, 4);
 });
 
-test("no ledger, a token the ledger does not know, or a day with no price: no numbers rather than wrong ones", () => {
-  assert.equal(fundFlows(fundA, null), null);
-  assert.equal(fundFlows([{ chain: "ethereum", address: B }], backfilled([])), null);
-  assert.equal(fundFlows(fundA, backfilled([ev(T, "in", 1)], { [A]: null })), null);
+test("no ledger is unavailable; a token the job has not read yet is collecting from the next update (#26)", () => {
+  assert.deepEqual(fundFlows(fundA, null), { status: "unavailable" });
+  assert.deepEqual(fundFlows([{ chain: "ethereum", address: B, symbol: "BBB" }], backfilled([])), { status: "collecting", since: null, asOf: T });
+  // the job keeps failing: "collecting from the next update" turns stale with the chain's date
+  const late = fundFlows([{ chain: "ethereum", address: B, symbol: "BBB" }], backfilled([]), Date.parse("2026-11-05T00:00:00Z"));
+  assert.equal(late.stale, true);
+  assert.equal(late.asOf, T);
+  assert.deepEqual(fundFlows(fundA, emptyLedger()), { status: "collecting", since: null }, "the chain was never read");
+  assert.equal(fundFlows([], backfilled([])), null, "no tokens: no flows object");
+});
+
+test("a damaged day or date in the ledger is unavailable, never a $0 or a guessed state (#26)", () => {
+  const bad = backfilled([ev(T, "in", 1)]);
+  bad.tokens[`ethereum:${A}`].days[T].in = "1";
+  assert.deepEqual(fundFlows(fundA, bad), { status: "unavailable" });
+  const badDay = backfilled([ev(T, "in", 1)]);
+  badDay.chains.ethereum.asOf = "yesterday";
+  assert.deepEqual(fundFlows(fundA, badDay), { status: "unavailable" });
+});
+
+// ── no price, stale (#26) ──
+test("a day without a price: a single-token fund gives its numbers in token units, never dollars", () => {
+  const l = backfilled([ev(shiftDay(T, -2), "in", 10), ev(T, "out", 4, "0xa")], { [A]: null });
+  const s = fundFlows(fundA, l);
+  assert.equal(s.status, "full");
+  assert.equal(s.noPrice, true);
+  assert.deepEqual(s.symbols, ["AAA"]);
+  assert.deepEqual(s.units, { in30: 10, out30: 4, net7: 6, net30: 6, maxOut30: 4, maxOutDay: T, maxOutTx: "0xa" });
+  for (const k of ["in30", "out30", "net7", "net30", "maxOut30"]) assert.equal(s[k], undefined, `no dollar ${k}`);
+});
+
+test("if any token of a fund has a day without a price in the window, the fund's summary is no price (no numbers for several tokens)", () => {
+  const tokB2 = { address: B, decimals: 18, symbol: "BBB" };
+  const l = addFlows(emptyLedger(), { chain: "ethereum", events: [ev(T, "in", 10), ev(T, "in", 3, null, B)], lastBlock: 500, today: T,
+    tracked: [tokA, tokB2], prices: { [A]: 1, [B]: null }, backfill: true });
+  const s = fundFlows([...fundA, { chain: "ethereum", address: B, symbol: "BBB" }], l);
+  assert.equal(s.noPrice, true);
+  assert.deepEqual(s.symbols, ["BBB"], "only the token without a price is named");
+  assert.equal(s.units, undefined);
+  assert.equal(s.in30, undefined);
+  // a priced day outside the window, or a no-price day before the token's first day, doesn't count
+  const ok = backfilled([ev(T, "in", 1)], { [A]: 1 });
+  ok.tokens[`ethereum:${A}`].days[shiftDay(T, -40)] = { in: 1, out: 0, maxOut: 0, maxOutTx: null, price: null };
+  assert.equal(fundFlows(fundA, ok).noPrice, undefined);
+});
+
+test("stale: the last update over 36 h ago, or the data's last day ended over 48 h ago, is marked with its date", () => {
+  const l = backfilled([ev(T, "in", 1)]); // updatedAt 2026-10-30T04:00Z, data to 29 Oct
+  const at = (iso) => fundFlows(fundA, l, Date.parse(iso));
+  assert.equal(at("2026-10-31T15:00:00Z").stale, undefined, "35 h after the update, 39 h after the data day ended");
+  assert.equal(at("2026-10-31T17:00:00Z").stale, true, "37 h after the update");
+  assert.equal(at("2026-10-31T17:00:00Z").updatedAt, "2026-10-30T04:00:00Z");
+  const noStamp = backfilled([ev(T, "in", 1)], { [A]: 1 }, { updatedAt: null });
+  assert.equal(fundFlows(fundA, noStamp, Date.parse("2026-10-31T23:00:00Z")).stale, undefined, "47 h after the data day ended");
+  assert.equal(fundFlows(fundA, noStamp, Date.parse("2026-11-01T01:00:00Z")).stale, true, "49 h after the data day ended");
+  const damaged = backfilled([ev(T, "in", 1)], { [A]: 1 }, { updatedAt: "not a date" });
+  assert.equal(fundFlows(fundA, damaged, Date.parse("2026-10-30T05:00:00Z")).stale, true, "a damaged stamp can't prove the numbers are current");
+  assert.equal(fundFlows([{ chain: "ethereum", address: A }], backfilled([], { [A]: 1 }, { backfill: shiftDay(T, -2) }), Date.parse("2026-11-05T00:00:00Z")).stale, true, "collecting is marked too");
+});
+
+test("withFlows: an unreadable ledger gives every tracked fund unavailable, not an error", () => {
+  const out = withFlows({ mainStage: [{ slug: "tracked" }, { slug: "other" }], secondaryLanes: {} }, { tracked: { tokens: fundA }, other: {} }, null, Date.now());
+  assert.deepEqual(out.mainStage[0].flows, { status: "unavailable" });
+  assert.equal("flows" in out.mainStage[1], false);
 });
 
 test("withFlows adds a flows object to registry funds with tokens, in the main stage and secondary lanes, and leaves the rest alone", () => {
@@ -193,5 +253,31 @@ test("a token taken out of tracking is dropped, so it starts fresh if it comes b
 test("a ledger token without a well-formed first day gives no numbers, never a full $0 window", () => {
   const l = backfilled([ev(T, "in", 1)]);
   delete l.tokens[`ethereum:${A}`].firstDay;
-  assert.equal(fundFlows(fundA, l), null);
+  assert.deepEqual(fundFlows(fundA, l), { status: "unavailable" });
+});
+
+test("one unpriced day among priced days makes the fund no price; its units still count every day", () => {
+  const l = backfilled([ev(shiftDay(T, -10), "in", 5), ev(T, "in", 3)], { [A]: 1 });
+  l.tokens[`ethereum:${A}`].days[shiftDay(T, -10)].price = null;
+  const s = fundFlows(fundA, l);
+  assert.equal(s.noPrice, true);
+  assert.equal(s.units.in30, 8);
+  assert.equal(s.in30, undefined);
+});
+
+test("an unpriced part-day before a later token's own first day does not make the fund no price", () => {
+  const tokB2 = { address: B, decimals: 18, symbol: "BBB" };
+  let l = backfilled([ev(T, "in", 1)], { [A]: 1 }, { backfill: shiftDay(T, -9), tracked: [tokA] });
+  const next = shiftDay(T, 1);
+  l = addFlows(l, { chain: "ethereum", events: [ev(next, "in", 9, null, B)], lastBlock: 600, today: next, tracked: [tokA, tokB2], prices: { [A]: 1, [B]: null } });
+  const s = fundFlows([...fundA, { chain: "ethereum", address: B, symbol: "BBB" }], l);
+  assert.equal(s.status, "partial");
+  assert.equal(s.noPrice, undefined);
+  assert.equal(s.in30, 1);
+});
+
+test("a null day record is unavailable", () => {
+  const l = backfilled([ev(T, "in", 1)]);
+  l.tokens[`ethereum:${A}`].days[T] = null;
+  assert.deepEqual(fundFlows(fundA, l), { status: "unavailable" });
 });

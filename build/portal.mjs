@@ -128,8 +128,9 @@ export async function fetchMintsBurns({ dataset, tokens, fromBlock, toBlock, ...
       o.onBatch?.({ lastBlock, events: events.length, bytes });
     }
   } catch (e) {
-    // batches are contiguous, so everything up to lastBlock is complete: hand it back
-    // with the error so the caller can keep that progress instead of starting over.
+    // batches are contiguous, so everything up to lastBlock is complete: hand it back with
+    // the error. The flows job keeps the ledger unchanged on a Portal failure (#26) and only
+    // reports the bytes read; a caller could keep this progress instead.
     e.partial = { events, lastBlock, lastTimestamp, bytes };
     throw e;
   }

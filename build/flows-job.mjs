@@ -67,8 +67,11 @@ export async function runFlows({ ledger, tokens, portal, prices, now = Date.now(
   const startOfToday = Date.parse(utcDay(now) + "T00:00:00Z");
   const last = ledger.chains?.[chain]?.lastBlock;
   const backfill = !Number.isInteger(last);
-  const head = await portal.finalizedHead(dataset);
-  const fromBlock = backfill ? await portal.blockAt(dataset, (startOfToday - KEEP_DAYS * DAY_MS) / 1000) : last + 1;
+  // an error from a Portal call is the Portal's (busy, down): flows-run.mjs keeps the ledger and
+  // warns. Any other error is ours and fails the run.
+  const fromPortal = async (call) => { try { return await call(); } catch (e) { e.fromPortal = true; throw e; } };
+  const head = await fromPortal(() => portal.finalizedHead(dataset));
+  const fromBlock = backfill ? await fromPortal(() => portal.blockAt(dataset, (startOfToday - KEEP_DAYS * DAY_MS) / 1000)) : last + 1;
   if (fromBlock > head) { log.warn(`  ⚠ ${chain}: no new finalized blocks since ${last}`); return { ledger, bytes: 0 }; }
 
   // A token new to the ledger is read only from fromBlock, which sits inside the day after the
@@ -80,9 +83,11 @@ export async function runFlows({ ledger, tokens, portal, prices, now = Date.now(
   let batches = 0;
   const onBatch = (p) => {
     if (++batches % 25) return;
-    log.log(`    ${chain}: ${Math.round((100 * (p.lastBlock - fromBlock + 1)) / (head - fromBlock + 1))}% · block ${p.lastBlock} · ${p.events} events · ${(p.bytes / 1e6).toFixed(1)} MB`);
+    // our own progress line must never fail a read (it would be blamed on the Portal)
+    try { log.log(`    ${chain}: ${Math.round((100 * (p.lastBlock - fromBlock + 1)) / (head - fromBlock + 1))}% · block ${p.lastBlock} · ${p.events} events · ${(p.bytes / 1e6).toFixed(1)} MB`); }
+    catch { /* a progress line is not worth a failed run */ }
   };
-  const r = await portal.fetchMintsBurns({ dataset, tokens: tokens.map(({ address, decimals }) => ({ address, decimals })), fromBlock, toBlock: head, onBatch, deadline: jobStart + readLimitMs });
+  const r = await fromPortal(() => portal.fetchMintsBurns({ dataset, tokens: tokens.map(({ address, decimals }) => ({ address, decimals })), fromBlock, toBlock: head, onBatch, deadline: jobStart + readLimitMs }));
   if (r.lastBlock >= fromBlock && r.lastTimestamp != null) {
     const today = shiftDay(utcDay(r.lastTimestamp * 1000), -1);
     ledger = addFlows(ledger, {
