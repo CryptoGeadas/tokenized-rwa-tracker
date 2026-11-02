@@ -18,7 +18,7 @@
 //     net30, maxOut30, maxOutDay, maxOutTx } in dollars; { status: "collecting", since, asOf }
 //     under 7 full days; or null when there are no honest numbers (no ledger, a token it does
 //     not know, a day without a price). Several tokens are summed into one fund.
-//   withFlows(result, registry, ledger) → result with `flows` on registry funds that have tokens
+//   withFlows(result, registry, ledger, now) → result with a `flows` object on every fund (see below)
 //
 // Ledger: { asOf, chains: { ethereum: { lastBlock, asOf, updatedAt } },
 //           tokens: { "ethereum:0x…": { symbol, decimals, firstDay, days: { "YYYY-MM-DD": { in, out, maxOut, maxOutTx, price } } } } }
@@ -141,11 +141,24 @@ export function fundFlows(tokens, ledger, now = null) {
   return { ...head, ...finish(usd, cents), ...tail };
 }
 
+// Every fund on the page gets a `flows` object (#27): a tracked fund's summary (fundFlows), or
+// { status: "untracked", reason } with a code the page turns into words:
+//   owner (+ note: the registry's flows_not_tracked reason), chain (not on Ethereum),
+//   no-token (on Ethereum, no approved token yet), not-reviewed (not in the registry).
+// A tracked fund also on other chains carries otherChains, so the page says "Ethereum only".
 export function withFlows(result, registry, ledger, now = Date.now()) {
   const add = (f) => {
-    const tokens = registry[f.slug]?.tokens;
-    return tokens ? { ...f, flows: fundFlows(tokens, ledger, now) } : f;
+    const e = registry[f.slug];
+    if (!e) return { ...f, flows: { status: "untracked", reason: "not-reviewed" } };
+    if (e.tokens) {
+      const other = (e.chains ?? []).filter((c) => c !== "ethereum");
+      return { ...f, flows: { ...fundFlows(e.tokens, ledger, now), ...(other.length ? { otherChains: other } : {}) } };
+    }
+    if (e.flows_not_tracked) return { ...f, flows: { status: "untracked", reason: "owner", note: e.flows_not_tracked } };
+    return { ...f, flows: { status: "untracked", reason: (e.chains ?? []).includes("ethereum") ? "no-token" : "chain" } };
   };
   const lanes = Object.fromEntries(Object.entries(result.secondaryLanes ?? {}).map(([k, v]) => [k, v.map(add)]));
-  return { ...result, mainStage: result.mainStage.map(add), secondaryLanes: lanes };
+  const out = { ...result, mainStage: result.mainStage.map(add), secondaryLanes: lanes };
+  for (const k of ["unclassified", "smaller"]) if (Array.isArray(result[k])) out[k] = result[k].map(add);
+  return out;
 }

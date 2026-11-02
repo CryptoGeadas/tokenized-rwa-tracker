@@ -135,15 +135,14 @@ test("stale: the last update over 36 h ago, or the data's last day ended over 48
 test("withFlows: an unreadable ledger gives every tracked fund unavailable, not an error", () => {
   const out = withFlows({ mainStage: [{ slug: "tracked" }, { slug: "other" }], secondaryLanes: {} }, { tracked: { tokens: fundA }, other: {} }, null, Date.now());
   assert.deepEqual(out.mainStage[0].flows, { status: "unavailable" });
-  assert.equal("flows" in out.mainStage[1], false);
+  assert.equal(out.mainStage[1].flows.status, "untracked", "a fund without tokens is not tracked, ledger or not");
 });
 
-test("withFlows adds a flows object to registry funds with tokens, in the main stage and secondary lanes, and leaves the rest alone", () => {
+test("withFlows adds a flows object to registry funds with tokens, in the main stage and secondary lanes", () => {
   const l = backfilled([ev(T, "out", 3, "0xa")]);
   const registry = { tracked: { tokens: fundA }, other: {} };
   const out = withFlows({ mainStage: [{ slug: "tracked" }, { slug: "other" }], secondaryLanes: { equity: [{ slug: "tracked" }] }, stats: {} }, registry, l);
   assert.equal(out.mainStage[0].flows.out30, 3);
-  assert.equal("flows" in out.mainStage[1], false);
   assert.equal(out.secondaryLanes.equity[0].flows.maxOutTx, "0xa");
   assert.deepEqual(out.stats, {});
 });
@@ -280,4 +279,41 @@ test("a null day record is unavailable", () => {
   const l = backfilled([ev(T, "in", 1)]);
   l.tokens[`ethereum:${A}`].days[T] = null;
   assert.deepEqual(fundFlows(fundA, l), { status: "unavailable" });
+});
+
+// ── not tracked, Ethereum only (#27) ──
+test("not tracked, with a plain reason: owner's marker, no Ethereum chain, no approved token, not in the registry", () => {
+  const l = backfilled([ev(T, "in", 1)]);
+  const registry = {
+    marked: { chains: ["ethereum"], flows_not_tracked: "Many property tokens, no single main token." },
+    solana: { chains: ["solana"] },
+    pending: { chains: ["ethereum", "base"] },
+  };
+  const out = withFlows({ mainStage: [{ slug: "marked" }, { slug: "solana" }, { slug: "pending" }], secondaryLanes: {},
+    unclassified: [{ slug: "new-fund" }], smaller: [{ slug: "small" }] }, registry, l, Date.now());
+  assert.deepEqual(out.mainStage.map((f) => f.flows), [
+    { status: "untracked", reason: "owner", note: "Many property tokens, no single main token." },
+    { status: "untracked", reason: "chain" },
+    { status: "untracked", reason: "no-token" },
+  ]);
+  assert.deepEqual(out.unclassified[0].flows, { status: "untracked", reason: "not-reviewed" });
+  assert.deepEqual(out.smaller[0].flows, { status: "untracked", reason: "not-reviewed" });
+  for (const f of out.mainStage) for (const k of ["in30", "net30", "units"]) assert.equal(f.flows[k], undefined, "never a number");
+});
+
+test("a tracked fund on other chains too carries those chains, so the page says Ethereum only", () => {
+  const l = backfilled([ev(T, "in", 1)]);
+  const out = withFlows({ mainStage: [{ slug: "multi" }, { slug: "eth" }], secondaryLanes: {} },
+    { multi: { tokens: fundA, chains: ["ethereum", "avalanche", "polygon"] }, eth: { tokens: fundA, chains: ["ethereum"] } }, l, Date.now());
+  assert.deepEqual(out.mainStage[0].flows.otherChains, ["avalanche", "polygon"]);
+  assert.equal(out.mainStage[1].flows.otherChains, undefined);
+  const gone = withFlows({ mainStage: [{ slug: "multi" }], secondaryLanes: {} }, { multi: { tokens: fundA, chains: ["ethereum", "base"] } }, null, Date.now());
+  assert.deepEqual(gone.mainStage[0].flows, { status: "unavailable", otherChains: ["base"] });
+});
+
+test("the owner's reason wins over the chain rule; lanes get the same flows objects", () => {
+  const out = withFlows({ mainStage: [], secondaryLanes: { "real-estate": [{ slug: "realt" }, { slug: "multi" }] } },
+    { realt: { chains: ["gnosis"], flows_not_tracked: "Many property tokens." }, multi: { tokens: fundA, chains: ["ethereum", "base"] } }, backfilled([ev(T, "in", 1)]), Date.now());
+  assert.deepEqual(out.secondaryLanes["real-estate"][0].flows, { status: "untracked", reason: "owner", note: "Many property tokens." });
+  assert.deepEqual(out.secondaryLanes["real-estate"][1].flows.otherChains, ["base"]);
 });

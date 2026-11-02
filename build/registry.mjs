@@ -7,7 +7,8 @@
 //     a wrapper (wrapper "token-wrapper") lists what it `holds` (registry slugs, or plain
 //     names for funds outside the registry) and its tier can't be better than the worst
 //     registry fund it holds. A fund's `tokens` (#21) must be well formed, on a chain flows
-//     are read on (TOKEN_CHAINS), listed once, and never shared with another fund.
+//     are read on (TOKEN_CHAINS), listed once, and never shared with another fund; or the fund
+//     says why it is not tracked (flows_not_tracked, #27), never both.
 //   registryWarnings(dropped) → [{ id, text }] for registry funds DefiLlama no longer
 //     lists, or lists without TVL (a fund that only shrank under $5M is just logged).
 //   registryLog(warnings, env) → lines for the build log (+ ::warning lines in CI)
@@ -20,7 +21,7 @@ export const WRAPPERS = ["regulated-fund", "on-chain-pool", "protocol", "LLC", "
 const SLUG = /^[a-z0-9][a-z0-9.()-]*$/; // a holds item in this form must be a registry slug
 export const LANES = ["main", "real-estate", "commodity", "equity"];
 const REQUIRED = ["name", "issuer", "backing_type", "lane", "one_liner"];
-const KNOWN = new Set([...REQUIRED, "trust_tier", "tier_overrides", "wrapper", "jurisdiction", "redemption", "chains", "mislabel", "pool_projects", "holds", "tvl_source", "tokens"]);
+const KNOWN = new Set([...REQUIRED, "trust_tier", "tier_overrides", "wrapper", "jurisdiction", "redemption", "chains", "mislabel", "pool_projects", "holds", "tvl_source", "tokens", "flows_not_tracked"]);
 // tokens (#21): the fund's token contracts whose mints and burns are its flows.
 // TOKEN_CHAINS = the chains the flows job reads (flows-job.mjs DATASETS; a test keeps them equal).
 export const TOKEN_CHAINS = ["ethereum"];
@@ -40,7 +41,9 @@ export function checkRegistry(raw = {}) {
     const unknown = Object.keys(e).filter((k) => !KNOWN.has(k));
     if (unknown.length) throw new Error(`${at}: unknown field(s) ${unknown.join(", ")}`);
     for (const f of REQUIRED) if (typeof e[f] !== "string" || !e[f].trim()) throw new Error(`${at} needs ${f}`);
-    if (!Array.isArray(e.chains)) throw new Error(`${at} needs chains (a list)`);
+    // lowercase and never empty: flows read "not on Ethereum" and "also on <chains>" from this list (#27)
+    if (!Array.isArray(e.chains) || !e.chains.length || !e.chains.every((c) => typeof c === "string" && /^[a-z0-9-]+$/.test(c)))
+      throw new Error(`${at} needs chains (a non-empty list of lowercase chain names)`);
     if (e.pool_projects !== undefined && !(Array.isArray(e.pool_projects) && e.pool_projects.every((p) => typeof p === "string" && p.trim())))
       throw new Error(`${at}: pool_projects must be a list of slugs`);
     if (e.tvl_source !== undefined) {
@@ -55,6 +58,12 @@ export function checkRegistry(raw = {}) {
       if (bad) throw new Error(`${at}: tokens chain "${bad.chain}" is not one flows are read on (${TOKEN_CHAINS.join(", ")})`);
       const keys = e.tokens.map((t) => `${t.chain}:${t.address.toLowerCase()}`);
       if (new Set(keys).size !== keys.length) throw new Error(`${at} lists the same token twice`);
+    }
+    // flows_not_tracked (#27): the owner's one-line reason this fund's flows are not read
+    if (e.flows_not_tracked !== undefined) {
+      if (typeof e.flows_not_tracked !== "string" || !e.flows_not_tracked.trim() || /[\r\n]/.test(e.flows_not_tracked))
+        throw new Error(`${at}: flows_not_tracked must be a one-line reason`);
+      if (e.tokens !== undefined) throw new Error(`${at}: give either tokens or flows_not_tracked, not both`);
     }
     if (typeof e.mislabel !== "boolean") throw new Error(`${at} needs mislabel (true/false)`);
     if (!BACKING_TYPES.includes(e.backing_type)) throw new Error(`${at}: backing_type "${e.backing_type}" is not one of ${BACKING_TYPES.join(", ")}`);

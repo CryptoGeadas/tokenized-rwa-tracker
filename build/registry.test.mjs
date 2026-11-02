@@ -188,3 +188,10 @@ test("token chains are exactly the chains the flows job reads", async () => {
   const { DATASETS } = await import("./flows-job.mjs");
   assert.deepEqual([...TOKEN_CHAINS].sort(), Object.keys(DATASETS).sort());
 });
+
+test("flows_not_tracked: a one-line reason, never with tokens (#27)", () => {
+  assert.equal(checkRegistry({ x: entry({ flows_not_tracked: "Many property tokens." }) }).x.flows_not_tracked, "Many property tokens.");
+  for (const bad of ["", "  ", true, null, ["x"], "two\nlines"]) assert.throws(() => checkRegistry({ x: entry({ flows_not_tracked: bad }) }), /x.*flows_not_tracked/, JSON.stringify(bad));
+  const t = { chain: "ethereum", address: "0x7712c34205737192402172409a8F7ccef8aA2AEc", decimals: 6, symbol: "BUIDL" };
+  assert.throws(() => checkRegistry({ x: entry({ tokens: [t], flows_not_tracked: "x" }) }), /x.*either tokens or flows_not_tracked/);
+});

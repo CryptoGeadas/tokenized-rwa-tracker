@@ -67,3 +67,44 @@ test("no price, one token: the numbers in token units and the no-price line; sev
   assert.match(many, /No price for AAA, BBB on CoinGecko, so no dollar amounts\./);
   assert.doesNotMatch(many, /\$|<b/);
 });
+
+// ── not tracked, Ethereum only (#27) ──
+test("not-tracked card: the plain reason, no numbers, never $0", async () => {
+  const { flowsCardHtml } = await import("../site/flows.js");
+  const cases = [
+    [{ reason: "owner", note: "Many property tokens, no single main token." }, "Not tracked: Many property tokens, no single main token."],
+    [{ reason: "chain" }, "Not tracked: not on Ethereum, the only chain flows are read on for now."],
+    [{ reason: "no-token" }, "Not tracked: no Ethereum token approved for this fund yet."],
+    [{ reason: "not-reviewed" }, "Not tracked: this fund is not reviewed yet."],
+  ];
+  for (const [f, text] of cases) {
+    const html = flowsCardHtml({ flows: { status: "untracked", ...f } });
+    assert.ok(html.includes(text), text);
+    assert.doesNotMatch(html, /\$|<b/);
+  }
+  assert.equal(flowsCardHtml({ flows: { status: "untracked", reason: "unknown-code" } }), "", "an unknown reason shows nothing rather than a wrong sentence");
+});
+
+test("a multi-chain tracked fund's card says Ethereum only and names the other chains", async () => {
+  const { flowsCardHtml } = await import("../site/flows.js");
+  const html = flowsCardHtml({ flows: { ...full, otherChains: ["avalanche", "optimism", "arbitrum", "polygon"] } }, NOW);
+  assert.match(html, /Ethereum only\. This fund is also on Avalanche, Optimism, Arbitrum, Polygon\./);
+  assert.doesNotMatch(flowsCardHtml({ flows: full }, NOW), /Ethereum only/);
+  assert.match(flowsCardHtml({ flows: { status: "unavailable", otherChains: ["base"] } }, NOW), /Ethereum only\. This fund is also on Base\./);
+});
+
+test("owner reasons: a period added only when missing, text escaped, a blank note shows nothing", async () => {
+  const { flowsCardHtml } = await import("../site/flows.js");
+  const card = (note) => flowsCardHtml({ flows: { status: "untracked", reason: "owner", note } });
+  assert.match(card("Many tokens"), /Not tracked: Many tokens\./);
+  assert.match(card("Which token?"), /Not tracked: Which token\?</);
+  assert.match(card("A <b> & c."), /Not tracked: A &lt;b&gt; &amp; c\./);
+  for (const blank of ["", "  ", undefined]) assert.equal(card(blank), "");
+});
+
+test("Ethereum only also on the collecting and no-price cards", async () => {
+  const { flowsCardHtml } = await import("../site/flows.js");
+  const other = { otherChains: ["base"] };
+  assert.match(flowsCardHtml({ flows: { status: "collecting", since: "2026-10-30", asOf: "2026-10-31", ...other } }, NOW), /Ethereum only\. This fund is also on Base\./);
+  assert.match(flowsCardHtml({ flows: { status: "full", since: null, asOf: "2026-10-29", noPrice: true, symbols: ["A", "B"], ...other } }, NOW), /Ethereum only\. This fund is also on Base\./);
+});
