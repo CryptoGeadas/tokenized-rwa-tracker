@@ -17,12 +17,16 @@
 //   fundFlows(tokens, ledger) → { status: "full" | "partial", since, asOf, in30, out30, net7,
 //     net30, maxOut30, maxOutDay, maxOutTx } in dollars; { status: "collecting", since, asOf }
 //     under 7 full days; or null when there are no honest numbers (no ledger, a token it does
-//     not know, a day without a price). Several tokens are summed into one fund.
+//     not know, a day without a price). Several tokens are summed into one fund. With a known
+//     supply on Ethereum it adds supplyUsd, supplyDay and any `flags` (#28, flag-rules.mjs).
 //   withFlows(result, registry, ledger, now) → result with a `flows` object on every fund (see below)
 //
 // Ledger: { asOf, chains: { ethereum: { lastBlock, asOf, updatedAt } },
 //           tokens: { "ethereum:0x…": { symbol, decimals, firstDay, days: { "YYYY-MM-DD": { in, out, maxOut, maxOutTx, price } } } } }
 // ─────────────────────────────────────────────────────────────────────────────
+
+import { FLAG_RULES, SUPPLY_MAX_AGE_DAYS } from "./flag-rules.mjs";
+export { FLAG_RULES };
 
 export const KEEP_DAYS = 30;
 export const MIN_DAYS = 7; // under this many full days: "collecting", no numbers
@@ -35,7 +39,7 @@ const keyOf = (chain, address) => `${chain}:${String(address).toLowerCase()}`;
 
 export const emptyLedger = () => ({ asOf: null, chains: {}, tokens: {} });
 
-export function addFlows(ledger, { chain, events, lastBlock, today, tracked = [], prices = {}, backfill = false, newFrom = null, updatedAt = null }) {
+export function addFlows(ledger, { chain, events, lastBlock, today, tracked = [], prices = {}, supplies = {}, supplyDay = today, backfill = false, newFrom = null, updatedAt = null }) {
   const next = structuredClone(ledger);
   // a token new to the ledger outside a backfill was read from part-way through a day: its first
   // full day is tomorrow, or `newFrom` (from the job) when that is later — never earlier
@@ -50,6 +54,14 @@ export function addFlows(ledger, { chain, events, lastBlock, today, tracked = []
     for (const k of Object.keys(next.tokens)) if (k.startsWith(`${chain}:`) && !keep.has(k)) delete next.tokens[k];
   }
   for (const t of tracked) Object.assign(tokenOf(t.address), { symbol: t.symbol, decimals: t.decimals });
+  // supply on Ethereum (#28): the latest good read with its date; a failed read keeps the last one
+  const supplyOf = new Map(Object.entries(supplies).map(([a, u]) => [a.toLowerCase(), u]));
+  for (const t of tracked) {
+    const units = supplyOf.get(t.address.toLowerCase()), p = priceOf.get(t.address.toLowerCase());
+    // no price today: the last known price, so one failed price call doesn't drop a real flag
+    const tok = tokenOf(t.address);
+    if (num(units)) tok.supply = { units, price: num(p) ? p : tok.supply?.price ?? null, day: supplyDay };
+  }
   for (const e of events) {
     const p = priceOf.get(e.token.toLowerCase());
     const d = (tokenOf(e.token).days[e.day] ??= { in: 0, out: 0, maxOut: 0, maxOutTx: null, price: Number.isFinite(p) ? p : null });
@@ -138,7 +150,36 @@ export function fundFlows(tokens, ledger, now = null) {
     // `symbols` names only the tokens without a price.
     return { ...head, noPrice: true, symbols: [...unpriced], ...(tokens.length === 1 ? { units: finish(units, (n) => Math.round(n * 1e6) / 1e6) } : {}), ...tail };
   }
-  return { ...head, ...finish(usd, cents), ...tail };
+  finish(usd, cents);
+  const supply = fundSupply(tokens, ledger);
+  // a supply read that has been failing for over a week is too old to judge by: shown, no flags
+  const flags = supply && supply.day >= shiftDay(asOf, -SUPPLY_MAX_AGE_DAYS) ? flagsOf(usd, supply.usd) : [];
+  return { ...head, ...usd, ...(supply ? { supplyUsd: cents(supply.usd), supplyDay: supply.day } : {}), ...(flags.length ? { flags } : {}), ...tail };
+}
+
+// The fund's dollar supply on Ethereum: the sum of its tokens, or null when any token has no
+// supply or no price for it (no share is better than a share of part of the fund).
+function fundSupply(tokens, ledger) {
+  let usd = 0, day = null;
+  for (const tok of tokens) {
+    const s = ledger.tokens[keyOf(tok.chain, tok.address)].supply;
+    if (!s || !num(s.units) || !num(s.price) || !DAY.test(String(s.day))) return null;
+    usd += s.units * s.price;
+    day = !day || s.day < day ? s.day : day; // the oldest read, so the date never overstates
+  }
+  return usd >= 0 ? { usd, day } : null; // a real $0: the whole fund left Ethereum
+}
+
+// Flags (#28): facts from a published rule (flag-rules.mjs), never an opinion. Same window as the
+// numbers. Each carries its share of the fund's supply on Ethereum; the page words them.
+function flagsOf(s, supplyUsd) {
+  // nothing left on Ethereum: any redemption was more than the supply, so share null (JSON has no Infinity)
+  if (supplyUsd === 0) return [...(s.net30 < 0 ? [{ kind: "outflow", share: null }] : []), ...(s.maxOut30 > 0 ? [{ kind: "big-redemption", share: null }] : [])];
+  const net = s.net30 / supplyUsd, big = s.maxOut30 / supplyUsd, flags = [];
+  if (net <= -FLAG_RULES.outflow) flags.push({ kind: "outflow", share: -net });
+  if (big >= FLAG_RULES.bigRedemption) flags.push({ kind: "big-redemption", share: big });
+  if (net >= FLAG_RULES.inflow) flags.push({ kind: "inflow", share: net });
+  return flags;
 }
 
 // Every fund on the page gets a `flows` object (#27): a tracked fund's summary (fundFlows), or
@@ -152,7 +193,9 @@ export function withFlows(result, registry, ledger, now = Date.now()) {
     if (!e) return { ...f, flows: { status: "untracked", reason: "not-reviewed" } };
     if (e.tokens) {
       const other = (e.chains ?? []).filter((c) => c !== "ethereum");
-      return { ...f, flows: { ...fundFlows(e.tokens, ledger, now), ...(other.length ? { otherChains: other } : {}) } };
+      const s = fundFlows(e.tokens, ledger, now);
+      const named = ["full", "partial"].includes(s?.status) ? { tokenSymbols: e.tokens.map((t) => t.symbol) } : {};
+      return { ...f, flows: { ...s, ...named, ...(other.length ? { otherChains: other } : {}) } };
     }
     if (e.flows_not_tracked) return { ...f, flows: { status: "untracked", reason: "owner", note: e.flows_not_tracked } };
     return { ...f, flows: { status: "untracked", reason: (e.chains ?? []).includes("ethereum") ? "no-token" : "chain" } };

@@ -1,7 +1,7 @@
 // Tests for the fund flows ledger (flows.mjs). Run: npm test
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { emptyLedger, addFlows, fundFlows, withFlows, shiftDay } from "./flows.mjs";
+import { emptyLedger, addFlows, fundFlows, withFlows, shiftDay, FLAG_RULES } from "./flows.mjs";
 
 const A = "0x00000000000000000000000000000000000000aa";
 const B = "0x00000000000000000000000000000000000000bb";
@@ -316,4 +316,88 @@ test("the owner's reason wins over the chain rule; lanes get the same flows obje
     { realt: { chains: ["gnosis"], flows_not_tracked: "Many property tokens." }, multi: { tokens: fundA, chains: ["ethereum", "base"] } }, backfilled([ev(T, "in", 1)]), Date.now());
   assert.deepEqual(out.secondaryLanes["real-estate"][0].flows, { status: "untracked", reason: "owner", note: "Many property tokens." });
   assert.deepEqual(out.secondaryLanes["real-estate"][1].flows.otherChains, ["base"]);
+});
+
+// ── supply and flags (#28) ──
+const supplied = (events, units, price = 1) => addFlows(emptyLedger(), { chain: "ethereum", events, lastBlock: 500, today: T, tracked: [tokA], prices: { [A]: price }, backfill: true, supplies: { [A]: units }, supplyDay: "2026-10-30" });
+const kinds = (s) => (s.flags ?? []).map((g) => g.kind);
+
+test("the rules are the three published lines", () => {
+  assert.deepEqual(FLAG_RULES, { outflow: 0.10, bigRedemption: 0.05, inflow: 0.20 });
+});
+
+test("Outflow: net 30 days at −10% of the supply on Ethereum or worse", () => {
+  const out = (n) => Array.from({ length: n }, (_, i) => ev(shiftDay(T, -i), "out", 10)); // 1% each, never a big redemption
+  assert.deepEqual(kinds(fundFlows(fundA, supplied(out(9), 1000))), []);
+  assert.deepEqual(kinds(fundFlows(fundA, supplied(out(10), 1000))), ["outflow"]);
+  assert.deepEqual(kinds(fundFlows(fundA, supplied(out(11), 1000))), ["outflow"]);
+  assert.deepEqual(fundFlows(fundA, supplied(out(10), 1000)).flags, [{ kind: "outflow", share: 0.1 }]);
+});
+
+test("Big redemption: one redemption of 5% or more, with its share", () => {
+  assert.deepEqual(kinds(fundFlows(fundA, supplied([ev(T, "out", 49)], 1000))), []);
+  assert.deepEqual(fundFlows(fundA, supplied([ev(T, "out", 50, "0xa")], 1000)).flags, [{ kind: "big-redemption", share: 0.05 }]);
+  assert.deepEqual(kinds(fundFlows(fundA, supplied([ev(T, "out", 51)], 1000))), ["big-redemption"]);
+});
+
+test("Inflow: net 30 days at +20% or more", () => {
+  assert.deepEqual(kinds(fundFlows(fundA, supplied([ev(T, "in", 199)], 1000))), []);
+  assert.deepEqual(fundFlows(fundA, supplied([ev(T, "in", 200)], 1000)).flags, [{ kind: "inflow", share: 0.2 }]);
+  assert.deepEqual(kinds(fundFlows(fundA, supplied([ev(T, "in", 201)], 1000))), ["inflow"]);
+});
+
+test("several flags on one fund; shares are in dollars at each token's price", () => {
+  const s = fundFlows(fundA, supplied([ev(T, "out", 20, "0xa")], 100, 2));
+  assert.deepEqual(kinds(s), ["outflow", "big-redemption"]);
+  assert.equal(s.supplyUsd, 200);
+  assert.equal(s.supplyDay, "2026-10-30");
+  assert.equal(s.flags[0].share, 0.2);
+});
+
+test("a fund's supply is the sum of its tokens; one token without a supply means no share and no flags", () => {
+  const both = addFlows(emptyLedger(), { chain: "ethereum", events: [ev(T, "out", 30)], lastBlock: 500, today: T, tracked: [tokA, tokB], prices: { [A]: 1, [B]: 2 }, backfill: true, supplies: { [A]: 100, [B]: 50 } });
+  assert.equal(fundFlows(fundAB, both).supplyUsd, 200);
+  assert.deepEqual(kinds(fundFlows(fundAB, both)), ["outflow", "big-redemption"]);
+  const missing = addFlows(emptyLedger(), { chain: "ethereum", events: [ev(T, "out", 30)], lastBlock: 500, today: T, tracked: [tokA, tokB], prices: { [A]: 1, [B]: 2 }, backfill: true, supplies: { [A]: 100, [B]: null } });
+  const s = fundFlows(fundAB, missing);
+  assert.equal(s.supplyUsd, undefined);
+  assert.equal(s.flags, undefined);
+  assert.equal(s.out30, 30, "the dollar numbers still show");
+});
+
+test("a partial window uses the since-numbers; no flags while collecting, with no price, or a supply without a price", () => {
+  const since = shiftDay(T, -9);
+  const partial = addFlows(emptyLedger(), { chain: "ethereum", events: [ev(T, "out", 20), ev(shiftDay(since, -1), "in", 500)], lastBlock: 500, today: T, tracked: [tokA], prices: { [A]: 1 }, backfill: since, supplies: { [A]: 100 } });
+  assert.deepEqual(kinds(fundFlows(fundA, partial)), ["outflow", "big-redemption"]);
+  const collecting = addFlows(emptyLedger(), { chain: "ethereum", events: [ev(T, "out", 20)], lastBlock: 500, today: T, tracked: [tokA], prices: { [A]: 1 }, backfill: shiftDay(T, -2), supplies: { [A]: 100 } });
+  assert.equal(fundFlows(fundA, collecting).flags, undefined);
+  const noPrice = addFlows(emptyLedger(), { chain: "ethereum", events: [ev(T, "out", 20)], lastBlock: 500, today: T, tracked: [tokA], prices: { [A]: null }, backfill: true, supplies: { [A]: 100 } });
+  assert.equal(fundFlows(fundA, noPrice).flags, undefined);
+  // the flows days are priced, but the supply was read on a run without a price
+  const l = supplied([ev(T, "out", 20)], 100);
+  l.tokens[`ethereum:${A}`].supply.price = null;
+  assert.equal(fundFlows(fundA, l).supplyUsd, undefined);
+  assert.equal(fundFlows(fundA, l).flags, undefined);
+});
+
+test("withFlows names a tracked fund's tokens for the source line", () => {
+  const out = withFlows({ mainStage: [{ slug: "t" }], secondaryLanes: {} }, { t: { tokens: fundA, chains: ["ethereum"] } }, supplied([ev(T, "in", 1)], 100), Date.now());
+  assert.deepEqual(out.mainStage[0].flows.tokenSymbols, ["AAA"]);
+});
+
+test("a good supply read on a day without a price keeps the last known price, so a real flag stays", () => {
+  let l = supplied([ev(T, "out", 20)], 100);
+  l = addFlows(l, { chain: "ethereum", events: [], lastBlock: 600, today: T, tracked: [tokA], prices: { [A]: null }, supplies: { [A]: 90 }, supplyDay: "2026-10-31" });
+  assert.deepEqual(l.tokens[`ethereum:${A}`].supply, { units: 90, price: 1, day: "2026-10-31" });
+  assert.equal(fundFlows(fundA, l).supplyUsd, 90);
+});
+
+test("a real $0 supply is shown and flagged; a supply over 7 days older than the data gives no flags", () => {
+  const empty = fundFlows(fundA, supplied([ev(T, "out", 20)], 0));
+  assert.equal(empty.supplyUsd, 0);
+  assert.deepEqual(empty.flags, [{ kind: "outflow", share: null }, { kind: "big-redemption", share: null }]);
+  const at = (day) => addFlows(emptyLedger(), { chain: "ethereum", events: [ev(T, "out", 20)], lastBlock: 500, today: T, tracked: [tokA], prices: { [A]: 1 }, backfill: true, supplies: { [A]: 100 }, supplyDay: day });
+  assert.equal(fundFlows(fundA, at(shiftDay(T, -7))).flags.length, 2);
+  assert.equal(fundFlows(fundA, at(shiftDay(T, -8))).flags, undefined);
+  assert.equal(fundFlows(fundA, at(shiftDay(T, -8))).supplyUsd, 100, "still shown, with its date");
 });

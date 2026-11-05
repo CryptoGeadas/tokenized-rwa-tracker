@@ -105,3 +105,33 @@ test("a second run on the same day does not move a new token's first day earlier
   const r = await runFlows({ ledger: first.ledger, tokens, portal: rerun, prices: async () => ({}), now: NOW + 3_600_000, log: quiet });
   assert.equal(r.ledger.tokens[`ethereum:${B}`].firstDay, "2026-10-31", "read from part-way through 30 Oct: 31 Oct is its first full day");
 });
+
+// ── supply on Ethereum (#28) ──
+test("supply: one read per token with its decimals, at the finalized block; a failed or bad read is null", async () => {
+  const { fetchSupplies } = await import("./flows-job.mjs");
+  const B = "0x00000000000000000000000000000000000000bb", C = "0x00000000000000000000000000000000000000cc", D = "0x00000000000000000000000000000000000000dd";
+  const calls = [], logged = [];
+  const fetchImpl = async (url, init) => {
+    const q = JSON.parse(init.body);
+    calls.push(q);
+    const to = q.params[0].to;
+    if (to === C) throw new Error("timeout");
+    if (to === D) return new Response(JSON.stringify({ error: { message: "reverted" } }), { status: 200 });
+    return new Response(JSON.stringify({ result: to === A ? "0x" + (172602137647549n).toString(16) : "0x" + (5n * 10n ** 18n).toString(16) }), { status: 200 });
+  };
+  const s = await fetchSupplies([{ address: A, decimals: 6 }, { address: B, decimals: 18 }, { address: C, decimals: 6 }, { address: D, decimals: 6 }], { fetchImpl, log: { ...quiet, log: (l) => logged.push(l) } });
+  assert.deepEqual(s, { [A]: 172602137.647549, [B]: 5, [C]: null, [D]: null });
+  assert.deepEqual(calls[0].params, [{ to: A, data: "0x18160ddd" }, "finalized"]);
+  assert.equal(calls[0].method, "eth_call");
+  assert.equal(logged.filter((l) => /^::warning::totalSupply/.test(l)).length, 2, "each failed read shows on the run page");
+});
+
+test("the job stores each token's supply; a failed read keeps the last value and its date", async () => {
+  const tok = [{ address: A, decimals: 6, symbol: "AAA" }];
+  const first = await runFlows({ ledger: emptyLedger(), tokens: tok, portal: fakePortal([]), prices: async () => ({ [A]: 2 }), supplies: async () => ({ [A]: 100 }), now: NOW, log: quiet });
+  assert.deepEqual(first.ledger.tokens[`ethereum:${A}`].supply, { units: 100, price: 2, day: "2026-10-30" });
+  const next = fakePortal([], Date.parse("2026-10-31T03:00:00Z") / 1000);
+  next.finalizedHead = async () => 1500;
+  const r = await runFlows({ ledger: first.ledger, tokens: tok, portal: next, prices: async () => ({ [A]: 3 }), supplies: async () => ({ [A]: null }), now: NOW + 86_400_000, log: quiet });
+  assert.deepEqual(r.ledger.tokens[`ethereum:${A}`].supply, { units: 100, price: 2, day: "2026-10-30" });
+});

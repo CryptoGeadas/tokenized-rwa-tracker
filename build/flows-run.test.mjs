@@ -133,3 +133,16 @@ test("the build's read and the summary together: a broken ledger file gives trac
   assert.deepEqual(out.mainStage[0].flows, { status: "unavailable" });
   await rm(f.dir, { recursive: true });
 });
+
+test("the CLI passes the supply read through to the saved ledger", async () => {
+  const f = await files(JSON.stringify(ledger));
+  const portal = { ...portalThat(null), fetchMintsBurns: async (q) => ({ events: [], lastBlock: q.toBlock, lastTimestamp: NOW / 1000 - 3600, bytes: 1 }) };
+  await runFlowsFile({ ...f, portal, prices: async () => ({ [A]: 1 }), supplies: async () => ({ [A]: 42 }), now: NOW, log: logs() });
+  assert.equal(JSON.parse(await readFile(f.ledgerPath, "utf8")).tokens[`ethereum:${A}`].supply.units, 42);
+  await rm(f.dir, { recursive: true });
+});
+
+test("the script's own wiring passes fetchSupplies", async () => {
+  const src = await readFile(new URL("./flows-run.mjs", import.meta.url), "utf8");
+  assert.match(src, /supplies: \(tokens\) => fetchSupplies\(tokens\)/);
+});

@@ -1,5 +1,5 @@
 import { esc, fmtPct, tvlCell, backingBadge, tierBadge } from "./fmt.js";
-import { flowsCardHtml } from "./flows.js";
+import { flowsCardHtml, flagTagsHtml } from "./flows.js";
 
 const COLS = [
   { key: "name", label: "Fund" },
@@ -111,7 +111,7 @@ export function renderTable(container, funds, sortKey, sortDir, expandedSlug, op
     const wrapperTag = f.holds?.length ? `<span class="wrapper-tag" title="Holds other RWA tokens">wrapper</span>` : "";
     const isOpen = expandedSlug === f.slug;
     const row = `<tr data-slug="${esc(f.slug)}" class="${isOpen ? "expanded" : ""}">
-      <td class="name-cell">${esc(f.name)}${wrapperTag}${mislabelBadge}</td>
+      <td class="name-cell">${esc(f.name)}${wrapperTag}${mislabelBadge}${opts.flowsCard ? flagTagsHtml(f) : ""}</td>
       <td class="issuer-cell">${esc(f.issuer)}</td>
       <td>${backingBadge(f.backing_type)}</td>
       <td class="num yield-cell">${fmtPct(f.apyBase)}</td>

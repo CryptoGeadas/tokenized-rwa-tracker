@@ -120,7 +120,15 @@
 .flows-line.flows-wait { margin-top: 0; font-size: 14px; color: var(--fg); }
 .flows-card .dk { display: flex; justify-content: space-between; gap: 8px; }
 .flows-card .fl-asof { color: var(--warn); text-transform: none; letter-spacing: 0; }
-.flows-card.is-stale .flows-net, .flows-card.is-stale .flows-sub { opacity: 0.55; } /* old numbers: still readable, clearly not current */
+.flows-card.is-stale .flows-flags, .flows-card.is-stale .flows-net, .flows-card.is-stale .flows-sub { opacity: 0.55; } /* old numbers: still readable, clearly not current */
+
+/* money-flow flags (#28): a word and a colour, on the row and at the top of the card */
+.fl-tags { display: inline-flex; gap: 6px; margin-left: 6px; vertical-align: middle; white-space: nowrap; }
+.fl-flag { padding: 1px 6px; border: 1px solid currentColor; border-radius: var(--r-ctl); font: 500 10px var(--font-mono); letter-spacing: 0.04em; white-space: nowrap; }
+.fl-flag-outflow { color: var(--down); } .fl-flag-big-redemption { color: var(--warn); } .fl-flag-inflow { color: var(--up); }
+.flows-flags { margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.flows-flag { font-size: 14px; line-height: 1.6; }
+.flows-flag .fl-flag { margin-right: 6px; }
 
 /* one-liner column */
 .oneliner { color: var(--muted); font-size: 13px; max-width: 320px; line-height: 1.4; }
@@ -186,6 +194,7 @@ a.uncl-name:hover { color: var(--accent); }
   .scatter-legend { flex-direction: column; align-items: flex-start; gap: 6px; }
   .legend-note { margin-left: 0; }
   .tbl .oneliner, .tbl .chains-cell, .tbl .issuer-cell { display: none; }
+  .fl-tags { display: flex; margin: 4px 0 0; } /* tags on one line under the fund name */
   .tbl th, .tbl td { padding: 8px 5px; }
   .tbl th { letter-spacing: 0.06em; }
   .tbl td { font-size: 13px; }

@@ -2,7 +2,7 @@
 // FLOWS JOB — one daily run (#21). flows-run.mjs is the CLI around it (files + exit code);
 // the Portal and the price lookup are passed in, so this is tested with fakes.
 //
-//   runFlows({ ledger, tokens, portal, prices, now, log }) → { ledger, bytes }
+//   runFlows({ ledger, tokens, portal, prices, supplies?, now, log }) → { ledger, bytes }
 //     tokens = [{ address, decimals, symbol }] on Ethereum (registryTokens).
 //     First run (no last block): read the 30 whole days before today. Later runs: from the
 //     last block + 1 to the finalized head. `today` for the ledger = the last COMPLETE UTC
@@ -14,6 +14,9 @@
 //     A failed or empty answer is null: "no price", never a guessed $1.
 //     The free API has no past prices by contract address, so the first run's 30 backfilled
 //     days all carry that run's price. Every later day carries its own run's price.
+//   fetchSupplies(tokens, { fetchImpl?, log? }) → { address: units | null }
+//     totalSupply once per token at the finalized block, from a free public RPC (no key).
+//     A failed read is null: the ledger keeps the last value and its date.
 //
 // Ethereum only for now (#21); the dataset map is the place to add a chain later.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -24,6 +27,8 @@ const DAY_MS = 86_400_000;
 const utcDay = (ms) => new Date(ms).toISOString().slice(0, 10);
 const PRICE_URL = "https://api.coingecko.com/api/v3/simple/token_price/ethereum";
 const realSleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const RPC_URL = "https://ethereum-rpc.publicnode.com";
+const TOTAL_SUPPLY = "0x18160ddd"; // totalSupply()
 const PRICE_TRIES = 3; // a rate-limited, failing or hung price call: wait 30 s, then 60 s
 
 export function registryTokens(registry, chain) {
@@ -58,9 +63,31 @@ export async function fetchPrices(addresses, { fetchImpl = fetch, sleep = realSl
   return out;
 }
 
+export async function fetchSupplies(tokens, { fetchImpl = fetch, log = console } = {}) {
+  const out = {};
+  for (const t of tokens) {
+    const a = t.address.toLowerCase();
+    try {
+      const res = await fetchImpl(RPC_URL, {
+        method: "POST", headers: { "content-type": "application/json" }, signal: AbortSignal.timeout(30_000),
+        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_call", params: [{ to: a, data: TOTAL_SUPPLY }, "finalized"] }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const j = await res.json();
+      if (!/^0x[0-9a-fA-F]+$/.test(j?.result ?? "")) throw new Error(j?.error?.message ?? "no result");
+      out[a] = Number(BigInt(j.result)) / 10 ** t.decimals;
+    } catch (e) {
+      // GitHub shows "::warning::" on the run page; the run stays green
+      log.log(`::warning::totalSupply for ${a} failed (${e.message}): keeping the last value`);
+      out[a] = null;
+    }
+  }
+  return out;
+}
+
 // readLimitMs: stop reading cleanly before the workflow's timeout kills the job, so what was
 // read is saved and the next run continues from there
-export async function runFlows({ ledger, tokens, portal, prices, now = Date.now(), log = console, readLimitMs = 300 * 60_000 }) {
+export async function runFlows({ ledger, tokens, portal, prices, supplies = async () => ({}), now = Date.now(), log = console, readLimitMs = 300 * 60_000 }) {
   const jobStart = Date.now();
   const chain = "ethereum", dataset = DATASETS[chain];
   if (!tokens.length) { log.warn("  ⚠ flows: no tracked tokens in the registry"); return { ledger, bytes: 0 }; }
@@ -89,9 +116,10 @@ export async function runFlows({ ledger, tokens, portal, prices, now = Date.now(
   };
   const r = await fromPortal(() => portal.fetchMintsBurns({ dataset, tokens: tokens.map(({ address, decimals }) => ({ address, decimals })), fromBlock, toBlock: head, onBatch, deadline: jobStart + readLimitMs }));
   if (r.lastBlock >= fromBlock && r.lastTimestamp != null) {
+    const supply = await supplies(tokens);
     const today = shiftDay(utcDay(r.lastTimestamp * 1000), -1);
     ledger = addFlows(ledger, {
-      chain, events: r.events, lastBlock: r.lastBlock, today, tracked: tokens, prices: price,
+      chain, events: r.events, lastBlock: r.lastBlock, today, tracked: tokens, prices: price, supplies: supply, supplyDay: utcDay(now),
       backfill: backfill ? utcDay(startOfToday - KEEP_DAYS * DAY_MS) : false, newFrom,
       updatedAt: r.lastBlock >= head ? new Date(now).toISOString() : null,
     });

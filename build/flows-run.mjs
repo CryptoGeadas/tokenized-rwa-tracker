@@ -11,7 +11,7 @@
 // updated for over 72 h, or on a first run that has nothing to keep. Any other error is ours
 // (a broken ledger, a bug) and fails the run so it is seen.
 //
-//   runFlowsFile({ registryPath, ledgerPath, portal, prices, now?, log? }) → exit code 0
+//   runFlowsFile({ registryPath, ledgerPath, portal, prices, supplies?, now?, log? }) → exit code 0
 // ─────────────────────────────────────────────────────────────────────────────
 import { readFile, writeFile, mkdir, rename } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
@@ -19,7 +19,7 @@ import { dirname, join, resolve } from "node:path";
 import { checkRegistry } from "./registry.mjs";
 import { fetchMintsBurns, finalizedHead, blockAt } from "./portal.mjs";
 import { emptyLedger } from "./flows.mjs";
-import { runFlows, fetchPrices, registryTokens } from "./flows-job.mjs";
+import { runFlows, fetchPrices, fetchSupplies, registryTokens } from "./flows-job.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const LATE_MS = 72 * 3_600_000;
@@ -36,12 +36,12 @@ async function loadLedger(path) {
   return j;
 }
 
-export async function runFlowsFile({ registryPath, ledgerPath, portal, prices, now = Date.now(), log = console }) {
+export async function runFlowsFile({ registryPath, ledgerPath, portal, prices, supplies, now = Date.now(), log = console }) {
   const registry = checkRegistry(JSON.parse(await readFile(registryPath, "utf8")));
   const before = await loadLedger(ledgerPath);
   let r;
   try {
-    r = await runFlows({ ledger: before, tokens: registryTokens(registry, "ethereum"), portal, prices, now, log });
+    r = await runFlows({ ledger: before, tokens: registryTokens(registry, "ethereum"), portal, prices, supplies, now, log });
   } catch (e) {
     if (!e.fromPortal) throw e;
     const mb = ((e.partial?.bytes ?? 0) / 1e6).toFixed(2);
@@ -71,5 +71,6 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     ledgerPath: join(HERE, "state", "flows-ledger.json"),
     portal: { fetchMintsBurns, finalizedHead, blockAt },
     prices: (addresses) => fetchPrices(addresses),
+    supplies: (tokens) => fetchSupplies(tokens),
   }).then((code) => process.exit(code), (e) => { console.error(e); process.exit(1); });
 }

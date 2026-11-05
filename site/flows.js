@@ -32,6 +32,24 @@ const CHAIN = (c) => String(c).charAt(0).toUpperCase() + String(c).slice(1);
 // a fund also on other chains: the numbers are Ethereum's only, never the whole fund
 const ethOnly = (s) => (Array.isArray(s.otherChains) && s.otherChains.length ? ` Ethereum only. This fund is also on ${esc(s.otherChains.map(CHAIN).join(", "))}.` : "");
 
+// Flags (#28): words with colour, never colour only. The build decides them (build/flag-rules.mjs).
+const FLAG_TAGS = { outflow: "Outflow", "big-redemption": "Big redemption", inflow: "Inflow" };
+const knownFlags = (s) => (s?.flags ?? []).filter((g) => FLAG_TAGS[g.kind]);
+const flagTag = (g) => `<span class="fl-flag fl-flag-${g.kind}">${FLAG_TAGS[g.kind]}</span>`;
+export const flagTagsHtml = (f) => {
+  const flags = knownFlags(f.flows);
+  return flags.length ? `<span class="fl-tags">${flags.map(flagTag).join("")}</span>` : "";
+};
+// One plain sentence per flag, used by the card and the strip, so both read the same.
+export function flagSentence(g, s) {
+  const during = s.status === "partial" ? `since ${esc(fmtDay(s.since))}` : "in 30 days";
+  // today's supply can be smaller than what left: never "500% of its tokens"
+  const share = g.share == null || g.share >= 1 ? "more than its whole supply on Ethereum today." : `${Math.round(g.share * 100)}% of its tokens on Ethereum.`;
+  if (g.kind === "outflow") return `${fmtUsd(s.net30)} more redeemed than minted ${during}, ${share}`;
+  if (g.kind === "inflow") return `${fmtUsd(s.net30)} more minted than redeemed ${during}, ${share}`;
+  return `One redemption of ${fmtUsd(s.maxOut30)} on ${esc(fmtDay(s.maxOutDay))}, ${share}`;
+}
+
 const HOUR = 3_600_000;
 function isStale(s, now) {
   if (s.stale === true) return true;
@@ -71,8 +89,13 @@ export function flowsCardHtml(f, now = Date.now()) {
   // a real $0 (days read, no burns), like the Scanner card; the date only when there is one
   const big = u.maxOut30 > 0 && u.maxOutDay ? `${amount(u.maxOut30)} <small>${esc(fmtDay(u.maxOutDay))}</small>` : amount(0);
   const note = s.noPrice ? " No price on CoinGecko, so no dollar amounts." : "";
-  return card(`
+  const flagLines = knownFlags(s).map((g) => `<div class="flows-flag">${flagTag(g)} ${flagSentence(g, s)}</div>`).join("");
+  const tokens = s.tokenSymbols?.length ? esc(s.tokenSymbols.join(", ")) : "the fund's tokens";
+  const supply = Number.isFinite(s.supplyUsd) ? fmtUsd(s.supplyUsd) : "unknown";
+  // the read failed lately: name its day instead of saying "now"
+  const supplyWhen = s.supplyDay && s.supplyDay < s.asOf ? `on ${esc(fmtDay(s.supplyDay))}` : "now";
+  return card(`${flagLines ? `<div class="flows-flags">${flagLines}</div>` : ""}
     <div class="flows-net">${num("Net, 7 days", net(u.net7), netCls(u.net7))}${num(`Net, ${period}`, net(u.net30), netCls(u.net30))}</div>
     <div class="flows-sub">${num(`Minted, ${period}`, amount(u.in30))}${num(`Redeemed, ${period}`, amount(u.out30))}${num(`Biggest redemption, ${period}`, big)}</div>
-    <div class="flows-line">${s.status === "partial" ? `Since ${esc(fmtDay(s.since))}` : "Last 30 days"}, to ${esc(fmtDay(s.asOf))}. Mints and burns of the fund's tokens on Ethereum.${(s.tokensSince ?? []).map((t) => ` ${esc(t.symbol)} counted since ${esc(fmtDay(t.since))}.`).join("")}${note}${ethOnly(s)}</div>`);
+    <div class="flows-line">${s.status === "partial" ? `Since ${esc(fmtDay(s.since))}` : "Last 30 days"}, to ${esc(fmtDay(s.asOf))}. Mints and burns of ${tokens} on Ethereum. On Ethereum ${supplyWhen}: ${supply}.${(s.tokensSince ?? []).map((t) => ` ${esc(t.symbol)} counted since ${esc(fmtDay(t.since))}.`).join("")}${note}${ethOnly(s)}</div>`);
 }

@@ -1,6 +1,7 @@
 import { esc, fmtTvl, tvlCell, backingBadge, BACKING_COLORS } from "./fmt.js";
 import { renderScatter } from "./scatter.js";
 import { renderTable } from "./table.js";
+import { flagTagsHtml } from "./flows.js";
 
 const $ = (s) => document.querySelector(s);
 const state = { data: null, sortKey: "trust_tier", sortDir: "asc", expandedSlug: null };
@@ -119,7 +120,7 @@ function renderSecondary() {
     ).join("");
     const rows = funds.map((f) =>
       `<tr>
-        <td class="name-cell">${esc(f.name)}${f.holds?.length ? `<span class="wrapper-tag" title="Holds other RWA tokens">wrapper</span>` : ""}</td>
+        <td class="name-cell">${esc(f.name)}${f.holds?.length ? `<span class="wrapper-tag" title="Holds other RWA tokens">wrapper</span>` : ""}${tableOpts().flowsCard ? flagTagsHtml(f) : ""}</td>
         <td>${esc(f.issuer)}</td>
         <td>${backingBadge(f.backing_type)}</td>
         <td class="num">${tvlCell(f)}</td>
