@@ -27,6 +27,7 @@
     "jurisdiction": "US",
     "redemption": "daily",
     "chains": ["ethereum", "solana"],
+    "tokens": [{ "chain": "ethereum", "address": "0x136471a34f6ef19fe571effc1ca711fdb8e49f2b", "decimals": 6, "symbol": "USYC" }],
     "one_liner": "Short-duration US Treasury fund via Hashnote. Institutional-grade, regulated wrapper, now under Circle.",
     "mislabel": false,
     "lane": "main"
@@ -42,6 +43,10 @@
     "jurisdiction": "US",
     "redemption": "daily",
     "chains": ["ethereum", "solana", "mantle", "arbitrum", "sui"],
+    "tokens": [
+      { "chain": "ethereum", "address": "0x96f6ef951840721adbf46ac996b59e0235cb985c", "decimals": 18, "symbol": "USDY" },
+      { "chain": "ethereum", "address": "0x1b19c19393e2d034d8ff31ff34c81252fcbbee92", "decimals": 18, "symbol": "OUSG" }
+    ],
     "one_liner": "Ondo's US Treasury-backed yield tokens. USDY is permissionless on supported chains; OUSG is permissioned. Daily redemptions.",
     "mislabel": false,
     "lane": "main"
@@ -57,6 +62,7 @@
     "jurisdiction": "US",
     "redemption": "daily",
     "chains": ["ethereum"],
+    "tokens": [{ "chain": "ethereum", "address": "0x43415eb6ff9db7e26a15b704e7a3edce97d31c4e", "decimals": 6, "symbol": "USTB" }],
     "one_liner": "Invesco's tokenized short-term Treasury bond ETF. Institutional pedigree, Securitize-distributed.",
     "mislabel": false,
     "lane": "main"
@@ -72,6 +78,7 @@
     "jurisdiction": "BVI",
     "redemption": "daily",
     "chains": ["ethereum", "arbitrum"],
+    "tokens": [{ "chain": "ethereum", "address": "0xdd50c053c096cb04a3e3362e2b622529ec5f2e8a", "decimals": 6, "symbol": "TBILL" }],
     "one_liner": "Tokenized US T-bill vault. Known issuer, regulated but BVI-domiciled — one notch below US-regulated wrappers.",
     "mislabel": false,
     "lane": "main"
@@ -88,6 +95,7 @@
     "jurisdiction": "US",
     "redemption": "epoch-based",
     "chains": ["ethereum"],
+    "flows_not_tracked": "A platform for many pools; its largest pool token (JTRSY) is tracked under Anemoy.",
     "one_liner": "Real-world credit pools on-chain — invoices, trade finance, structured credit. Epoch-based redemptions; counterparty risk on each pool.",
     "mislabel": false,
     "lane": "main"
@@ -103,6 +111,10 @@
     "jurisdiction": "BVI",
     "redemption": "variable",
     "chains": ["ethereum", "solana", "base"],
+    "tokens": [
+      { "chain": "ethereum", "address": "0x80ac24aa929eaf5013f6436cda2a7ba190f5cc0b", "decimals": 6, "symbol": "syrupUSDC" },
+      { "chain": "ethereum", "address": "0x356b8d89c1e1239cbbb9de4815c39a1474d5ba7d", "decimals": 6, "symbol": "syrupUSDT" }
+    ],
     "one_liner": "Institutional lending to real-world borrowers. Previously had defaults (2022); v2 restructured with better underwriting. Still private credit risk.",
     "mislabel": false,
     "lane": "main"
@@ -119,6 +131,10 @@
     "jurisdiction": "US",
     "redemption": "varies",
     "chains": ["ethereum", "avalanche"],
+    "tokens": [
+      { "chain": "ethereum", "address": "0x51c2d74017390cbbd30550179a16a1c28f7210fc", "decimals": 6, "symbol": "STAC" },
+      { "chain": "ethereum", "address": "0x17418038ecf73ba4026c4f428547bf099706f27b", "decimals": 6, "symbol": "ACRED" }
+    ],
     "one_liner": "Tokenized credit funds — Apollo CLO, Hamilton Lane senior credit. Institutional managers, Securitize as platform. Accredited investors only.",
     "mislabel": false,
     "lane": "main"
@@ -165,6 +181,7 @@
     "jurisdiction": "BVI",
     "redemption": "instant",
     "chains": ["ethereum"],
+    "tokens": [{ "chain": "ethereum", "address": "0x4c9edd5852cd905f086c759e8383e09bff1e68b3", "decimals": 18, "symbol": "USDe" }],
     "one_liner": "Delta-neutral basis trade — earns funding rates, NOT backed by real-world assets. Often appears in RWA listings but is a synthetic yield product.",
     "mislabel": true,
     "lane": "main"
@@ -180,6 +197,7 @@
     "jurisdiction": "BVI",
     "redemption": "instant",
     "chains": ["ethereum"],
+    "tokens": [{ "chain": "ethereum", "address": "0xc139190f447e929f090edeb554d95abb8b18ac1c", "decimals": 18, "symbol": "USDtb" }],
     "one_liner": "Marketed as 'institutional USDe' with BUIDL backing, but yield is still from basis trades. Not a real-world asset despite the packaging.",
     "mislabel": true,
     "lane": "main"
@@ -195,6 +213,7 @@
     "jurisdiction": "EU",
     "redemption": "instant",
     "chains": ["ethereum"],
+    "tokens": [{ "chain": "ethereum", "address": "0x73a15fed60bf67631dc6cd7bc5b6e8da8190acf5", "decimals": 18, "symbol": "USD0" }],
     "one_liner": "Treasury-backed stablecoin with yield redistribution via USUAL governance token. T-bill backing is real, but protocol structure is newer.",
     "mislabel": false,
     "lane": "main"
@@ -210,6 +229,7 @@
     "jurisdiction": "unknown",
     "redemption": "instant",
     "chains": ["tron", "ethereum"],
+    "tokens": [{ "chain": "ethereum", "address": "0x25ec98773d7b4ced4cafab96a2a1c0945f145e10", "decimals": 18, "symbol": "stUSDT" }],
     "one_liner": "Claims US Treasury backing but opaque issuer structure. Proceed with caution — transparency far below institutional standards.",
     "mislabel": false,
     "lane": "main"
@@ -225,6 +245,10 @@
     "jurisdiction": "unknown",
     "redemption": "variable",
     "chains": ["ethereum"],
+    "tokens": [
+      { "chain": "ethereum", "address": "0x5086bf358635b81d8c47c66d1c8b9e567db70c72", "decimals": 18, "symbol": "reUSD" },
+      { "chain": "ethereum", "address": "0xddc0f880ff6e4e22e4b74632fbb43ce4df6ccc5a", "decimals": 18, "symbol": "reUSDe" }
+    ],
     "one_liner": "Reinsurance-backed yield protocol. Novel backing type (reinsurance premiums). Limited track record, higher risk.",
     "mislabel": false,
     "lane": "main"
@@ -240,6 +264,7 @@
     "jurisdiction": "US",
     "redemption": "secondary-market",
     "chains": ["ethereum", "gnosis"],
+    "flows_not_tracked": "Hundreds of single-property tokens, mostly on Gnosis.",
     "one_liner": "Tokenized US rental properties. Each token is a share in an LLC holding a single property. Rental yield distributed weekly.",
     "mislabel": false,
     "lane": "real-estate"
@@ -270,6 +295,7 @@
     "jurisdiction": "US",
     "redemption": "market-hours",
     "chains": ["ethereum"],
+    "flows_not_tracked": "Many tokenized stocks, one token each; not a single fund token.",
     "one_liner": "Tokenized US equities — TSLA, NVDA, etc. on-chain. Not a yield product; equity exposure only.",
     "mislabel": false,
     "lane": "equity",
@@ -286,6 +312,10 @@
     "jurisdiction": "US",
     "redemption": "varies",
     "chains": ["ethereum", "solana"],
+    "tokens": [
+      { "chain": "ethereum", "address": "0x19ebb35279a16207ec4ba82799cc64715065f7f6", "decimals": 6, "symbol": "PRIME" },
+      { "chain": "ethereum", "address": "0x997e2efbce91d170b00ea402e35a66c887ee1da9", "decimals": 6, "symbol": "AUTO" }
+    ],
     "one_liner": "Yield from Figure's home-equity loans (HELOCs), passed on through Hastra's PRIME token. Real US consumer credit from a listed lender; redemption terms are not clearly published.",
     "mislabel": false,
     "lane": "main"
@@ -316,6 +346,7 @@
     "jurisdiction": "BVI",
     "redemption": "daily",
     "chains": ["ethereum", "base", "celo"],
+    "tokens": [{ "chain": "ethereum", "address": "0x8c213ee79581ff4984583c6a801e5263418c4b86", "decimals": 6, "symbol": "JTRSY" }],
     "one_liner": "Mostly the Janus Henderson Anemoy Treasury Fund (JTRSY): 0-3 month US T-bills in a BVI-regulated fund, daily USDC redemption, non-US professional investors only. The same issuer also runs smaller credit funds (Apollo credit, AAA CLO).",
     "mislabel": false,
     "lane": "main"
@@ -362,6 +393,20 @@
     "jurisdiction": "unknown",
     "redemption": "varies",
     "chains": ["ethereum", "plume", "solana", "binance", "avalanche"],
+    "tokens": [
+      { "chain": "ethereum", "address": "0x119dd7daff816f29d7ee47596ae5e4bdc4299165", "decimals": 6, "symbol": "nOPAL" },
+      { "chain": "ethereum", "address": "0x7f80d7a9c0dfe52de38692f4642a5aa3d3a7f5dd", "decimals": 6, "symbol": "nETHERFI" },
+      { "chain": "ethereum", "address": "0x593ccca4c4bf58b7526a4c164ceef4003c6388db", "decimals": 6, "symbol": "nALPHA" },
+      { "chain": "ethereum", "address": "0xe72fe64840f4ef80e3ec73a1c749491b5c938cb9", "decimals": 6, "symbol": "nTBILL" },
+      { "chain": "ethereum", "address": "0x63810d7f1c7b4dbfb60c173ba120a2be98b59e13", "decimals": 6, "symbol": "nCLO" },
+      { "chain": "ethereum", "address": "0x11113ff3a60c2450f4b22515cb760417259ee94b", "decimals": 6, "symbol": "nBASIS" },
+      { "chain": "ethereum", "address": "0x2a3e301dbd45c143dfbb7b1ce1c55bf0bbf161cb", "decimals": 6, "symbol": "nACRDX" },
+      { "chain": "ethereum", "address": "0x9fbc367b9bb966a2a537989817a088afcaffdc4c", "decimals": 6, "symbol": "nELIXIR" },
+      { "chain": "ethereum", "address": "0xa5f78b2a0ab85429d2dfbf8b60abc70f4cec066c", "decimals": 6, "symbol": "nCREDIT" },
+      { "chain": "ethereum", "address": "0xdf45b8322ea4ce898331602e2d1f3d1a67ae0ee8", "decimals": 6, "symbol": "nLCRD" },
+      { "chain": "ethereum", "address": "0x29bf22381a5811dec89dc7b46a5ce57ad02c0240", "decimals": 6, "symbol": "nWISDOM" },
+      { "chain": "ethereum", "address": "0xbfc5770631641719cd1cf809d8325b146aed19de", "decimals": 6, "symbol": "nINSTO" }
+    ],
     "one_liner": "Vaults that hold other RWA products. About 56% is nOPAL: Brazilian card-installment receivables (BlackOpal). The rest is spread over nPRIME and smaller T-bill, credit and basis-carry vaults.",
     "mislabel": false,
     "lane": "main"
@@ -392,6 +437,7 @@
     "jurisdiction": "unknown",
     "redemption": "secondary-market",
     "chains": ["ethereum"],
+    "tokens": [{ "chain": "ethereum", "address": "0x98a878b1cd98131b271883b390f68d2c90674665", "decimals": 18, "symbol": "apxUSD" }],
     "one_liner": "A 'dollar' backed mostly (~82%) by Strategy's STRC preferred shares; the yield is their dividend. It lost up to 30% of its value when STRC fell, so it does not behave like a dollar.",
     "mislabel": false,
     "lane": "main"
@@ -438,6 +484,7 @@
     "jurisdiction": "US",
     "redemption": "daily",
     "chains": ["ethereum"],
+    "tokens": [{ "chain": "ethereum", "address": "0xcacd6fd266af91b8aed52accc382b4e165586e29", "decimals": 18, "symbol": "frxUSD" }],
     "one_liner": "A stablecoin backed 1:1 by tokenized T-bill funds held at approved custodians (WisdomTree, Superstate, BlackRock BUIDL). Yield goes to sfrxUSD holders. Reserve reports are self-published, not audited.",
     "mislabel": false,
     "lane": "main"
@@ -453,6 +500,7 @@
     "jurisdiction": "US",
     "redemption": "secondary-market",
     "chains": ["ethereum"],
+    "flows_not_tracked": "Sky's own collateral vaults; there is no fund token to follow.",
     "one_liner": "Not something you can buy: the old MakerDAO real-world loan vaults that back USDS (e.g. New Silver real-estate loans, Fortunafi). Shown so you know USDS holds them.",
     "mislabel": false,
     "lane": "main"
@@ -484,6 +532,22 @@
     ],
     "one_liner": "A shelf of about 29 vaults run by different managers. About a third is RWA: Bitwise's leveraged vault on Hastra PRIME, sUSDai and Huma PST, and R25's rcUSD. Most of the rest is crypto yield: RockawayX launch deals, lending loops and funding-rate trades.",
     "mislabel": true,
+    "lane": "main"
+  },
+
+  "vaneck-treasury-fund": {
+    "name": "VanEck Treasury Fund",
+    "issuer": "VanEck / Securitize",
+    "backing_type": "government-debt",
+    "trust_tier": 2,
+    "tier_overrides": null,
+    "wrapper": "regulated-fund",
+    "jurisdiction": "BVI",
+    "redemption": "daily",
+    "chains": ["ethereum", "binance", "solana", "avalanche"],
+    "tokens": [{ "chain": "ethereum", "address": "0x2255718832bc9fd3be1caf75084f4803da14ff01", "decimals": 6, "symbol": "VBILL" }],
+    "one_liner": "VanEck's tokenized US T-bill fund, issued through Securitize. Daily redemptions, institutional investors only.",
+    "mislabel": false,
     "lane": "main"
   }
 }
