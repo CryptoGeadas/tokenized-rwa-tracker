@@ -68,7 +68,7 @@ test("nothing tracked at all: no strip", () => {
 
 test("fund names are escaped", () => {
   const evil = fund("x", "<img src=x>", { net30: -5e6, flags: [{ kind: "outflow", share: 0.5 }] });
-  assert.doesNotMatch(stripHtml(data([evil]), NOW), /<img/);
+  assert.doesNotMatch(stripHtml(data([evil]), NOW), /<img src=x>/);
 });
 
 // ── only what was checked (#29 review) ──

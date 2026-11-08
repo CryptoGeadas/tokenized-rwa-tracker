@@ -198,7 +198,9 @@ export function withFlows(result, registry, ledger, now = Date.now()) {
       const other = (e.chains ?? []).filter((c) => c !== "ethereum");
       const s = fundFlows(e.tokens, ledger, now);
       const named = ["full", "partial"].includes(s?.status) ? { tokenSymbols: e.tokens.map((t) => t.symbol) } : {};
-      return { ...f, flows: { ...s, ...named, ...(other.length ? { otherChains: other } : {}) } };
+      // every tracked card links to its token contracts on Etherscan, whatever the flows state (#30)
+      const links = { tokenLinks: e.tokens.map((t) => ({ symbol: t.symbol, address: t.address.toLowerCase() })) };
+      return { ...f, flows: { ...s, ...named, ...links, ...(other.length ? { otherChains: other } : {}) } };
     }
     if (e.flows_not_tracked) return { ...f, flows: { status: "untracked", reason: "owner", note: e.flows_not_tracked } };
     return { ...f, flows: { status: "untracked", reason: (e.chains ?? []).includes("ethereum") ? "no-token" : "chain" } };

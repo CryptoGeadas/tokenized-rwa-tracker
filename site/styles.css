@@ -146,6 +146,17 @@
 .fl-strip-rule a { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--border); }
 .fl-strip li.is-stale, .fl-strip.is-stale .fl-strip-quiet { opacity: 0.55; } /* each line on its own date */
 
+/* links and data credit (#30) */
+.flows-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; margin-top: 12px; font-size: 12px; }
+.flows-foot .fl-links { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.flows-foot a, .fl-strip-rule a, .flows-flag a, .fl-strip li a { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--border); }
+.flows-foot a:hover, .flows-foot a:focus-visible, .flows-flag a:hover, .fl-strip li a:hover { text-decoration-color: var(--accent); }
+.fl-credit { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; padding: 4px 0; color: var(--muted) !important; font-size: 12px; text-decoration: none !important; }
+.fl-credit img { display: block; height: 16px; width: auto; }
+.fl-strip-foot { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 4px 16px; }
+.fl-strip-foot .fl-strip-rule { flex: 1 1 320px; }
+@media (max-width: 520px) { .fl-credit { margin-left: 0; } }
+
 /* one-liner column */
 .oneliner { color: var(--muted); font-size: 13px; max-width: 320px; line-height: 1.4; }
 

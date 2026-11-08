@@ -275,6 +275,45 @@
 
     <hr class="divider">
 
+    <!-- Money flows (#21) -->
+    <section class="meth-section">
+      <h2 id="flows">Money flows</h2>
+      <p>Open a fund&rsquo;s row to see how much money went <strong>in</strong> and <strong>out</strong> of it: the net over the last 7 and 30 days, the amount minted and redeemed, and the biggest single redemption. A fund can show a large TVL while people are leaving it; money flows show that.</p>
+
+      <h3>Where the numbers come from</h3>
+      <ul>
+        <li>The numbers are the fund token&rsquo;s own <strong>mints</strong> (new tokens created when money comes in) and <strong>burns</strong> (tokens destroyed when money is redeemed), read once a day from the token contract through <a href="https://sqd.dev" target="_blank" rel="noopener">SQD</a>&rsquo;s free public data service. Only finalized blocks are read, so a chain reorganisation can never put a wrong event in the numbers.</li>
+        <li><strong>Ethereum only.</strong> Flows are read on Ethereum only for now. A fund that is also on other chains is marked &ldquo;Ethereum only&rdquo;, so the numbers are never read as the whole fund.</li>
+        <li>Amounts are in dollars at each day&rsquo;s <a href="https://www.coingecko.com" target="_blank" rel="noopener">CoinGecko</a> price, fixed when the day is stored. The very first daily run read the 30 days before it, all at that run&rsquo;s price. A fund added later starts the day after it is added, and each of its days has its own price.</li>
+        <li>Each fund&rsquo;s token addresses are checked by hand before its flows are read. Every tracked fund&rsquo;s card links to its token contracts on Etherscan, and a Big redemption flag links to that transaction, so you can check the numbers yourself.</li>
+      </ul>
+
+      <h3>Large money flows</h3>
+      <p>Flows are also measured as a <strong>share of the fund&rsquo;s supply on Ethereum</strong> (its tokens on Ethereum at the latest supply read, times the latest price; a read more than 7 days older than the data gives no flags), because a dollar amount alone means little for a fund that holds only part of its money on Ethereum. A fund gets a flag, shown on its row and in the strip above the table, when:</p>
+      <ul>
+        <li><strong>Outflow:</strong> net redemptions reach 10% of its tokens on Ethereum.</li>
+        <li><strong>Big redemption:</strong> one redemption reaches 5%.</li>
+        <li><strong>Inflow:</strong> net mints reach 20%.</li>
+      </ul>
+      <p>These lines are a published rule, not an opinion, and they will be checked again after the first full month of data. When a fund&rsquo;s supply today is smaller than what left, the share reads &ldquo;more than its whole supply on Ethereum today&rdquo;.</p>
+      <div class="callout">
+        <p><strong>Money flows are shown only. They never change a fund&rsquo;s trust tier, backing type or any other opinion on this page.</strong></p>
+      </div>
+
+      <h3>What the card can say</h3>
+      <ul>
+        <li><strong>Collecting since &hellip;</strong> The fund was added recently. Numbers show once it has 7 full days. A fund not read yet says &ldquo;collecting from the next daily update&rdquo;.</li>
+        <li><strong>Since &hellip;</strong> The fund has between 7 and 29 days of history, so the numbers cover the days since that date, not 30 days.</li>
+        <li><strong>As of &hellip;</strong> The last update is over 36 hours old, or its data ends more than 2 days ago. The numbers are dimmed and run to that date.</li>
+        <li><strong>No price.</strong> CoinGecko had no price for a token on a day in the window. A fund with one token shows its numbers in token units; a fund with several shows none. Never a guessed $1.</li>
+        <li><strong>Unavailable.</strong> The flows record could not be read when this page was built, or a record in it was damaged. No numbers are shown rather than guessed ones.</li>
+        <li><strong>Not tracked.</strong> The card says why: the fund is not on Ethereum, its token is not approved yet, it has no single main token (for example many property tokens), or it is not reviewed yet.</li>
+      </ul>
+      <p>A day with no mints or redemptions shows a real $0. Days that were not read are never counted as $0.</p>
+    </section>
+
+    <hr class="divider">
+
     <!-- Editorial Disclosure -->
     <section class="meth-section">
       <h2>Editorial Disclosure</h2>

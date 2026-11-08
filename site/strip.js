@@ -8,7 +8,7 @@
 // data day among them, so it never claims more than the data shows; each line dims on its own
 // staleness (the card's rule, with the viewer's clock). Unreadable data: says so.
 import { esc } from "./fmt.js";
-import { flagTagsHtml, flagSentence, isStale, fmtDay } from "./flows.js";
+import { flagTagsHtml, flagSentence, isStale, fmtDay, SQD_CREDIT, METHOD_LINK } from "./flows.js";
 
 const FLAG_KINDS = new Set(["outflow", "big-redemption", "inflow"]);
 const pct = (n) => `${Math.round(n * 100)}%`;
@@ -27,7 +27,8 @@ export function stripHtml(data, now = Date.now()) {
   const rule = r ? `A fund is flagged when net redemptions reach ${pct(r.outflow)} of its tokens on Ethereum, one redemption reaches ${pct(r.bigRedemption)}, or net mints reach ${pct(r.inflow)}. ` : "";
   const notChecked = tracked.length - checked.length, notTracked = funds.length - tracked.length;
   const counts = `${plural(checked.length, "fund")} checked${notChecked ? `, ${notChecked} tracked but not checkable yet (collecting, or waiting for a price or supply)` : ""}, ${notTracked} not tracked.`;
-  const foot = `<p class="fl-strip-rule">${rule}${counts} <a href="methodology.html#flows">How money flows work</a></p>`;
+  // the SQD credit only where the strip shows SQD data (#30): a checked fund
+  const foot = `<div class="fl-strip-foot"><p class="fl-strip-rule">${rule}${counts} ${METHOD_LINK}</p>${checked.length ? SQD_CREDIT : ""}</div>`;
 
   if (!checked.length) {
     // the ledger could not be read, or nothing has enough data yet: never "no large money flows"

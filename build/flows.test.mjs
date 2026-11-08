@@ -134,7 +134,7 @@ test("stale: the last update over 36 h ago, or the data's last day ended over 48
 
 test("withFlows: an unreadable ledger gives every tracked fund unavailable, not an error", () => {
   const out = withFlows({ mainStage: [{ slug: "tracked" }, { slug: "other" }], secondaryLanes: {} }, { tracked: { tokens: fundA }, other: {} }, null, Date.now());
-  assert.deepEqual(out.mainStage[0].flows, { status: "unavailable" });
+  assert.equal(out.mainStage[0].flows.status, "unavailable");
   assert.equal(out.mainStage[1].flows.status, "untracked", "a fund without tokens is not tracked, ledger or not");
 });
 
@@ -308,7 +308,7 @@ test("a tracked fund on other chains too carries those chains, so the page says 
   assert.deepEqual(out.mainStage[0].flows.otherChains, ["avalanche", "polygon"]);
   assert.equal(out.mainStage[1].flows.otherChains, undefined);
   const gone = withFlows({ mainStage: [{ slug: "multi" }], secondaryLanes: {} }, { multi: { tokens: fundA, chains: ["ethereum", "base"] } }, null, Date.now());
-  assert.deepEqual(gone.mainStage[0].flows, { status: "unavailable", otherChains: ["base"] });
+  assert.deepEqual(gone.mainStage[0].flows, { status: "unavailable", tokenLinks: [{ symbol: "AAA", address: A }], otherChains: ["base"] });
 });
 
 test("the owner's reason wins over the chain rule; lanes get the same flows objects", () => {
@@ -407,4 +407,11 @@ test("flagsChecked marks a summary whose flags were applied (#29: the strip coun
   assert.equal(fundFlows(fundA, backfilled([ev(T, "in", 1)])).flagsChecked, undefined, "no supply: not checked");
   const old = addFlows(emptyLedger(), { chain: "ethereum", events: [ev(T, "in", 1)], lastBlock: 500, today: T, tracked: [tokA], prices: { [A]: 1 }, backfill: true, supplies: { [A]: 100 }, supplyDay: shiftDay(T, -8) });
   assert.equal(fundFlows(fundA, old).flagsChecked, undefined, "a supply too old: not checked");
+});
+
+test("withFlows gives every tracked fund its token links, addresses in lowercase (#30)", () => {
+  const mixed = [{ chain: "ethereum", address: "0x00000000000000000000000000000000000000AA", decimals: 6, symbol: "AAA" }];
+  const out = withFlows({ mainStage: [{ slug: "t" }], secondaryLanes: {} }, { t: { tokens: mixed, chains: ["ethereum"] } }, supplied([ev(T, "in", 1)], 100), Date.now());
+  assert.deepEqual(out.mainStage[0].flows.tokenLinks, [{ symbol: "AAA", address: A }]);
+  assert.equal(out.mainStage[0].flows.status, "full");
 });

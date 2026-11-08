@@ -130,7 +130,7 @@ test("the build's read and the summary together: a broken ledger file gives trac
   const { withFlows } = await import("./flows.mjs");
   const f = await files("{ not json");
   const out = withFlows({ mainStage: [{ slug: "f" }], secondaryLanes: {} }, registry, await loadLedgerForBuild(f.ledgerPath, logs()), NOW);
-  assert.deepEqual(out.mainStage[0].flows, { status: "unavailable" });
+  assert.equal(out.mainStage[0].flows.status, "unavailable");
   await rm(f.dir, { recursive: true });
 });
 

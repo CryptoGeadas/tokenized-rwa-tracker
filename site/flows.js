@@ -47,7 +47,23 @@ export function flagSentence(g, s) {
   const share = g.share == null || g.share >= 1 ? "more than its whole supply on Ethereum today." : `${Math.round(g.share * 100)}% of its tokens on Ethereum.`;
   if (g.kind === "outflow") return `${fmtUsd(s.net30)} more redeemed than minted ${during}, ${share}`;
   if (g.kind === "inflow") return `${fmtUsd(s.net30)} more minted than redeemed ${during}, ${share}`;
-  return `One redemption of ${fmtUsd(s.maxOut30)} on ${esc(fmtDay(s.maxOutDay))}, ${share}`;
+  // the reader can check it: the transaction on Etherscan (#30); a missing or malformed hash, no link
+  const what = `${fmtUsd(s.maxOut30)} on ${esc(fmtDay(s.maxOutDay))}`;
+  const linked = TX.test(s.maxOutTx ?? "") ? `<a href="${EXPLORER}/tx/${s.maxOutTx}" target="_blank" rel="noopener">${what} ↗</a>` : what;
+  return `One redemption of ${linked}, ${share}`;
+}
+
+// Where readers check the numbers (#30): the token contracts and each big redemption on Etherscan,
+// the methodology section, and the data credit (SQD's own light logo, unaltered, per its brand page;
+// the same file the owner approved for the Scanner).
+const EXPLORER = "https://etherscan.io";
+const TX = /^0x[0-9a-fA-F]{64}$/, ADDRESS = /^0x[0-9a-fA-F]{40}$/;
+export const SQD_CREDIT = `<a class="fl-credit" href="https://sqd.dev" target="_blank" rel="noopener">Data from <img src="./assets/logos/sqd-light.svg" alt="SQD" width="38" height="16"></a>`;
+export const METHOD_LINK = `<a href="methodology.html#flows">How money flows work</a>`;
+function footHtml(s, credit) {
+  const contracts = (s.tokenLinks ?? []).filter((t) => ADDRESS.test(t.address ?? ""))
+    .map((t) => `<a href="${EXPLORER}/token/${t.address}" target="_blank" rel="noopener">Check the ${esc(t.symbol)} contract ↗</a>`).join("");
+  return `<div class="flows-foot"><span class="fl-links">${contracts}${METHOD_LINK}</span>${credit ? SQD_CREDIT : ""}</div>`;
 }
 
 const HOUR = 3_600_000;
@@ -63,8 +79,10 @@ export function flowsCardHtml(f, now = Date.now()) {
   if (!s) return "";
   const stale = !!s.asOf && isStale(s, now);
   const head = `<div class="dk">Money flows${stale ? ` <span class="fl-asof">As of ${esc(fmtDay(s.asOf))}</span>` : ""}</div>`;
-  const card = (body) => `<div class="detail-item full flows-card${stale ? " is-stale" : ""}">${head}${body}</div>`;
-  const line = (text) => card(`<div class="flows-line flows-wait">${text}</div>`);
+  // credit: the card shows SQD data (numbers, units, or collecting since a date); not when it is
+  // not tracked, unavailable, or not read yet
+  const card = (body, credit = true) => `<div class="detail-item full flows-card${stale ? " is-stale" : ""}">${head}${body}${footHtml(s, credit)}</div>`;
+  const line = (text, credit = false) => card(`<div class="flows-line flows-wait">${text}</div>`, credit);
 
   // not tracked (#27): the plain reason, no numbers, never $0; an unknown code shows nothing
   if (s.status === "untracked") {
@@ -74,10 +92,10 @@ export function flowsCardHtml(f, now = Date.now()) {
   if (s.status === "unavailable") return line(`Money flows unavailable right now.${ethOnly(s)}`);
   // under 7 full days: no numbers yet
   if (s.status === "collecting")
-    return line(`${s.since ? `Collecting since ${esc(fmtDay(s.since))}. Numbers show after 7 days.` : "Collecting from the next daily update."}${ethOnly(s)}`);
+    return line(`${s.since ? `Collecting since ${esc(fmtDay(s.since))}. Numbers show after 7 days.` : "Collecting from the next daily update."}${ethOnly(s)}`, !!s.since);
   if (!["full", "partial"].includes(s.status)) return "";
   if (s.noPrice && !s.units)
-    return line(`No price for ${esc((s.symbols ?? []).join(", "))} on CoinGecko, so no dollar amounts.${ethOnly(s)}`);
+    return line(`No price for ${esc((s.symbols ?? []).join(", "))} on CoinGecko, so no dollar amounts.${ethOnly(s)}`, true);
 
   // dollars, or (no price, one token) the same numbers in token units
   const u = s.noPrice ? s.units : s;
