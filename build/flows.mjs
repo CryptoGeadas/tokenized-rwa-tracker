@@ -153,8 +153,11 @@ export function fundFlows(tokens, ledger, now = null) {
   finish(usd, cents);
   const supply = fundSupply(tokens, ledger);
   // a supply read that has been failing for over a week is too old to judge by: shown, no flags
-  const flags = supply && supply.day >= shiftDay(asOf, -SUPPLY_MAX_AGE_DAYS) ? flagsOf(usd, supply.usd) : [];
-  return { ...head, ...usd, ...(supply ? { supplyUsd: cents(supply.usd), supplyDay: supply.day } : {}), ...(flags.length ? { flags } : {}), ...tail };
+  const checked = !!supply && supply.day >= shiftDay(asOf, -SUPPLY_MAX_AGE_DAYS);
+  const flags = checked ? flagsOf(usd, supply.usd) : [];
+  // flagsChecked: the rules were applied (numbers, a price, a fresh supply), so "no flags" means
+  // nothing crossed a line, not "could not tell" — the strip (#29) counts only these as checked
+  return { ...head, ...usd, ...(supply ? { supplyUsd: cents(supply.usd), supplyDay: supply.day } : {}), ...(checked ? { flagsChecked: true } : {}), ...(flags.length ? { flags } : {}), ...tail };
 }
 
 // The fund's dollar supply on Ethereum: the sum of its tokens, or null when any token has no

@@ -130,6 +130,22 @@
 .flows-flag { font-size: 14px; line-height: 1.6; }
 .flows-flag .fl-flag { margin-right: 6px; }
 
+/* "Large money flows" strip (#29): above the table; loud only when something is flagged */
+#flows-strip { margin-bottom: 16px; }
+.fl-strip { padding: 14px 0 4px; }
+.fl-strip-loud { border-left: 3px solid var(--warn); background: var(--panel); border-radius: 0 var(--r-panel) var(--r-panel) 0; padding: 16px 20px; }
+.fl-strip-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.fl-strip-head h3 { font: 600 18px var(--font-head); margin: 0; }
+.fl-strip-when { font-size: 13px; color: var(--muted); }
+.fl-strip .fl-asof { color: var(--warn); font-size: 13px; }
+.fl-strip ul { list-style: none; margin: 12px 0 0; padding: 0; }
+.fl-strip li { padding: 6px 0; font-size: 14px; line-height: 1.6; }
+.fl-strip li .fl-tags { margin: 0 8px; }
+.fl-strip-quiet { margin: 6px 0 0; font-size: 14px; color: var(--muted); }
+.fl-strip-rule { margin: 10px 0 0; font-size: 12px; color: var(--muted); line-height: 1.6; }
+.fl-strip-rule a { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--border); }
+.fl-strip li.is-stale, .fl-strip.is-stale .fl-strip-quiet { opacity: 0.55; } /* each line on its own date */
+
 /* one-liner column */
 .oneliner { color: var(--muted); font-size: 13px; max-width: 320px; line-height: 1.4; }
 

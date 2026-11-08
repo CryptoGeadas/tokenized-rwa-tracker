@@ -401,3 +401,10 @@ test("a real $0 supply is shown and flagged; a supply over 7 days older than the
   assert.equal(fundFlows(fundA, at(shiftDay(T, -8))).flags, undefined);
   assert.equal(fundFlows(fundA, at(shiftDay(T, -8))).supplyUsd, 100, "still shown, with its date");
 });
+
+test("flagsChecked marks a summary whose flags were applied (#29: the strip counts only these)", () => {
+  assert.equal(fundFlows(fundA, supplied([ev(T, "in", 1)], 100)).flagsChecked, true);
+  assert.equal(fundFlows(fundA, backfilled([ev(T, "in", 1)])).flagsChecked, undefined, "no supply: not checked");
+  const old = addFlows(emptyLedger(), { chain: "ethereum", events: [ev(T, "in", 1)], lastBlock: 500, today: T, tracked: [tokA], prices: { [A]: 1 }, backfill: true, supplies: { [A]: 100 }, supplyDay: shiftDay(T, -8) });
+  assert.equal(fundFlows(fundA, old).flagsChecked, undefined, "a supply too old: not checked");
+});

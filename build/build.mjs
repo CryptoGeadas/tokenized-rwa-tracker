@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 import { runPipeline, DROP } from "./pipeline.mjs";
 import { checkRegistry, registryWarnings, registryLog } from "./registry.mjs";
 import { fetchFallbackTvl } from "./coingecko.mjs";
-import { withFlows } from "./flows.mjs";
+import { withFlows, FLAG_RULES } from "./flows.mjs";
 import { loadLedgerForBuild } from "./flows-file.mjs";
 
 // SWITCH: show the "Money flows" card in open rows (#21). Off until go-live (#33);
@@ -40,7 +40,7 @@ async function main() {
   const payload = {
     generatedAt: new Date().toISOString(),
     source: "https://defillama.com",
-    config: { flowsCard },
+    config: { flowsCard, flagRules: FLAG_RULES }, // the page states the rules it flags by (#29)
     ...result,
   };
 

@@ -2,6 +2,7 @@ import { esc, fmtTvl, tvlCell, backingBadge, BACKING_COLORS } from "./fmt.js";
 import { renderScatter } from "./scatter.js";
 import { renderTable } from "./table.js";
 import { flagTagsHtml } from "./flows.js";
+import { renderStrip } from "./strip.js";
 
 const $ = (s) => document.querySelector(s);
 const state = { data: null, sortKey: "trust_tier", sortDir: "asc", expandedSlug: null };
@@ -19,6 +20,8 @@ async function load() {
     return;
   }
   rerender();
+  // #29, behind the flowsCard switch; a bad record must never stop the rest of the page
+  try { renderStrip($("#flows-strip"), state.data); } catch (e) { console.error("flows strip:", e); $("#flows-strip").hidden = true; }
   renderUnclassified();
   renderSecondary();
   renderSmaller();

@@ -15,7 +15,7 @@ const fmtUsd = (n) => (Math.abs(n) < 1e3 ? `$${Math.round(Math.abs(n))}` : fmtTv
 const sign = (n) => (n > 0 ? "+" : n < 0 ? "−" : "");
 const fmtNet = (n) => `${sign(n)}${fmtUsd(n)}`;
 const netCls = (n) => (n > 0 ? "up" : n < 0 ? "down" : "");
-const fmtDay = (d) => new Date(`${d}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+export const fmtDay = (d) => new Date(`${d}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
 const compact = (n) => {
   const a = Math.abs(n);
   return a >= 1e9 ? `${(a / 1e9).toFixed(2)}B` : a >= 1e6 ? `${(a / 1e6).toFixed(1)}M` : a >= 1e3 ? `${(a / 1e3).toFixed(1)}K` : `${Math.round(a * 100) / 100}`;
@@ -51,7 +51,7 @@ export function flagSentence(g, s) {
 }
 
 const HOUR = 3_600_000;
-function isStale(s, now) {
+export function isStale(s, now) {
   if (s.stale === true) return true;
   const at = typeof s.updatedAt === "string" ? Date.parse(s.updatedAt) : NaN;
   const dataEnd = typeof s.asOf === "string" ? Date.parse(`${s.asOf}T00:00:00Z`) + 24 * HOUR : NaN;
