@@ -175,6 +175,8 @@ document.addEventListener("click", (e) => {
     const slug = tr.dataset.slug;
     state.expandedSlug = state.expandedSlug === slug ? null : slug;
     renderTable($("#table-container"), state.data.mainStage, state.sortKey, state.sortDir, state.expandedSlug, tableOpts());
+    // keyboard users (#22): the redraw replaced the row, so put focus back on its button
+    if (e.target.closest(".row-toggle")) $(`.row-toggle[aria-controls="detail-${CSS.escape(slug)}"]`)?.focus();
   }
 });
 

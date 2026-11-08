@@ -54,7 +54,7 @@ function renderDetailCard(f, colCount, opts) {
     ? `<div class="detail-item full"><div class="dk">Holds</div><div class="dv">${f.holds.map((h) => esc(h.name)).join(", ")}</div></div>`
     : "";
 
-  return `<tr class="detail-row"><td colspan="${colCount}">
+  return `<tr class="detail-row" id="detail-${esc(f.slug)}"><td colspan="${colCount}">
     <div class="detail-card">
       <div class="detail-grid">
         <div class="detail-item">
@@ -111,7 +111,7 @@ export function renderTable(container, funds, sortKey, sortDir, expandedSlug, op
     const wrapperTag = f.holds?.length ? `<span class="wrapper-tag" title="Holds other RWA tokens">wrapper</span>` : "";
     const isOpen = expandedSlug === f.slug;
     const row = `<tr data-slug="${esc(f.slug)}" class="${isOpen ? "expanded" : ""}">
-      <td class="name-cell">${esc(f.name)}${wrapperTag}${mislabelBadge}${opts.flowsCard ? flagTagsHtml(f) : ""}</td>
+      <td class="name-cell"><button type="button" class="row-toggle" aria-expanded="${isOpen}" aria-controls="detail-${esc(f.slug)}">${esc(f.name)}</button>${wrapperTag}${mislabelBadge}${opts.flowsCard ? flagTagsHtml(f) : ""}</td>
       <td class="issuer-cell">${esc(f.issuer)}</td>
       <td>${backingBadge(f.backing_type)}</td>
       <td class="num yield-cell">${fmtPct(f.apyBase)}</td>

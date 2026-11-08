@@ -157,6 +157,11 @@
 .fl-strip-foot .fl-strip-rule { flex: 1 1 320px; }
 @media (max-width: 520px) { .fl-credit { margin-left: 0; } }
 
+/* the fund name opens the row's card from the keyboard too (#22): a button that looks like the name */
+.row-toggle { all: unset; cursor: pointer; font: inherit; font-weight: 600; color: inherit; border-radius: var(--r-ctl); }
+.row-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (forced-colors: active) { .row-toggle { text-decoration: underline; } } /* high-contrast mode: still looks like a control */
+
 /* one-liner column */
 .oneliner { color: var(--muted); font-size: 13px; max-width: 320px; line-height: 1.4; }
 
