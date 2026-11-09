@@ -7,9 +7,9 @@ import { fetchFallbackTvl } from "./coingecko.mjs";
 import { withFlows, FLAG_RULES } from "./flows.mjs";
 import { loadLedgerForBuild } from "./flows-file.mjs";
 
-// SWITCH: show the "Money flows" card in open rows (#21). Off until go-live (#33);
+// SWITCH: show the "Money flows" card, row flags and strip (#21). On since go-live (#33, 2026-11-09);
 // FLOWS_CARD=1 turns it on for a local build only.
-const FLOWS_CARD = false;
+const FLOWS_CARD = true;
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SITE = join(HERE, "..", "site");
