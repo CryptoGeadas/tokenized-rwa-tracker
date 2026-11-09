@@ -151,3 +151,10 @@ test("a token with zero supply and no price counts as $0, so it does not hide th
   const s = fundFlows([...fundA, { chain: "ethereum", ...tokB }], l);
   assert.equal(s.supplyUsd, 100);
 });
+
+test("an open row's card is as wide as the visible table and stays in view when the table scrolls sideways (#34)", async () => {
+  const css = await (await import("node:fs/promises")).readFile(new URL("../site/styles.css", import.meta.url), "utf8");
+  assert.match(css, /#table-container \{[^}]*container-type: inline-size/);
+  assert.match(css, /\.detail-card \{[^}]*position: sticky;[^}]*left: 0;[^}]*width: 100cqw;[^}]*box-sizing: border-box/);
+  assert.match(css, /.tbl .detail-row td { padding: 0; }/, "the narrow-screen cell padding must not push the card off screen");
+});

@@ -42,7 +42,8 @@
 .scatter-tooltip .tt-row { color: var(--muted); font-size: 12px; margin-top: 2px; }
 
 /* trust filter table: scrolls inside its own box on small screens, never the page */
-#table-container { overflow-x: auto; }
+/* the open row's card sizes itself to the visible table, not the scrolled width (#34) */
+#table-container { overflow-x: auto; container-type: inline-size; }
 .tbl { width: 100%; border-collapse: separate; border-spacing: 0; }
 .tbl th {
   font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: 0.12em;
@@ -97,7 +98,7 @@
 
 /* detail card (drill-down) */
 .detail-row td { padding: 0; border-bottom: 1px solid var(--accent); }
-.detail-card { background: var(--panel); padding: 20px; border-left: 3px solid var(--accent); }
+.detail-card { background: var(--panel); padding: 20px; border-left: 3px solid var(--accent); position: sticky; left: 0; width: 100cqw; box-sizing: border-box; }
 .detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .detail-item { background: var(--bg); border: 1px solid var(--border); border-radius: var(--r-ctl); padding: 10px 12px; }
 .detail-item.full { grid-column: 1 / -1; }
@@ -228,6 +229,7 @@ a.uncl-name:hover { color: var(--accent); }
   .tbl .oneliner, .tbl .chains-cell, .tbl .issuer-cell { display: none; }
   .fl-tags { display: flex; margin: 4px 0 0; } /* tags on one line under the fund name */
   .tbl th, .tbl td { padding: 8px 5px; }
+  .tbl .detail-row td { padding: 0; } /* the open card fills the visible table exactly (#34) */
   .tbl th { letter-spacing: 0.06em; }
   .tbl td { font-size: 13px; }
   .detail-card { padding: 14px 10px; }
