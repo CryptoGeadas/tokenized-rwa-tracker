@@ -21,7 +21,7 @@ async function load() {
   }
   rerender();
   // #29, behind the flowsCard switch; a bad record must never stop the rest of the page
-  try { renderStrip($("#flows-strip"), state.data); } catch (e) { console.error("flows strip:", e); $("#flows-strip").hidden = true; }
+  try { renderStrip($("#flows-strip"), state.data); } catch (e) { console.error("flows strip:", e); const el = $("#flows-strip"); el.innerHTML = `<div class="fl-strip"><p class="fl-strip-quiet">Money flows unavailable right now.</p></div>`; el.hidden = !state.data?.config?.flowsCard; }
   renderUnclassified();
   renderSecondary();
   renderSmaller();

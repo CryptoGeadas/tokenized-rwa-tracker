@@ -79,7 +79,7 @@ test("prices: a busy answer is tried again; a listed-but-empty answer is logged 
   assert.deepEqual(await fetchPrices([A], { fetchImpl, sleep: async (ms) => waits.push(ms), log: quiet }), { [A]: 1 });
   assert.deepEqual(waits, [30_000]);
   const empty = async () => new Response("{}", { status: 200 });
-  assert.deepEqual(await fetchPrices([A], { fetchImpl: empty, sleep: async () => {}, log: { ...quiet, warn: (l) => warns.push(l) } }), { [A]: null });
+  assert.deepEqual(await fetchPrices([A], { fetchImpl: empty, sleep: async () => {}, log: { ...quiet, log: (l) => warns.push(l) } }), { [A]: null });
   assert.match(warns[0], /no USD price/);
 });
 

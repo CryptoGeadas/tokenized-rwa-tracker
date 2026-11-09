@@ -83,10 +83,16 @@ function renderDetailCard(f, colCount, opts) {
           <div class="dk">What you're actually holding</div>
           <div class="dv editorial">${esc(f.one_liner || "—")}</div>
         </div>
-        ${opts.flowsCard ? flowsCardHtml(f) : ""}
+        ${opts.flowsCard ? safeCard(f) : ""}
       </div>
     </div>
   </td></tr>`;
+}
+
+// a bad flows record must never stop the table (#32): that card says unavailable instead
+function safeCard(f) {
+  try { return flowsCardHtml(f); }
+  catch (e) { console.error("flows card:", e); return flowsCardHtml({ ...f, flows: { status: "unavailable" } }); }
 }
 
 // opts.flowsCard: the snapshot's switch for the Money flows card (#21)

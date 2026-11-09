@@ -11,7 +11,8 @@
 //   • no price: one token shows its numbers in token units; several tokens show no numbers.
 import { esc, fmtTvl } from "./fmt.js";
 
-const fmtUsd = (n) => (Math.abs(n) < 1e3 ? `$${Math.round(Math.abs(n))}` : fmtTvl(Math.abs(n)));
+// a missing number reads unknown, never $NaN (#32)
+const fmtUsd = (n) => (!Number.isFinite(n) ? "unknown" : Math.abs(n) < 1e3 ? `$${Math.round(Math.abs(n))}` : fmtTvl(Math.abs(n)));
 const sign = (n) => (n > 0 ? "+" : n < 0 ? "−" : "");
 const fmtNet = (n) => `${sign(n)}${fmtUsd(n)}`;
 const netCls = (n) => (n > 0 ? "up" : n < 0 ? "down" : "");
@@ -71,7 +72,9 @@ export function isStale(s, now) {
   if (s.stale === true) return true;
   const at = typeof s.updatedAt === "string" ? Date.parse(s.updatedAt) : NaN;
   const dataEnd = typeof s.asOf === "string" ? Date.parse(`${s.asOf}T00:00:00Z`) + 24 * HOUR : NaN;
-  return (Number.isFinite(at) && now - at > 36 * HOUR) || (Number.isFinite(dataEnd) && now - dataEnd > 48 * HOUR);
+  // the build's rule (flows.mjs freshness): a damaged stamp is stale too
+  const damaged = s.updatedAt != null && !Number.isFinite(at);
+  return damaged || (Number.isFinite(at) && now - at > 36 * HOUR) || (Number.isFinite(dataEnd) && now - dataEnd > 48 * HOUR);
 }
 
 export function flowsCardHtml(f, now = Date.now()) {

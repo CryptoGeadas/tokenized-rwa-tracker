@@ -62,7 +62,7 @@ export function addFlows(ledger, { chain, events, lastBlock, today, tracked = []
     const tok = tokenOf(t.address);
     if (num(units)) tok.supply = { units, price: num(p) ? p : tok.supply?.price ?? null, day: supplyDay };
   }
-  for (const e of events) {
+  for (const e of netByTx(events)) {
     const p = priceOf.get(e.token.toLowerCase());
     const d = (tokenOf(e.token).days[e.day] ??= { in: 0, out: 0, maxOut: 0, maxOutTx: null, price: Number.isFinite(p) ? p : null });
     if (e.kind === "in") d.in += e.units;
@@ -70,6 +70,12 @@ export function addFlows(ledger, { chain, events, lastBlock, today, tracked = []
       d.out += e.units;
       if (e.units > d.maxOut) { d.maxOut = e.units; d.maxOutTx = e.tx ?? null; }
     }
+  }
+  // a day stored while the price call failed takes the next good price (#32): one failed call must
+  // not hide a fund's dollars for 30 days. A day that has a price keeps it.
+  for (const t of tracked) {
+    const p = priceOf.get(t.address.toLowerCase());
+    if (num(p)) for (const d of Object.values(tokenOf(t.address).days)) if (!num(d.price)) d.price = p;
   }
   const oldest = shiftDay(today, -(KEEP_DAYS - 1));
   for (const [k, t] of Object.entries(next.tokens))
@@ -95,6 +101,21 @@ export function freshness(chainInfo, now) {
 }
 
 const num = (x) => typeof x === "number" && Number.isFinite(x);
+
+// A mint and a burn of the same token in one transaction are one movement (#32): a contract that
+// mints and burns in the same call (USYC's) is a round trip, not a redemption. Each transaction
+// becomes its net mint or net burn; events without a hash are kept as they are.
+export function netByTx(events) {
+  const out = [], byTx = new Map();
+  for (const e of events) {
+    if (!e.tx) { out.push(e); continue; }
+    const k = `${e.token.toLowerCase()}|${e.tx}`;
+    const g = byTx.get(k) ?? byTx.set(k, { token: e.token, day: e.day, tx: e.tx, net: 0 }).get(k);
+    g.net += e.kind === "in" ? e.units : -e.units;
+  }
+  for (const g of byTx.values()) if (g.net) out.push({ token: g.token, day: g.day, tx: g.tx, kind: g.net > 0 ? "in" : "out", units: Math.abs(g.net) });
+  return out;
+}
 
 // now: the build's clock for the stale rule; left out (tests), no freshness fields are added.
 export function fundFlows(tokens, ledger, now = null) {
@@ -166,8 +187,9 @@ function fundSupply(tokens, ledger) {
   let usd = 0, day = null;
   for (const tok of tokens) {
     const s = ledger.tokens[keyOf(tok.chain, tok.address)].supply;
-    if (!s || !num(s.units) || !num(s.price) || !DAY.test(String(s.day))) return null;
-    usd += s.units * s.price;
+    // zero units is $0 with or without a price (an emptied token must not hide the fund's supply)
+    if (!s || !num(s.units) || !(num(s.price) || s.units === 0) || !DAY.test(String(s.day))) return null;
+    usd += s.units === 0 ? 0 : s.units * s.price;
     day = !day || s.day < day ? s.day : day; // the oldest read, so the date never overstates
   }
   return usd >= 0 ? { usd, day } : null; // a real $0: the whole fund left Ethereum

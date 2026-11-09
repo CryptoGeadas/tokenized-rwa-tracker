@@ -61,7 +61,9 @@ export function draftEntry({ fund, protocol }) {
 }
 
 // DefiLlama text goes into Markdown: one line, control characters escaped, only http(s) links.
-const md = (s) => String(s).replace(/\s+/g, " ").trim().replace(/[\\`*_[\]<>|#!]/g, (c) => "\\" + c);
+// Bare web addresses are broken too (#32): Markdown viewers turn them into links by themselves.
+const md = (s) => String(s).replace(/\s+/g, " ").trim().replace(/[\\`*_[\]<>|#!]/g, (c) => "\\" + c)
+  .replace(/:\/\//g, "[:]//").replace(/\bwww\./gi, "www[.]");
 const link = (u) => (/^https?:\/\/[^\s<>()]+$/i.test(u || "") ? u : null);
 const money = (n) => (Number.isFinite(n) ? `$${(n / 1e6).toFixed(1)}M` : "unknown");
 const pct = (n) => (Number.isFinite(n) ? `${n.toFixed(2)}%` : "unknown");

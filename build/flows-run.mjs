@@ -56,12 +56,22 @@ export async function runFlowsFile({ registryPath, ledgerPath, portal, prices, s
   }
   log.log(`flows: ${(r.bytes / 1e6).toFixed(2)} MB from SQD Portal this run · ledger as of ${r.ledger.asOf}`);
   const text = JSON.stringify(r.ledger);
-  if (text === JSON.stringify(before)) { log.log("flows: ledger unchanged"); return 0; }
+  if (text === JSON.stringify(before)) { log.log("flows: ledger unchanged"); lateCheck(r.ledger, now); return 0; }
   await mkdir(dirname(ledgerPath), { recursive: true });
   // a temp file, then rename: a job killed mid-write never leaves half a ledger
   await writeFile(ledgerPath + ".tmp", text + "\n");
   await rename(ledgerPath + ".tmp", ledgerPath);
+  lateCheck(r.ledger, now);
   return 0;
+}
+
+// A read that keeps stopping before the head, or a finalized head that stops moving, throws
+// nothing: what was read is saved above, but over 72 h without a full update fails the run so
+// GitHub emails (#32). A first run that has not finished yet has no stamp and only warns.
+function lateCheck(ledger, now) {
+  const at = Date.parse(ledger.chains?.ethereum?.updatedAt ?? "");
+  if (Number.isFinite(at) && now - at > LATE_MS)
+    throw new Error("flows have not updated for over 72 h: the read did not reach the Portal's finalized head — check the SQD Portal");
 }
 
 // run as a script (not when imported by tests)

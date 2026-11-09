@@ -50,11 +50,12 @@ export async function fetchPrices(addresses, { fetchImpl = fetch, sleep = realSl
         if (!res.ok) throw Object.assign(new Error(`HTTP ${res.status}`), { retry: res.status === 429 || res.status >= 500 });
         const p = (await res.json())?.[a]?.usd;
         out[a] = Number.isFinite(p) && p > 0 ? p : null;
-        if (out[a] === null) log.warn(`  ⚠ CoinGecko has no USD price for ${a}: no price today`);
+        // GitHub shows "::warning::" on the run page; the run stays green
+        if (out[a] === null) log.log(`::warning::CoinGecko has no USD price for ${a}: no price today`);
         break;
       } catch (e) {
         if ((e.retry || e.name === "TimeoutError" || e.name === "TypeError") && tries < PRICE_TRIES) { await sleep(30_000 * tries); continue; }
-        log.warn(`  ⚠ CoinGecko price for ${a} failed (${e.message}): no price today`);
+        log.log(`::warning::CoinGecko price for ${a} failed (${e.message}): no price today; the next good price fills it in`);
         out[a] = null;
         break;
       }
@@ -99,7 +100,7 @@ export async function runFlows({ ledger, tokens, portal, prices, supplies = asyn
   const fromPortal = async (call) => { try { return await call(); } catch (e) { e.fromPortal = true; throw e; } };
   const head = await fromPortal(() => portal.finalizedHead(dataset));
   const fromBlock = backfill ? await fromPortal(() => portal.blockAt(dataset, (startOfToday - KEEP_DAYS * DAY_MS) / 1000)) : last + 1;
-  if (fromBlock > head) { log.warn(`  ⚠ ${chain}: no new finalized blocks since ${last}`); return { ledger, bytes: 0 }; }
+  if (fromBlock > head) { log.log(`::warning::${chain}: no new finalized blocks since ${last}`); return { ledger, bytes: 0 }; }
 
   // A token new to the ledger is read only from fromBlock, which sits inside the day after the
   // chain's last complete day: its first full day is the one after that (also on a same-day rerun).
@@ -124,7 +125,7 @@ export async function runFlows({ ledger, tokens, portal, prices, supplies = asyn
       updatedAt: r.lastBlock >= head ? new Date(now).toISOString() : null,
     });
   }
-  if (r.lastBlock < head) log.warn(`  ⚠ ${chain}: stopped at block ${r.lastBlock}, before the finalized head ${head}; the next run continues`);
+  if (r.lastBlock < head) log.log(`::warning::${chain}: stopped at block ${r.lastBlock}, before the finalized head ${head}; the next run continues`);
   log.log(`  ${chain}: ${tokens.length} tokens · blocks ${fromBlock}–${r.lastBlock}${backfill ? " (first run: 30-day backfill)" : ""} · ${r.events.length} events · ${(r.bytes / 1e6).toFixed(2)} MB · ${Math.round((Date.now() - t0) / 1000)}s`);
   return { ledger, bytes: r.bytes };
 }
