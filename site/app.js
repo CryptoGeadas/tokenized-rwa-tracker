@@ -26,6 +26,35 @@ async function load() {
   renderSecondary();
   renderSmaller();
   renderFooter();
+  renderSummary();
+}
+
+// The hero's coverage panel (once per data load).
+function renderSummary() {
+  const panel = $("#rwa-panel");
+  const d = state.data;
+  if (!panel || !d?.stats) return;
+  const s = d.stats;
+  const set = (k, v) => { const el = panel.querySelector(`[data-${k}]`); if (el) el.textContent = v; };
+  set("main", s.mainStageCount);
+  set("secondary", s.secondaryCount);
+  set("review", s.unclassifiedCount);
+  set("smaller", Array.isArray(d.smaller) ? d.smaller.length : "—");
+  const review = panel.querySelector("[data-review]");
+  if (review) review.style.color = s.unclassifiedCount > 0 ? "var(--warn)" : "var(--accent)";
+  const when = new Date(d.generatedAt);
+  const ageH = Math.round((Date.now() - when) / 3.6e6);
+  const age = panel.querySelector("[data-age]");
+  age.innerHTML = `<span class="dot-live${ageH > 36 ? " warn" : ""}" aria-hidden="true"></span>${Number.isFinite(ageH) ? `${ageH}h old` : "—"}`;
+  age.classList.toggle("stale", ageH > 36);
+  // same rule as the coverage line under the table: only claim "all reviewed" when it is true
+  const c = s.coverage;
+  const allReviewed = c && Array.isArray(d.unclassified) && d.unclassified.length === 0 && c.overLine === c.classifiedOverLine;
+  const cov = panel.querySelector("[data-coverage]");
+  const stamp = Number.isFinite(when.getTime()) ? `data ${when.toISOString().slice(0, 16).replace("T", " ")} UTC` : "";
+  if (cov) cov.textContent = allReviewed
+    ? `All funds over $50M reviewed · ${c.classifiedTvlShare == null ? "share of RWA TVL unknown" : `${Math.round(c.classifiedTvlShare * 100)}% of TVL in RWA funds over $5M`} · ${stamp}`
+    : `${s.unclassifiedCount} fund${s.unclassifiedCount === 1 ? "" : "s"} over $50M waiting for review · ${stamp}`;
 }
 
 function rerender() {

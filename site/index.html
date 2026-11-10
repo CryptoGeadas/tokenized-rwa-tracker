@@ -41,24 +41,36 @@
   </header>
 
   <main id="main" class="tool-main">
-    <div class="tool-head">
-      <div class="tool-head-copy">
+    <div class="tool-hero">
+      <div class="tool-hero-copy">
         <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">HOME</a><span aria-hidden="true">/</span><a href="/tools/">BUILD LOG</a><span aria-hidden="true">/</span><span aria-current="page">TOKENIZED RWA TRACKER</span></nav>
-        <div class="tool-title"><h1>Tokenized RWA Tracker</h1><span class="badge badge-live">● Live</span></div>
-        <p class="tool-question">"I want to park euros or dollars in real-world yield. Show me what's real, what's risky and what's fake."</p>
+        <div class="tool-kicker"><span>T / 02</span><span class="badge badge-live">Live</span></div>
+        <h1>Tokenized RWA Tracker</h1>
+        <p class="tool-question">“I want to park euros or dollars in real-world yield. Show me what's real, what's risky and what's fake.”</p>
+        <p class="tool-sub sub">
+          A trust filter for tokenized real-world assets. Every fund
+          <strong>classified by what actually backs it</strong> &mdash; not by the marketing label.
+          Government bonds, private credit, or synthetic basis trades disguised as RWA.
+        </p>
+        <div class="tool-links">
+          <a class="btn btn-sm" href="methodology.html">Methodology</a>
+          <a class="btn btn-sm" href="https://github.com/CryptoGeadas/tokenized-rwa-tracker" rel="noopener" target="_blank">Source ↗</a>
+        </div>
       </div>
-      <div class="tool-links">
-        <a class="btn btn-sm" href="methodology.html">Methodology</a>
-        <a class="btn btn-sm" href="https://github.com/CryptoGeadas/tokenized-rwa-tracker" rel="noopener" target="_blank">Source ↗</a>
-      </div>
+      <!-- Filled by app.js from data/latest.json; the dashes show until it loads. -->
+      <aside class="sum-panel" id="rwa-panel" aria-label="Coverage">
+        <div class="sum-h"><span>Coverage</span><span class="age" data-age>—</span></div>
+        <div class="sum-grid">
+          <div><b data-main>—</b><span>main-stage funds</span></div>
+          <div><b data-secondary>—</b><span>secondary lanes</span></div>
+          <div><b data-review>—</b><span>in review</span></div>
+          <div><b data-smaller>—</b><span>smaller, not reviewed</span></div>
+        </div>
+        <div class="sum-f" data-coverage>&nbsp;</div>
+      </aside>
     </div>
 
     <div class="tool-app" id="app">
-      <p class="sub">
-        A trust filter for tokenized real-world assets. Every fund
-        <strong>classified by what actually backs it</strong> &mdash; not by the marketing label.
-        Government bonds, private credit, or synthetic basis trades disguised as RWA.
-      </p>
 
     <section id="scatter-section">
       <div class="section-head">
@@ -143,7 +155,8 @@
     </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <!-- d3 v7.9.0, vendored (ISC licence in vendor/d3.LICENSE) so the page loads nothing from a third party -->
+  <script src="vendor/d3.v7.9.0.min.js"></script>
   <script type="module" src="/site.js"></script>
   <script type="module" src="app.js"></script>
 </body>
