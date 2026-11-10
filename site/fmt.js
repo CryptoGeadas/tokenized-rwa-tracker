@@ -6,20 +6,21 @@ export const tvlCell = (f) => fmtTvl(f.tvl) + (f.tvlSource === "coingecko" ? ` <
 export const fmtTvl = (n) =>
   n >= 1e9 ? `$${(n / 1e9).toFixed(2)}B` : n >= 1e6 ? `$${(n / 1e6).toFixed(1)}M` : `$${Math.round(n / 1e3)}K`;
 
-// Colours follow the bernardogeadas.com palette (tokens in /site.css).
-const ACCENT = "oklch(0.89 0.2 128)", WARN = "oklch(0.75 0.15 50)", DOWN = "oklch(0.68 0.19 25)";
-const TEAL = "oklch(0.78 0.12 180)", VIOLET = "oklch(0.72 0.15 300)", INFO = "oklch(0.74 0.11 235)";
-const GOLD = "oklch(0.86 0.13 90)", MUTED = "oklch(0.66 0.012 150)";
-const fill = (c) => c.replace(")", " / 0.7)");
+// Colours follow the site v2 palette (tokens in /site.css): mint for the
+// safest backing, a light neutral for credit, amber for synthetic (caution), and quiet
+// data colours for the rest. Each differs in lightness as well as hue.
+const MINT = "#7ee0a8", NEUTRAL = "#c9d1cb", AMBER = "#e5b45a";
+const CYAN = "#8fb3c9", VIOLET = "#b7a6d9", SAND = "#d4c08a", MUTED = "#a3ada6", FAINT = "#7f8c84";
+const fill = (c) => `${c}b3`; // 70% alpha on a #rrggbb colour
 export const BACKING_COLORS = {
-  "government-debt":       { fill: fill(ACCENT), stroke: ACCENT, label: "Gov debt",    badge: "bt-gov" },
-  "private-credit":        { fill: fill(WARN),   stroke: WARN,   label: "Credit",      badge: "bt-credit" },
-  "basis-trade/synthetic": { fill: fill(DOWN),   stroke: DOWN,   label: "Synthetic",   badge: "bt-synth" },
-  "real-estate":           { fill: fill(TEAL),   stroke: TEAL,   label: "Real estate", badge: "bt-realestate" },
-  "commodity":             { fill: fill(VIOLET), stroke: VIOLET, label: "Commodity",   badge: "bt-commodity" },
-  "equity":                { fill: fill(INFO),   stroke: INFO,   label: "Equity",      badge: "bt-equity" },
-  "insurance":             { fill: fill(GOLD),   stroke: GOLD,   label: "Insurance",   badge: "bt-insurance" },
-  "mixed/other":           { fill: fill(MUTED),  stroke: MUTED,  label: "Mixed/other", badge: "bt-other" },
+  "government-debt":       { fill: fill(MINT),    stroke: MINT,    label: "Gov debt",    badge: "bt-gov" },
+  "private-credit":        { fill: fill(NEUTRAL), stroke: NEUTRAL, label: "Credit",      badge: "bt-credit" },
+  "basis-trade/synthetic": { fill: fill(AMBER),   stroke: AMBER,   label: "Synthetic",   badge: "bt-synth" },
+  "real-estate":           { fill: fill(VIOLET),  stroke: VIOLET,  label: "Real estate", badge: "bt-realestate" },
+  "commodity":             { fill: fill(SAND),    stroke: SAND,    label: "Commodity",   badge: "bt-commodity" },
+  "equity":                { fill: fill(MUTED),   stroke: MUTED,   label: "Equity",      badge: "bt-equity" },
+  "insurance":             { fill: fill(CYAN),    stroke: CYAN,    label: "Insurance",   badge: "bt-insurance" },
+  "mixed/other":           { fill: fill(FAINT),   stroke: FAINT,   label: "Mixed/other", badge: "bt-other" },
 };
 
 export function backingBadge(type) {

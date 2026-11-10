@@ -13,43 +13,42 @@
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/site.css">
   <style>
-    .doc { max-width: 860px; padding-bottom: 32px; }
-    .doc .hero-sub { margin: 0; color: var(--muted); font-size: 17px; line-height: 1.65; }
+    .doc { padding-bottom: 32px; }
+    .doc .hero-sub { margin: 0; }
 
-    .meth-section { margin: 44px 0 0; }
-    .meth-section h2 { font-size: clamp(22px, 3vw, 26px); margin-bottom: 14px; }
-    .meth-section h3 { font-size: 17px; margin: 20px 0 8px; }
-    .meth-section p { color: var(--muted); font-size: 15px; line-height: 1.65; margin: 0 0 12px; }
-    .meth-section ul { color: var(--muted); font-size: 15px; line-height: 1.65; margin: 0 0 12px; padding-left: 20px; }
+    .meth-section { margin: 0; }
+    .meth-section p { margin: 0 0 12px; }
+    .meth-section ul { margin: 0 0 12px; padding-left: 20px; }
     .meth-section li { margin-bottom: 4px; }
-    .meth-section strong { color: var(--fg); font-weight: 600; }
-    .meth-section a { color: var(--accent); }
+    .meth-section strong { font-weight: 600; }
     .meth-section code { font: 13px var(--font-mono); color: var(--fg); background: var(--panel); border: 1px solid var(--border); border-radius: var(--r-ctl); padding: 1px 5px; }
 
     .tier-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
-    .tier-card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r-panel); padding: 16px; }
+    .tier-card { background: var(--panel); border: 1px solid var(--border-strong); border-radius: var(--r-panel); padding: 18px; }
     .tier-card .tier-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
     .tier-badge {
       display: inline-flex; align-items: center; justify-content: center;
       width: 30px; height: 24px; border-radius: var(--r-ctl); border: 1px solid currentColor;
       font: 500 13px var(--font-mono);
     }
-    .tier-badge-1 { color: var(--up); }
-    .tier-badge-2 { color: oklch(0.74 0.11 235); }
-    .tier-badge-3 { color: var(--warn); }
-    .tier-badge-4 { color: var(--down); }
+    /* same pills as the tracker's table: solid mint → amber */
+    .tier-badge { border-radius: 3px; border-color: var(--border-strong); }
+    .tier-badge-1 { color: var(--accent-fg); background: var(--accent); border-color: var(--accent); }
+    .tier-badge-2 { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+    .tier-badge-3 { color: var(--fg-2); }
+    .tier-badge-4 { color: var(--warn); border-color: var(--warn); }
     .tier-card .tier-label { font: 600 16px var(--font-head); color: var(--fg); }
     .tier-card p { color: var(--muted); font-size: 14px; line-height: 1.65; margin: 0; }
     .tier-card ul { color: var(--muted); font-size: 14px; line-height: 1.65; margin: 8px 0 0; padding-left: 18px; }
 
     .backing-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 16px 0; }
-    .backing-card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r-panel); padding: 16px; display: flex; gap: 14px; align-items: flex-start; }
+    .backing-card { background: var(--panel); border: 1px solid var(--border-strong); border-radius: var(--r-panel); padding: 16px 18px; display: flex; gap: 14px; align-items: flex-start; }
     .backing-dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
     .dot-gov { background: var(--accent); }
-    .dot-credit { background: var(--warn); }
-    .dot-insurance { background: var(--gold); }
-    .dot-other { background: var(--muted); }
-    .dot-synth { background: var(--down); }
+    .dot-credit { background: var(--fg-2); }
+    .dot-insurance { background: #8fb3c9; }
+    .dot-other { background: var(--faint); }
+    .dot-synth { background: var(--warn); }
     .backing-card .backing-label { font: 600 16px var(--font-head); color: var(--fg); margin-bottom: 4px; }
     .backing-card p { color: var(--muted); font-size: 14px; line-height: 1.65; margin: 0; }
 
@@ -57,7 +56,7 @@
     .callout p { color: var(--muted); font-size: 14px; line-height: 1.65; margin: 0; }
     .callout strong { color: var(--warn); }
 
-    .disclosure { background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--r-panel); padding: 20px; margin: 16px 0; }
+    .disclosure { background: var(--panel); border: 1px solid var(--border-strong); border-radius: var(--r-panel); padding: 20px; margin: 16px 0; }
     .disclosure p { font-size: 16px; line-height: 1.65; color: var(--fg); margin: 0; }
 
     .divider { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
@@ -86,23 +85,26 @@
         <a href="/tools/" class="is-active">Tools</a>
         <a href="/#contact">Contact</a>
       </nav>
-      <span class="site-tagline">PRODUCT × PARTNERSHIPS × COMPLIANCE</span>
+      <a class="btn btn-sm site-cta" href="mailto:bernardofgeadasj@gmail.com">Email me</a>
     </div>
   </header>
 
   <div class="tool-main">
-    <div class="tool-head">
-      <div class="tool-head-copy">
+    <div class="tool-hero tool-hero-doc">
+      <div class="tool-hero-copy">
         <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">HOME</a><span aria-hidden="true">/</span><a href="/tools/">BUILD LOG</a><span aria-hidden="true">/</span><a href="./">TOKENIZED RWA TRACKER</a><span aria-hidden="true">/</span><span aria-current="page">METHODOLOGY</span></nav>
-        <div class="tool-title"><h1>Methodology</h1></div>
-      </div>
-      <div class="tool-links">
+        <div class="tool-kicker"><span>T / 02 · Methodology</span></div>
+        <h1>Methodology</h1>
+        <div class="tool-links">
         <a class="btn btn-primary btn-sm" href="./">← Back to tracker</a>
         <a class="btn btn-sm" href="https://github.com/CryptoGeadas/tokenized-rwa-tracker" rel="noopener" target="_blank">Source ↗</a>
       </div>
+      </div>
     </div>
 
-  <main class="doc" id="main">
+  <div class="doc-layout">
+    <nav class="doc-toc" data-doc-toc aria-label="On this page" hidden></nav>
+    <main class="doc" id="main">
     <p class="hero-sub">How we classify tokenized real-world assets, what the trust tiers mean, and where the data comes from.</p>
 
     <!-- Trust Tier Rubric -->
@@ -325,6 +327,7 @@
     </section>
 
   </main>
+    </div>
 
     <nav class="tool-nav" aria-label="Other tools">
       <a href="/tools/">← All tools</a>

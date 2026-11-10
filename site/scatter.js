@@ -1,7 +1,8 @@
 import { esc, fmtPct, fmtTvl, BACKING_COLORS } from "./fmt.js";
 
 // A type with no color is a bug (build/fmt.test.mjs checks every type has one); draw it hollow, not as another type.
-const UNKNOWN = { fill: "transparent", stroke: "oklch(0.96 0.005 120)" };
+const UNKNOWN = { fill: "transparent", stroke: "#e8ece9" };
+const MONO = "Geist Mono, ui-monospace, monospace";
 
 export function renderScatter(container, tooltip, funds, isDark) {
   container.innerHTML = "";
@@ -19,9 +20,9 @@ export function renderScatter(container, tooltip, funds, isDark) {
   const minR = 7, maxR = 34;
 
   // Dark only (site palette): muted labels, hairline grid.
-  const textColor = "oklch(0.66 0.012 150)";
-  const gridColor = "oklch(0.27 0.01 160)";
-  const axisColor = "oklch(0.66 0.012 150)";
+  const textColor = "#7f8c84";
+  const gridColor = "#223029";
+  const axisColor = "#a3ada6";
 
   const svg = d3.select(container)
     .append("svg")
@@ -33,6 +34,14 @@ export function renderScatter(container, tooltip, funds, isDark) {
   const rScale = (tvl) => minR + (Math.sqrt(tvl) / Math.sqrt(maxTvl)) * (maxR - minR);
   const zoneW = plotW / 4;
   const tierX = (tier) => PAD.left + zoneW * (tier - 1) + zoneW / 2;
+
+  // Tier 4 (mislabeled) zone: a faint amber hatch, drawn first so it sits behind the dots.
+  const defs = svg.append("defs");
+  defs.append("pattern").attr("id", "nr-hatch").attr("width", 9).attr("height", 9)
+    .attr("patternUnits", "userSpaceOnUse").attr("patternTransform", "rotate(45)")
+    .append("rect").attr("width", 1).attr("height", 9).attr("fill", "#e5b45a").attr("opacity", 0.14);
+  svg.append("rect").attr("x", PAD.left + zoneW * 3).attr("y", PAD.top).attr("width", zoneW).attr("height", plotH)
+    .attr("fill", "url(#nr-hatch)");
 
   const yTicks = d3.range(0, maxYield, maxYield / 4).concat(maxYield);
   svg.selectAll(".grid-line")
@@ -54,14 +63,14 @@ export function renderScatter(container, tooltip, funds, isDark) {
     .join("text")
     .attr("x", PAD.left - 8).attr("y", (d) => yScale(d) + 4)
     .attr("text-anchor", "end")
-    .attr("fill", textColor).attr("font-size", 11).attr("font-family", "JetBrains Mono, monospace")
+    .attr("fill", textColor).attr("font-size", 11).attr("font-family", MONO)
     .text((d) => d.toFixed(1) + "%");
 
   svg.append("text")
     .attr("transform", `translate(14, ${PAD.top + plotH / 2}) rotate(-90)`)
     .attr("text-anchor", "middle")
     .attr("fill", axisColor).attr("font-size", 10)
-    .attr("font-family", "JetBrains Mono, monospace").attr("font-weight", 600)
+    .attr("font-family", MONO).attr("font-weight", 500)
     .text("YIELD (apyBase)");
 
   const tierLabels = [
@@ -74,10 +83,10 @@ export function renderScatter(container, tooltip, funds, isDark) {
     const cx = tierX(t.tier);
     svg.append("text").attr("x", cx).attr("y", H - 24).attr("text-anchor", "middle")
       .attr("fill", axisColor).attr("font-size", 10)
-      .attr("font-family", "JetBrains Mono, monospace").attr("font-weight", 600)
+      .attr("font-family", MONO).attr("font-weight", 600)
       .text(t.line1);
     svg.append("text").attr("x", cx).attr("y", H - 10).attr("text-anchor", "middle")
-      .attr("fill", textColor).attr("font-size", 9).attr("font-family", "JetBrains Mono, monospace")
+      .attr("fill", textColor).attr("font-size", 9).attr("font-family", MONO)
       .text(t.line2);
   });
 
@@ -107,8 +116,8 @@ export function renderScatter(container, tooltip, funds, isDark) {
     .append("text")
     .attr("y", (f) => -rScale(f.tvl) - 5)
     .attr("text-anchor", "middle")
-    .attr("fill", "oklch(0.68 0.19 25)").attr("font-size", 10)
-    .attr("font-family", "JetBrains Mono, monospace").attr("font-weight", 700)
+    .attr("fill", "#e5b45a").attr("font-size", 10)
+    .attr("font-family", MONO).attr("font-weight", 500)
     .text("NOT RWA");
 
   dots.on("mouseenter", function (event, f) {
