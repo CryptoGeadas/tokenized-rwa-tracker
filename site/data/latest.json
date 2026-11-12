@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-12T20:59:54.978Z",
+  "generatedAt": "2026-11-12T21:10:24.668Z",
   "source": "https://defillama.com",
   "config": {
     "flowsCard": true,
@@ -1620,7 +1620,7 @@
         "one_liner": "Tokenized US equities — TSLA, NVDA, etc. on-chain. Not a yield product; equity exposure only.",
         "mislabel": false,
         "lane": "equity",
-        "tvl": 1308231135.3953817,
+        "tvl": 1308355595.038767,
         "tvlSource": "coingecko",
         "apyBase": null,
         "apyReward": null,
@@ -1920,7 +1920,7 @@
     "coverage": {
       "overLine": 28,
       "classifiedOverLine": 28,
-      "classifiedTvlShare": 0.9824115729147092
+      "classifiedTvlShare": 0.9824116844424706
     }
   }
 }
