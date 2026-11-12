@@ -38,7 +38,7 @@ jobs:
             echo "no change"
           else
             git commit -m "data: refresh RWA snapshot ($(date -u +%FT%TZ))"
-            git push
+            git pull --rebase origin main && git push   # code may have been pushed while the job ran
           fi
 
       - name: Review alarm issue
