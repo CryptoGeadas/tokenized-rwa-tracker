@@ -95,6 +95,9 @@ export async function runFlows({ ledger, tokens, portal, prices, supplies = asyn
   const startOfToday = Date.parse(utcDay(now) + "T00:00:00Z");
   const last = ledger.chains?.[chain]?.lastBlock;
   const backfill = !Number.isInteger(last);
+  // a ledger with data but no block to continue from would double-count on a new backfill
+  const known = Object.keys(ledger.tokens ?? {}).filter((k) => k.startsWith(`${chain}:`)).length;
+  if (backfill && known) throw new Error(`flows-ledger.json: ${chain} has ${known} tokens but no lastBlock — refusing to backfill on top`);
   // an error from a Portal call is the Portal's (busy, down): flows-run.mjs keeps the ledger and
   // warns. Any other error is ours and fails the run.
   const fromPortal = async (call) => { try { return await call(); } catch (e) { e.fromPortal = true; throw e; } };
@@ -115,16 +118,31 @@ export async function runFlows({ ledger, tokens, portal, prices, supplies = asyn
     try { log.log(`    ${chain}: ${Math.round((100 * (p.lastBlock - fromBlock + 1)) / (head - fromBlock + 1))}% · block ${p.lastBlock} · ${p.events} events · ${(p.bytes / 1e6).toFixed(1)} MB`); }
     catch { /* a progress line is not worth a failed run */ }
   };
-  const r = await fromPortal(() => portal.fetchMintsBurns({ dataset, tokens: tokens.map(({ address, decimals }) => ({ address, decimals })), fromBlock, toBlock: head, onBatch, deadline: jobStart + readLimitMs }));
-  if (r.lastBlock >= fromBlock && r.lastTimestamp != null) {
+  // `complete`: the read reached the head. Only then is it the chain's last successful update;
+  // a part-way read keeps its blocks but leaves updatedAt, so repeated failures turn stale.
+  const merge = async (r, complete) => {
+    if (r.lastBlock < fromBlock || r.lastTimestamp == null) return false;
     const supply = await supplies(tokens);
     const today = shiftDay(utcDay(r.lastTimestamp * 1000), -1);
     ledger = addFlows(ledger, {
       chain, events: r.events, lastBlock: r.lastBlock, today, tracked: tokens, prices: price, supplies: supply, supplyDay: utcDay(now),
       backfill: backfill ? utcDay(startOfToday - KEEP_DAYS * DAY_MS) : false, newFrom,
-      updatedAt: r.lastBlock >= head ? new Date(now).toISOString() : null,
+      updatedAt: complete ? new Date(now).toISOString() : null,
     });
+    return true;
+  };
+  let r;
+  try { r = await fromPortal(() => portal.fetchMintsBurns({ dataset, tokens: tokens.map(({ address, decimals }) => ({ address, decimals })), fromBlock, toBlock: head, onBatch, deadline: jobStart + readLimitMs })); }
+  catch (e) {
+    // keep what was read before the failure (whole blocks only, portal.mjs), so the next run
+    // continues from there (#46). The error carries the ledger for flows-run.mjs to save.
+    if (e.partial && await merge(e.partial, false)) {
+      e.ledger = ledger;
+      log.log(`  ${chain}: failed at block ${e.partial.lastBlock + 1}; kept blocks ${fromBlock}–${e.partial.lastBlock} (${e.partial.events.length} events)`);
+    }
+    throw e;
   }
+  await merge(r, r.lastBlock >= head);
   if (r.lastBlock < head) log.log(`::warning::${chain}: stopped at block ${r.lastBlock}, before the finalized head ${head}; the next run continues`);
   log.log(`  ${chain}: ${tokens.length} tokens · blocks ${fromBlock}–${r.lastBlock}${backfill ? " (first run: 30-day backfill)" : ""} · ${r.events.length} events · ${(r.bytes / 1e6).toFixed(2)} MB · ${Math.round((Date.now() - t0) / 1000)}s`);
   return { ledger, bytes: r.bytes };
