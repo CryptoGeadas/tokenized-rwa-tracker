@@ -68,7 +68,7 @@ test("prices: one call per token, a missing or failed price is null (never a gue
   };
   const p = await fetchPrices([A, B, C], { fetchImpl, sleep: async () => {}, log: quiet });
   assert.deepEqual(p, { [A]: 1.05, [B]: null, [C]: null });
-  assert.equal(urls.length, 3);
+  assert.equal(urls.length, 5, "A and B once; C, which gives no answer, three times (net.mjs)");
   assert.match(urls[0], /simple\/token_price\/ethereum\?contract_addresses=0x0+aa&vs_currencies=usd$/);
 });
 
@@ -119,11 +119,12 @@ test("supply: one read per token with its decimals, at the finalized block; a fa
     if (to === D) return new Response(JSON.stringify({ error: { message: "reverted" } }), { status: 200 });
     return new Response(JSON.stringify({ result: to === A ? "0x" + (172602137647549n).toString(16) : "0x" + (5n * 10n ** 18n).toString(16) }), { status: 200 });
   };
-  const s = await fetchSupplies([{ address: A, decimals: 6 }, { address: B, decimals: 18 }, { address: C, decimals: 6 }, { address: D, decimals: 6 }], { fetchImpl, log: { ...quiet, log: (l) => logged.push(l) } });
+  const s = await fetchSupplies([{ address: A, decimals: 6 }, { address: B, decimals: 18 }, { address: C, decimals: 6 }, { address: D, decimals: 6 }], { fetchImpl, sleep: async () => {}, log: { ...quiet, log: (l) => logged.push(l) } });
   assert.deepEqual(s, { [A]: 172602137.647549, [B]: 5, [C]: null, [D]: null });
   assert.deepEqual(calls[0].params, [{ to: A, data: "0x18160ddd" }, "finalized"]);
   assert.equal(calls[0].method, "eth_call");
   assert.equal(logged.filter((l) => /^::warning::totalSupply/.test(l)).length, 2, "each failed read shows on the run page");
+  assert.equal(calls.filter((q) => q.params[0].to === C).length, 2, "a read with no answer is tried twice (net.mjs)");
 });
 
 test("the job stores each token's supply; a failed read keeps the last value and its date", async () => {

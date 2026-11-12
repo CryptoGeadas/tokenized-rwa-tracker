@@ -7,6 +7,7 @@
 //   fallbackTvl(registry, categories) → { slug: marketCapUsd } (pure)
 //   fetchFallbackTvl(registry) → same, fetched; {} on any failure (logged)
 // ─────────────────────────────────────────────────────────────────────────────
+import { netFetch } from "./net.mjs";
 const CATEGORIES = "https://api.coingecko.com/api/v3/coins/categories";
 
 export function fallbackTvl(registry, categories) {
@@ -22,7 +23,7 @@ export function fallbackTvl(registry, categories) {
 export async function fetchFallbackTvl(registry) {
   if (!Object.values(registry).some((e) => e.tvl_source)) return {};
   try {
-    const res = await fetch(CATEGORIES, { headers: { accept: "application/json" }, signal: AbortSignal.timeout(30_000) });
+    const res = await netFetch(CATEGORIES, { headers: { accept: "application/json" } }, { timeoutMs: 30_000 });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const out = fallbackTvl(registry, await res.json());
     console.log(`  coingecko fallback TVL: ${Object.entries(out).map(([s, v]) => `${s} $${(v / 1e6).toFixed(0)}M`).join(", ") || "none found"}`);

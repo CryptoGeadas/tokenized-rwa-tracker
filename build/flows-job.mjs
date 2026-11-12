@@ -21,6 +21,7 @@
 // Ethereum only for now (#21); the dataset map is the place to add a chain later.
 // ─────────────────────────────────────────────────────────────────────────────
 import { addFlows, shiftDay, KEEP_DAYS } from "./flows.mjs";
+import { netFetch } from "./net.mjs";
 
 export const DATASETS = { ethereum: "ethereum-mainnet" };
 const DAY_MS = 86_400_000;
@@ -29,7 +30,7 @@ const PRICE_URL = "https://api.coingecko.com/api/v3/simple/token_price/ethereum"
 const realSleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const RPC_URL = "https://ethereum-rpc.publicnode.com";
 const TOTAL_SUPPLY = "0x18160ddd"; // totalSupply()
-const PRICE_TRIES = 3; // a rate-limited, failing or hung price call: wait 30 s, then 60 s
+const PRICE_TRIES = 3; // a rate-limited, failing or hung price call is tried again (waits: net.mjs)
 
 export function registryTokens(registry, chain) {
   const seen = new Map();
@@ -38,41 +39,38 @@ export function registryTokens(registry, chain) {
   return [...seen.values()];
 }
 
-export async function fetchPrices(addresses, { fetchImpl = fetch, sleep = realSleep, log = console } = {}) {
+export async function fetchPrices(addresses, { fetchImpl = undefined, sleep = realSleep, log = console } = {}) {
   const out = {};
   for (const [i, raw] of addresses.entries()) {
     const a = raw.toLowerCase();
     if (i) await sleep(2_500); // stay well inside the free rate limit
     // a day stored without a price keeps no dollars for 30 days, so a busy answer is tried again
-    for (let tries = 1; ; tries++) {
-      try {
-        const res = await fetchImpl(`${PRICE_URL}?contract_addresses=${a}&vs_currencies=usd`, { headers: { accept: "application/json" }, signal: AbortSignal.timeout(30_000) });
-        if (!res.ok) throw Object.assign(new Error(`HTTP ${res.status}`), { retry: res.status === 429 || res.status >= 500 });
-        const p = (await res.json())?.[a]?.usd;
-        out[a] = Number.isFinite(p) && p > 0 ? p : null;
-        // GitHub shows "::warning::" on the run page; the run stays green
-        if (out[a] === null) log.log(`::warning::CoinGecko has no USD price for ${a}: no price today`);
-        break;
-      } catch (e) {
-        if ((e.retry || e.name === "TimeoutError" || e.name === "TypeError") && tries < PRICE_TRIES) { await sleep(30_000 * tries); continue; }
-        log.log(`::warning::CoinGecko price for ${a} failed (${e.message}): no price today; the next good price fills it in`);
-        out[a] = null;
-        break;
-      }
+    try {
+      // CoinGecko goes through the build's one fetch helper (net.mjs): a timeout, and a busy,
+      // failing or hung call is tried again after a wait
+      const res = await netFetch(`${PRICE_URL}?contract_addresses=${a}&vs_currencies=usd`, { headers: { accept: "application/json" } }, { timeoutMs: 30_000, tries: PRICE_TRIES, fetchImpl, sleep, log: { warn: (l) => log.log(l) } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const p = (await res.json())?.[a]?.usd;
+      out[a] = Number.isFinite(p) && p > 0 ? p : null;
+      // GitHub shows "::warning::" on the run page; the run stays green
+      if (out[a] === null) log.log(`::warning::CoinGecko has no USD price for ${a}: no price today`);
+    } catch (e) {
+      log.log(`::warning::CoinGecko price for ${a} failed (${e.message}): no price today; the next good price fills it in`);
+      out[a] = null;
     }
   }
   return out;
 }
 
-export async function fetchSupplies(tokens, { fetchImpl = fetch, log = console } = {}) {
+export async function fetchSupplies(tokens, { fetchImpl = undefined, sleep = realSleep, log = console } = {}) {
   const out = {};
   for (const t of tokens) {
     const a = t.address.toLowerCase();
     try {
-      const res = await fetchImpl(RPC_URL, {
-        method: "POST", headers: { "content-type": "application/json" }, signal: AbortSignal.timeout(30_000),
+      const res = await netFetch(RPC_URL, {
+        method: "POST", headers: { "content-type": "application/json" },
         body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_call", params: [{ to: a, data: TOTAL_SUPPLY }, "finalized"] }),
-      });
+      }, { timeoutMs: 30_000, tries: 2, fetchImpl, sleep, log: { warn: (l) => log.log(l) } });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const j = await res.json();
       if (!/^0x[0-9a-fA-F]+$/.test(j?.result ?? "")) throw new Error(j?.error?.message ?? "no result");

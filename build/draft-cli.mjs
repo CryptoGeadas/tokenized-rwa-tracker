@@ -9,6 +9,7 @@ import { dirname, join } from "node:path";
 import { runPipeline } from "./pipeline.mjs";
 import { checkRegistry } from "./registry.mjs";
 import { reviewSheet, tokenSheet } from "./draft.mjs";
+import { netFetch } from "./net.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const TOKEN_LIST = "https://tokens.coingecko.com/ethereum/all.json";
@@ -38,7 +39,7 @@ async function writeSheet(out, text) {
 }
 
 async function fetchJSON(url) {
-  const res = await fetch(url, { signal: AbortSignal.timeout(60_000) });
+  const res = await netFetch(url);
   if (!res.ok) throw new Error(`${url} → ${res.status}`);
   try { return await res.json(); } catch (e) { throw new Error(`${url}: not JSON (${e.message})`); }
 }

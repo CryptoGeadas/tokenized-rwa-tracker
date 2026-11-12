@@ -6,6 +6,7 @@ import { checkRegistry, registryWarnings, registryLog } from "./registry.mjs";
 import { fetchFallbackTvl } from "./coingecko.mjs";
 import { withFlows, FLAG_RULES } from "./flows.mjs";
 import { loadLedgerForBuild } from "./flows-file.mjs";
+import { netFetch } from "./net.mjs";
 
 // SWITCH: show the "Money flows" card, row flags and strip (#21). On since go-live (#33, 2026-11-09);
 // FLOWS_CARD=1 turns it on for a local build only.
@@ -21,7 +22,7 @@ const PROTOCOLS_FEED = "https://api.llama.fi/protocols";
 
 async function fetchJSON(url) {
   console.log("fetching", url, "…");
-  const res = await fetch(url);
+  const res = await netFetch(url, {}, { timeoutMs: 120_000 }); // a timeout and retries (#49)
   if (!res.ok) throw new Error(`${url} → ${res.status}`);
   return res.json();
 }

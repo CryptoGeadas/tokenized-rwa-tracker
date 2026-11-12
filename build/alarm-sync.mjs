@@ -3,15 +3,17 @@
 // only prints what it would do, which is allowed locally but fails in CI.
 import { readFile } from "node:fs/promises";
 import { decideAlarm, ALARM_LABEL } from "./alarm.mjs";
+import { netFetch } from "./net.mjs";
 
 const { GITHUB_TOKEN: token, GITHUB_REPOSITORY: repo, GITHUB_ACTIONS: ci } = process.env;
 
 async function gh(method, path, body) {
-  const res = await fetch(`https://api.github.com/repos/${repo}${path}`, {
+  // only a read is tried again: a repeated write could open the same issue twice
+  const res = await netFetch(`https://api.github.com/repos/${repo}${path}`, {
     method,
     headers: { authorization: `Bearer ${token}`, accept: "application/vnd.github+json", "x-github-api-version": "2022-11-28" },
     body: body && JSON.stringify(body),
-  });
+  }, { timeoutMs: 30_000, tries: method === "GET" ? 3 : 1 });
   if (!res.ok) throw new Error(`GitHub ${method} ${path} → ${res.status} ${(await res.text()).slice(0, 200)}`);
   return res.json();
 }
