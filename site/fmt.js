@@ -6,12 +6,13 @@ export const tvlCell = (f) => fmtTvl(f.tvl) + (f.tvlSource === "coingecko" ? ` <
 export const fmtTvl = (n) =>
   n >= 1e9 ? `$${(n / 1e9).toFixed(2)}B` : n >= 1e6 ? `$${(n / 1e6).toFixed(1)}M` : `$${Math.round(n / 1e3)}K`;
 
-// Colours follow the site v2 palette (tokens in /site.css): mint for the
-// safest backing, a light neutral for credit, amber for synthetic (caution), and quiet
-// data colours for the rest. Each differs in lightness as well as hue.
-const MINT = "#7ee0a8", NEUTRAL = "#c9d1cb", AMBER = "#e5b45a";
-const CYAN = "#8fb3c9", VIOLET = "#b7a6d9", SAND = "#d4c08a", MUTED = "#a3ada6", FAINT = "#7f8c84";
-const fill = (c) => `${c}b3`; // 70% alpha on a #rrggbb colour
+// Colours are the site's tokens (/site.css), so one change there reaches the tracker (#45): mint
+// for the safest backing, a light neutral for credit, amber for synthetic (caution), and quiet
+// data colours for the rest. Each differs in lightness as well as hue. Sand has no site token;
+// it is the tracker's own data colour (styles.css). Use these as CSS (style, not SVG attributes).
+const MINT = "var(--accent)", NEUTRAL = "var(--fg-2)", AMBER = "var(--warn)";
+const CYAN = "var(--cyan)", VIOLET = "var(--violet)", SAND = "var(--sand)", MUTED = "var(--muted)", FAINT = "var(--faint)";
+const fill = (c) => `color-mix(in srgb, ${c} 70%, transparent)`;
 export const BACKING_COLORS = {
   "government-debt":       { fill: fill(MINT),    stroke: MINT,    label: "Gov debt",    badge: "bt-gov" },
   "private-credit":        { fill: fill(NEUTRAL), stroke: NEUTRAL, label: "Credit",      badge: "bt-credit" },

@@ -9,6 +9,20 @@ test("every backing type has a page color, and the page has no extra ones", () =
   assert.deepEqual(Object.keys(BACKING_COLORS).sort(), [...BACKING_TYPES].sort());
 });
 
+// #45: colours come from the site's tokens, so one change in /site.css reaches the tracker.
+test("no hard-coded colour in the tracker's scripts or stylesheet, apart from its one data colour with no site token", async () => {
+  const { readdir } = await import("node:fs/promises");
+  const dir = new URL("../site/", import.meta.url);
+  const found = [];
+  for (const f of await readdir(dir)) {
+    if (!/\.(js|css)$/.test(f)) continue;
+    const text = await readFile(new URL(f, dir), "utf8");
+    for (const m of text.matchAll(/(?<![&\w])#[0-9a-fA-F]{3,8}\b/g)) found.push(`${f}: ${m[0]}`);
+  }
+  assert.deepEqual(found, ["styles.css: #d4c08a"], "use a site token: var(--accent), var(--muted), …");
+  for (const c of Object.values(BACKING_COLORS)) assert.match(c.stroke, /^var\(--[a-z0-9-]+\)$/);
+});
+
 test("every color's badge class is styled", async () => {
   const css = await readFile(new URL("../site/styles.css", import.meta.url), "utf8");
   for (const c of Object.values(BACKING_COLORS)) assert.ok(css.includes("." + c.badge + " {"), c.badge);

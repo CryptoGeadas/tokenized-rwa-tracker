@@ -3,10 +3,8 @@
    footer) come from the main site's /site.css; this file only styles the tool. */
 
 :root {
-  /* data-only colours for backing types (v2 palette; see fmt.js) */
-  --info: #8fb3c9;
-  --teal: #b7a6d9;
-  --violet: #b7a6d9;
+  /* the tracker's one data colour with no site token (commodity backing; see fmt.js).
+     Every other colour is a site token from /site.css (#45). */
   --sand: #d4c08a;
 }
 
@@ -29,7 +27,7 @@
 .dot-legend.gov { background: var(--accent); }
 .dot-legend.credit { background: var(--fg-2); }
 .dot-legend.synth { background: var(--warn); }
-.dot-legend.insurance { background: var(--info); }
+.dot-legend.insurance { background: var(--cyan); }
 .dot-legend.other { background: var(--faint); }
 .legend-note { margin-left: auto; }
 
@@ -78,7 +76,7 @@
 .bt-realestate { color: var(--violet); }
 .bt-commodity { color: var(--sand); }
 .bt-equity { color: var(--muted); }
-.bt-insurance { color: var(--info); }
+.bt-insurance { color: var(--cyan); }
 .bt-other { color: var(--faint); }
 .wrapper-tag { margin-left: 6px; padding: 1px 6px; border: 1px solid var(--border); border-radius: var(--r-ctl); font: 10px var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); vertical-align: middle; }
 

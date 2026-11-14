@@ -1,7 +1,7 @@
 import { esc, fmtPct, fmtTvl, BACKING_COLORS } from "./fmt.js";
 
 // A type with no color is a bug (build/fmt.test.mjs checks every type has one); draw it hollow, not as another type.
-const UNKNOWN = { fill: "transparent", stroke: "#e8ece9" };
+const UNKNOWN = { fill: "transparent", stroke: "var(--fg)" };
 const MONO = "Geist Mono, ui-monospace, monospace";
 
 export function renderScatter(container, tooltip, funds, isDark) {
@@ -20,9 +20,10 @@ export function renderScatter(container, tooltip, funds, isDark) {
   const minR = 7, maxR = 34;
 
   // Dark only (site palette): muted labels, hairline grid.
-  const textColor = "#7f8c84";
-  const gridColor = "#223029";
-  const axisColor = "#a3ada6";
+  // site tokens (/site.css), set as CSS so they follow the site
+  const textColor = "var(--faint)";
+  const gridColor = "var(--border)";
+  const axisColor = "var(--muted)";
 
   const svg = d3.select(container)
     .append("svg")
@@ -39,7 +40,7 @@ export function renderScatter(container, tooltip, funds, isDark) {
   const defs = svg.append("defs");
   defs.append("pattern").attr("id", "nr-hatch").attr("width", 9).attr("height", 9)
     .attr("patternUnits", "userSpaceOnUse").attr("patternTransform", "rotate(45)")
-    .append("rect").attr("width", 1).attr("height", 9).attr("fill", "#e5b45a").attr("opacity", 0.14);
+    .append("rect").attr("width", 1).attr("height", 9).style("fill", "var(--warn)").attr("opacity", 0.14);
   svg.append("rect").attr("x", PAD.left + zoneW * 3).attr("y", PAD.top).attr("width", zoneW).attr("height", plotH)
     .attr("fill", "url(#nr-hatch)");
 
@@ -49,13 +50,13 @@ export function renderScatter(container, tooltip, funds, isDark) {
     .join("line")
     .attr("x1", PAD.left).attr("x2", W - PAD.right)
     .attr("y1", (d) => yScale(d)).attr("y2", (d) => yScale(d))
-    .attr("stroke", gridColor).attr("stroke-width", 1);
+    .style("stroke", gridColor).attr("stroke-width", 1);
 
   for (let t = 1; t < 4; t++) {
     svg.append("line")
       .attr("x1", PAD.left + zoneW * t).attr("x2", PAD.left + zoneW * t)
       .attr("y1", PAD.top).attr("y2", PAD.top + plotH)
-      .attr("stroke", gridColor).attr("stroke-dasharray", "4,4");
+      .style("stroke", gridColor).attr("stroke-dasharray", "4,4");
   }
 
   svg.selectAll(".y-label")
@@ -63,13 +64,13 @@ export function renderScatter(container, tooltip, funds, isDark) {
     .join("text")
     .attr("x", PAD.left - 8).attr("y", (d) => yScale(d) + 4)
     .attr("text-anchor", "end")
-    .attr("fill", textColor).attr("font-size", 11).attr("font-family", MONO)
+    .style("fill", textColor).attr("font-size", 11).attr("font-family", MONO)
     .text((d) => d.toFixed(1) + "%");
 
   svg.append("text")
     .attr("transform", `translate(14, ${PAD.top + plotH / 2}) rotate(-90)`)
     .attr("text-anchor", "middle")
-    .attr("fill", axisColor).attr("font-size", 10)
+    .style("fill", axisColor).attr("font-size", 10)
     .attr("font-family", MONO).attr("font-weight", 500)
     .text("YIELD (apyBase)");
 
@@ -82,11 +83,11 @@ export function renderScatter(container, tooltip, funds, isDark) {
   tierLabels.forEach((t) => {
     const cx = tierX(t.tier);
     svg.append("text").attr("x", cx).attr("y", H - 24).attr("text-anchor", "middle")
-      .attr("fill", axisColor).attr("font-size", 10)
+      .style("fill", axisColor).attr("font-size", 10)
       .attr("font-family", MONO).attr("font-weight", 600)
       .text(t.line1);
     svg.append("text").attr("x", cx).attr("y", H - 10).attr("text-anchor", "middle")
-      .attr("fill", textColor).attr("font-size", 9).attr("font-family", MONO)
+      .style("fill", textColor).attr("font-size", 9).attr("font-family", MONO)
       .text(t.line2);
   });
 
@@ -107,8 +108,8 @@ export function renderScatter(container, tooltip, funds, isDark) {
 
   dots.append("circle")
     .attr("r", (f) => rScale(f.tvl))
-    .attr("fill", (f) => (BACKING_COLORS[f.backing_type] || UNKNOWN).fill)
-    .attr("stroke", (f) => (BACKING_COLORS[f.backing_type] || UNKNOWN).stroke)
+    .style("fill", (f) => (BACKING_COLORS[f.backing_type] || UNKNOWN).fill)
+    .style("stroke", (f) => (BACKING_COLORS[f.backing_type] || UNKNOWN).stroke)
     .attr("stroke-width", 1.5)
     .style("cursor", "pointer");
 
@@ -116,7 +117,7 @@ export function renderScatter(container, tooltip, funds, isDark) {
     .append("text")
     .attr("y", (f) => -rScale(f.tvl) - 5)
     .attr("text-anchor", "middle")
-    .attr("fill", "#e5b45a").attr("font-size", 10)
+    .style("fill", "var(--warn)").attr("font-size", 10)
     .attr("font-family", MONO).attr("font-weight", 500)
     .text("NOT RWA");
 
