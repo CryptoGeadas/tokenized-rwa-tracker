@@ -58,8 +58,7 @@ function renderSummary() {
 }
 
 function rerender() {
-  const isDark = true; // site is dark only
-  renderScatter($("#scatter-chart"), $(".scatter-tooltip"), state.data.mainStage.filter((f) => f.apyBase != null), isDark);
+  renderScatter($("#scatter-chart"), $(".scatter-tooltip"), state.data.mainStage.filter((f) => f.apyBase != null));
   renderTable($("#table-container"), state.data.mainStage, state.sortKey, state.sortDir, state.expandedSlug, tableOpts());
 }
 
@@ -211,8 +210,7 @@ document.addEventListener("click", (e) => {
 
 window.addEventListener("resize", () => {
   if (state.data) {
-    const isDark = true; // site is dark only
-    renderScatter($("#scatter-chart"), $(".scatter-tooltip"), state.data.mainStage.filter((f) => f.apyBase != null), isDark);
+      renderScatter($("#scatter-chart"), $(".scatter-tooltip"), state.data.mainStage.filter((f) => f.apyBase != null));
   }
 });
 

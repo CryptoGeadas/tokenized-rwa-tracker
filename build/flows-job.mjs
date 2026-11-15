@@ -30,7 +30,8 @@ const PRICE_URL = "https://api.coingecko.com/api/v3/simple/token_price/ethereum"
 const realSleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const RPC_URL = "https://ethereum-rpc.publicnode.com";
 const TOTAL_SUPPLY = "0x18160ddd"; // totalSupply()
-const PRICE_TRIES = 3; // a rate-limited, failing or hung price call is tried again (waits: net.mjs)
+const PRICE_TRIES = 3; // a rate-limited, failing or hung price call is tried again…
+const PRICE_WAIT_MS = 30_000; // …after 30 s, then 60 s: CoinGecko's free tier stays busy for a while (#50)
 
 export function registryTokens(registry, chain) {
   const seen = new Map();
@@ -48,7 +49,7 @@ export async function fetchPrices(addresses, { fetchImpl = undefined, sleep = re
     try {
       // CoinGecko goes through the build's one fetch helper (net.mjs): a timeout, and a busy,
       // failing or hung call is tried again after a wait
-      const res = await netFetch(`${PRICE_URL}?contract_addresses=${a}&vs_currencies=usd`, { headers: { accept: "application/json" } }, { timeoutMs: 30_000, tries: PRICE_TRIES, fetchImpl, sleep, log: { warn: (l) => log.log(l) } });
+      const res = await netFetch(`${PRICE_URL}?contract_addresses=${a}&vs_currencies=usd`, { headers: { accept: "application/json" } }, { timeoutMs: 30_000, tries: PRICE_TRIES, retryWaitMs: PRICE_WAIT_MS, fetchImpl, sleep, log: { warn: (l) => log.log(l) } });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const p = (await res.json())?.[a]?.usd;
       out[a] = Number.isFinite(p) && p > 0 ? p : null;

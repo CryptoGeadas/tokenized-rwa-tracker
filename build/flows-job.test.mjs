@@ -136,3 +136,13 @@ test("the job stores each token's supply; a failed read keeps the last value and
   const r = await runFlows({ ledger: first.ledger, tokens: tok, portal: next, prices: async () => ({ [A]: 3 }), supplies: async () => ({ [A]: null }), now: NOW + 86_400_000, log: quiet });
   assert.deepEqual(r.ledger.tokens[`ethereum:${A}`].supply, { units: 100, price: 2, day: "2026-10-30" });
 });
+
+// #50: CoinGecko's free tier stays busy for a while, so a failing price call waits 30 s, then 60 s.
+test("prices: a call that keeps failing waits 30 s, then 60 s, before the day is stored without a price", async () => {
+  const waits = [];
+  let calls = 0;
+  const down = async () => { calls++; return new Response("", { status: 503 }); };
+  assert.deepEqual(await fetchPrices([A], { fetchImpl: down, sleep: async (ms) => waits.push(ms), log: quiet }), { [A]: null });
+  assert.equal(calls, 3);
+  assert.deepEqual(waits, [30_000, 60_000]);
+});

@@ -9,6 +9,13 @@ test("every backing type has a page color, and the page has no extra ones", () =
   assert.deepEqual(Object.keys(BACKING_COLORS).sort(), [...BACKING_TYPES].sort());
 });
 
+// In a stylesheet, "#abc" followed by "{" before any ";" or "}" is an id selector, not a colour (#50).
+function isIdSelector(file, text, end) {
+  if (!file.endsWith(".css")) return false;
+  const rest = text.slice(end), stop = rest.search(/[;{}]/);
+  return stop >= 0 && rest[stop] === "{";
+}
+
 // #45: colours come from the site's tokens, so one change in /site.css reaches the tracker.
 test("no hard-coded colour in the tracker's scripts or stylesheet, apart from its one data colour with no site token", async () => {
   const { readdir } = await import("node:fs/promises");
@@ -17,8 +24,12 @@ test("no hard-coded colour in the tracker's scripts or stylesheet, apart from it
   for (const f of await readdir(dir)) {
     if (!/\.(js|css)$/.test(f)) continue;
     const text = await readFile(new URL(f, dir), "utf8");
-    for (const m of text.matchAll(/(?<![&\w])#[0-9a-fA-F]{3,8}\b/g)) found.push(`${f}: ${m[0]}`);
+    for (const m of text.matchAll(/(?<![&\w])#[0-9a-fA-F]{3,8}\b/g)) if (!isIdSelector(f, text, m.index + m[0].length)) found.push(`${f}: ${m[0]}`);
   }
+  // a CSS id made of hex letters (#fade, #add) is a selector, not a colour
+  assert.equal(isIdSelector("x.css", "#fade { color: var(--fg); }", 5), true);
+  assert.equal(isIdSelector("x.css", "a { color: #fade00; }", 18), false);
+  assert.equal(isIdSelector("x.js", 'const c = "#fade";', 16), false, "in a script it is a value");
   assert.deepEqual(found, ["styles.css: #d4c08a"], "use a site token: var(--accent), var(--muted), …");
   for (const c of Object.values(BACKING_COLORS)) assert.match(c.stroke, /^var\(--[a-z0-9-]+\)$/);
 });
@@ -164,4 +175,11 @@ test("the share never reads over 100%, and an old supply read names its day inst
   assert.match(flowsCardHtml({ flows: { ...flagged, supplyDay: "2026-10-25" } }, NOW), /On Ethereum on 25 Oct: \$172\.6M\./);
   assert.match(flowsCardHtml({ flows: { ...flagged, supplyDay: "2026-10-30" } }, NOW), /On Ethereum now: \$172\.6M\./);
   assert.match(flowsCardHtml({ flows: { ...flagged, supplyUsd: 0, flags: [] } }, NOW), /On Ethereum now: \$0\./);
+});
+
+test("the scatter chart takes only what it uses: container, tooltip, funds (#50)", async () => {
+  const src = await readFile(new URL("../site/scatter.js", import.meta.url), "utf8");
+  assert.ok(src.includes("export function renderScatter(container, tooltip, funds) {"));
+  const app = await readFile(new URL("../site/app.js", import.meta.url), "utf8");
+  assert.ok(!app.includes("isDark"));
 });

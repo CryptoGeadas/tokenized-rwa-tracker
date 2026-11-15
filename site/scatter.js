@@ -4,7 +4,7 @@ import { esc, fmtPct, fmtTvl, BACKING_COLORS } from "./fmt.js";
 const UNKNOWN = { fill: "transparent", stroke: "var(--fg)" };
 const MONO = "Geist Mono, ui-monospace, monospace";
 
-export function renderScatter(container, tooltip, funds, isDark) {
+export function renderScatter(container, tooltip, funds) {
   container.innerHTML = "";
   if (!funds.length) return;
 
