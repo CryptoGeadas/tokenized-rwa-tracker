@@ -28,13 +28,12 @@
 import { FLAG_RULES, SUPPLY_MAX_AGE_DAYS } from "./flag-rules.mjs";
 export { FLAG_RULES };
 
-export const KEEP_DAYS = 30;
+// The day helpers, the 30-day trim and the freshness rule are the shared flows core (#47).
+import { KEEP_DAYS, DAY_MS, shiftDay, cents, dropOldDays, markChain, freshness as coreFreshness, STALE_MS, DATA_STALE_MS } from "./flows-core.mjs";
+export { KEEP_DAYS, shiftDay, STALE_MS, DATA_STALE_MS };
 export const MIN_DAYS = 7; // under this many full days: "collecting", no numbers
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
-const DAY_MS = 86_400_000;
-export const shiftDay = (day, n) => new Date(Date.parse(`${day}T00:00:00Z`) + n * DAY_MS).toISOString().slice(0, 10);
 const daysFrom = (first, last) => Math.round((Date.parse(`${last}T00:00:00Z`) - Date.parse(`${first}T00:00:00Z`)) / DAY_MS) + 1;
-const cents = (n) => Math.round(n * 100) / 100;
 const keyOf = (chain, address) => `${chain}:${String(address).toLowerCase()}`;
 
 export const emptyLedger = () => ({ asOf: null, chains: {}, tokens: {} });
@@ -77,11 +76,8 @@ export function addFlows(ledger, { chain, events, lastBlock, today, tracked = []
     const p = priceOf.get(t.address.toLowerCase());
     if (num(p)) for (const d of Object.values(tokenOf(t.address).days)) if (!num(d.price)) d.price = p;
   }
-  const oldest = shiftDay(today, -(KEEP_DAYS - 1));
-  for (const [k, t] of Object.entries(next.tokens))
-    if (k.startsWith(`${chain}:`)) for (const day of Object.keys(t.days)) if (day < oldest) delete t.days[day];
-  next.chains[chain] = { ...next.chains[chain], lastBlock, asOf: today, ...(updatedAt ? { updatedAt } : {}) };
-  next.asOf = today;
+  dropOldDays(next.tokens, chain, today);
+  markChain(next, chain, { lastBlock, today, updatedAt });
   return next;
 }
 
@@ -90,14 +86,10 @@ export function addFlows(ledger, { chain, events, lastBlock, today, tracked = []
 // own last day ended over 48 h ago (also covers a ledger without updatedAt), or updatedAt is
 // damaged (it can't prove the numbers are current). The page runs the same rule again with the
 // viewer's clock, so a snapshot that stops publishing never looks current.
-export const STALE_MS = 36 * 3_600_000;
-export const DATA_STALE_MS = 48 * 3_600_000;
+// (the rule is the core's; this tool's result carries only what is set)
 export function freshness(chainInfo, now) {
-  const raw = chainInfo?.updatedAt, asOf = chainInfo?.asOf;
-  const at = typeof raw === "string" ? Date.parse(raw) : NaN;
-  const dataEnd = typeof asOf === "string" && DAY.test(asOf) ? Date.parse(`${asOf}T00:00:00Z`) + DAY_MS : NaN;
-  const stale = (raw != null && !Number.isFinite(at)) || (Number.isFinite(at) && now - at > STALE_MS) || (Number.isFinite(dataEnd) && now - dataEnd > DATA_STALE_MS);
-  return { ...(stale ? { stale: true } : {}), ...(Number.isFinite(at) ? { updatedAt: raw } : {}) };
+  const { stale, updatedAt } = coreFreshness(chainInfo, null, now);
+  return { ...(stale ? { stale: true } : {}), ...(updatedAt ? { updatedAt } : {}) };
 }
 
 const num = (x) => typeof x === "number" && Number.isFinite(x);

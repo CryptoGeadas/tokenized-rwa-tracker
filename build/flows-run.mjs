@@ -23,7 +23,8 @@ import { emptyLedger } from "./flows.mjs";
 import { runFlows, fetchPrices, fetchSupplies, registryTokens } from "./flows-job.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-export const LATE_MS = 72 * 3_600_000;
+export { LATE_MS } from "./flows-core.mjs";
+import { LATE_MS } from "./flows-core.mjs";
 const isObj = (x) => !!x && typeof x === "object" && !Array.isArray(x);
 
 async function loadLedger(path) {

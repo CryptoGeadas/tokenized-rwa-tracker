@@ -20,12 +20,11 @@
 //
 // Ethereum only for now (#21); the dataset map is the place to add a chain later.
 // ─────────────────────────────────────────────────────────────────────────────
-import { addFlows, shiftDay, KEEP_DAYS } from "./flows.mjs";
+import { addFlows } from "./flows.mjs";
+import { runChains, utcDay } from "./flows-core.mjs";
 import { netFetch } from "./net.mjs";
 
 export const DATASETS = { ethereum: "ethereum-mainnet" };
-const DAY_MS = 86_400_000;
-const utcDay = (ms) => new Date(ms).toISOString().slice(0, 10);
 const PRICE_URL = "https://api.coingecko.com/api/v3/simple/token_price/ethereum";
 const realSleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const RPC_URL = "https://ethereum-rpc.publicnode.com";
@@ -85,64 +84,35 @@ export async function fetchSupplies(tokens, { fetchImpl = undefined, sleep = rea
   return out;
 }
 
-// readLimitMs: stop reading cleanly before the workflow's timeout kills the job, so what was
-// read is saved and the next run continues from there
-export async function runFlows({ ledger, tokens, portal, prices, supplies = async () => ({}), now = Date.now(), log = console, readLimitMs = 300 * 60_000 }) {
-  const jobStart = Date.now();
-  const chain = "ethereum", dataset = DATASETS[chain];
-  if (!tokens.length) { log.warn("  ⚠ flows: no tracked tokens in the registry"); return { ledger, bytes: 0 }; }
-  const startOfToday = Date.parse(utcDay(now) + "T00:00:00Z");
-  const last = ledger.chains?.[chain]?.lastBlock;
-  const backfill = !Number.isInteger(last);
-  // a ledger with data but no block to continue from would double-count on a new backfill
-  const known = Object.keys(ledger.tokens ?? {}).filter((k) => k.startsWith(`${chain}:`)).length;
-  if (backfill && known) throw new Error(`flows-ledger.json: ${chain} has ${known} tokens but no lastBlock — refusing to backfill on top`);
-  // an error from a Portal call is the Portal's (busy, down): flows-run.mjs keeps the ledger and
-  // warns. Any other error is ours and fails the run.
-  const fromPortal = async (call) => { try { return await call(); } catch (e) { e.fromPortal = true; throw e; } };
-  const head = await fromPortal(() => portal.finalizedHead(dataset));
-  const fromBlock = backfill ? await fromPortal(() => portal.blockAt(dataset, (startOfToday - KEEP_DAYS * DAY_MS) / 1000)) : last + 1;
-  if (fromBlock > head) { log.log(`::warning::${chain}: no new finalized blocks since ${last}`); return { ledger, bytes: 0 }; }
+// The tracker's adapter for the shared flows core (#47): which tokens to read, the price taken
+// once per run (only when there are new blocks), and how mints and burns go into the ledger
+// (netted per transaction, with price and supply, in addFlows).
+export function tokenAdapter({ tokens, prices, supplies, now }) {
+  let price = null;
+  return {
+    noun: "tokens",
+    prepare: ({ ledger, chain }) => ({ ledger, items: tokens, known: Object.keys(ledger.tokens ?? {}).filter((k) => k.startsWith(`${chain}:`)).length }),
+    read: ({ portal, items, ...rest }) => portal.fetchMintsBurns({ tokens: items.map(({ address, decimals }) => ({ address, decimals })), ...rest }),
+    // prices are asked for here, outside the Portal read, so a price bug is never blamed on the Portal
+    add: async (ledger, { items, ...rest }) => {
+      price ??= await prices(items.map((t) => t.address));
+      return addFlows(ledger, { ...rest, tracked: items, prices: price, supplies: await supplies(items), supplyDay: utcDay(now) });
+    },
+  };
+}
 
-  // A token new to the ledger is read only from fromBlock, which sits inside the day after the
-  // chain's last complete day: its first full day is the one after that (also on a same-day rerun).
-  const prevAsOf = ledger.chains?.[chain]?.asOf;
-  const newFrom = !backfill && prevAsOf ? shiftDay(prevAsOf, 2) : null;
-  const price = await prices(tokens.map((t) => t.address));
-  const t0 = Date.now();
-  let batches = 0;
-  const onBatch = (p) => {
-    if (++batches % 25) return;
-    // our own progress line must never fail a read (it would be blamed on the Portal)
-    try { log.log(`    ${chain}: ${Math.round((100 * (p.lastBlock - fromBlock + 1)) / (head - fromBlock + 1))}% · block ${p.lastBlock} · ${p.events} events · ${(p.bytes / 1e6).toFixed(1)} MB`); }
-    catch { /* a progress line is not worth a failed run */ }
-  };
-  // `complete`: the read reached the head. Only then is it the chain's last successful update;
-  // a part-way read keeps its blocks but leaves updatedAt, so repeated failures turn stale.
-  const merge = async (r, complete) => {
-    if (r.lastBlock < fromBlock || r.lastTimestamp == null) return false;
-    const supply = await supplies(tokens);
-    const today = shiftDay(utcDay(r.lastTimestamp * 1000), -1);
-    ledger = addFlows(ledger, {
-      chain, events: r.events, lastBlock: r.lastBlock, today, tracked: tokens, prices: price, supplies: supply, supplyDay: utcDay(now),
-      backfill: backfill ? utcDay(startOfToday - KEEP_DAYS * DAY_MS) : false, newFrom,
-      updatedAt: complete ? new Date(now).toISOString() : null,
-    });
-    return true;
-  };
-  let r;
-  try { r = await fromPortal(() => portal.fetchMintsBurns({ dataset, tokens: tokens.map(({ address, decimals }) => ({ address, decimals })), fromBlock, toBlock: head, onBatch, deadline: jobStart + readLimitMs })); }
-  catch (e) {
-    // keep what was read before the failure (whole blocks only, portal.mjs), so the next run
-    // continues from there (#46). The error carries the ledger for flows-run.mjs to save.
-    if (e.partial && await merge(e.partial, false)) {
-      e.ledger = ledger;
-      log.log(`  ${chain}: failed at block ${e.partial.lastBlock + 1}; kept blocks ${fromBlock}–${e.partial.lastBlock} (${e.partial.events.length} events)`);
-    }
+// readLimitMs: stop reading cleanly before the workflow's timeout kills the job, so what was
+// read is saved and the next run continues from there.
+// A Portal error is thrown again for flows-run.mjs, carrying e.ledger when blocks read before
+// it were kept (#46); any other error is thrown as it is.
+export async function runFlows({ ledger, tokens, portal, prices, supplies = async () => ({}), now = Date.now(), log = console, readLimitMs = 300 * 60_000 }) {
+  if (!tokens.length) { log.warn("  ⚠ flows: no tracked tokens in the registry"); return { ledger, bytes: 0 }; }
+  const before = ledger.chains?.ethereum?.lastBlock;
+  const r = await runChains({ ledger, datasets: DATASETS, adapter: tokenAdapter({ tokens, prices, supplies, now }), portal, now, log: { log: log.log, error: log.log, warn: (l) => log.log(l.replace(/^\s*⚠ /, "::warning::")) }, readLimitMs });
+  const e = r.errors.ethereum;
+  if (e) {
+    if (e.fromPortal && r.ledger.chains?.ethereum?.lastBlock !== before) e.ledger = r.ledger;
     throw e;
   }
-  await merge(r, r.lastBlock >= head);
-  if (r.lastBlock < head) log.log(`::warning::${chain}: stopped at block ${r.lastBlock}, before the finalized head ${head}; the next run continues`);
-  log.log(`  ${chain}: ${tokens.length} tokens · blocks ${fromBlock}–${r.lastBlock}${backfill ? " (first run: 30-day backfill)" : ""} · ${r.events.length} events · ${(r.bytes / 1e6).toFixed(2)} MB · ${Math.round((Date.now() - t0) / 1000)}s`);
-  return { ledger, bytes: r.bytes };
+  return { ledger: r.ledger, bytes: r.bytes };
 }
