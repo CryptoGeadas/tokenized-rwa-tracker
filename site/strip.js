@@ -7,8 +7,8 @@
 // money flows" shows only when at least one fund was checked; the header date is the OLDEST
 // data day among them, so it never claims more than the data shows; each line dims on its own
 // staleness (the card's rule, with the viewer's clock). Unreadable data: says so.
-import { esc } from "./fmt.js";
-import { flagTagsHtml, flagSentence, isStale, fmtDay, SQD_CREDIT, METHOD_LINK } from "./flows.js";
+import { esc, fmtDay } from "./format.js";
+import { flagTagsHtml, flagSentence, isStale, SQD_CREDIT, METHOD_LINK } from "./flows.js";
 
 const FLAG_KINDS = new Set(["outflow", "big-redemption", "inflow"]);
 const pct = (n) => `${Math.round(n * 100)}%`;

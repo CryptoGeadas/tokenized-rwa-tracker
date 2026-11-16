@@ -1,4 +1,5 @@
-import { esc, fmtPct, tvlCell, backingBadge, tierBadge } from "./fmt.js";
+import { esc, fmtPct } from "./format.js";
+import { tvlCell, backingBadge, tierBadge } from "./fmt.js";
 import { flowsCardHtml, flagTagsHtml } from "./flows.js";
 
 const COLS = [

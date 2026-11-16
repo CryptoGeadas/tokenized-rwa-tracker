@@ -9,14 +9,11 @@
 //     over 48 h ago (the same rule as build/flows.mjs freshness), so numbers never look current
 //     just because the snapshot stopped publishing;
 //   • no price: one token shows its numbers in token units; several tokens show no numbers.
-import { esc, fmtTvl } from "./fmt.js";
+// a missing number reads unknown, never $NaN (#32): the shared formatters do this (#48)
+import { esc, fmtUsd, fmtNet, fmtDay } from "./format.js";
 
-// a missing number reads unknown, never $NaN (#32)
-const fmtUsd = (n) => (!Number.isFinite(n) ? "unknown" : Math.abs(n) < 1e3 ? `$${Math.round(Math.abs(n))}` : fmtTvl(Math.abs(n)));
 const sign = (n) => (n > 0 ? "+" : n < 0 ? "−" : "");
-const fmtNet = (n) => `${sign(n)}${fmtUsd(n)}`;
 const netCls = (n) => (n > 0 ? "up" : n < 0 ? "down" : "");
-export const fmtDay = (d) => new Date(`${d}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
 const compact = (n) => {
   const a = Math.abs(n);
   return a >= 1e9 ? `${(a / 1e9).toFixed(2)}B` : a >= 1e6 ? `${(a / 1e6).toFixed(1)}M` : a >= 1e3 ? `${(a / 1e3).toFixed(1)}K` : `${Math.round(a * 100) / 100}`;

@@ -1,4 +1,5 @@
-import { esc, fmtTvl, tvlCell, backingBadge, BACKING_COLORS } from "./fmt.js";
+import { esc, fmtTvl } from "./format.js";
+import { tvlCell, backingBadge, BACKING_COLORS } from "./fmt.js";
 import { renderScatter } from "./scatter.js";
 import { renderTable } from "./table.js";
 import { flagTagsHtml } from "./flows.js";

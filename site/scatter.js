@@ -1,4 +1,5 @@
-import { esc, fmtPct, fmtTvl, BACKING_COLORS } from "./fmt.js";
+import { esc, fmtPct, fmtTvl } from "./format.js";
+import { BACKING_COLORS } from "./fmt.js";
 
 // A type with no color is a bug (build/fmt.test.mjs checks every type has one); draw it hollow, not as another type.
 const UNKNOWN = { fill: "transparent", stroke: "var(--fg)" };
