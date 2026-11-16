@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-16T05:27:35.667Z",
+  "generatedAt": "2026-11-16T21:45:34.447Z",
   "source": "https://defillama.com",
   "config": {
     "flowsCard": true,
@@ -28,36 +28,36 @@
       "one_liner": "Institutional lending to real-world borrowers. Previously had defaults (2022); v2 restructured with better underwriting. Still private credit risk.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 3503034626,
+      "tvl": 3473217171,
       "tvlSource": "defillama",
-      "apyBase": 5.21731,
+      "apyBase": 5.24406,
       "apyReward": 0,
       "apyBase7d": null,
-      "apyMean30d": 5.12425,
+      "apyMean30d": 5.12426,
       "poolCount": 3,
       "symbol": "USDC",
       "poolChain": "Ethereum",
       "flows": {
         "status": "full",
         "since": null,
-        "asOf": "2026-11-14",
-        "in30": 185007264.57,
-        "out30": 428063368.5,
-        "net7": -44289023.06,
-        "net30": -243056103.93,
+        "asOf": "2026-11-15",
+        "in30": 181742859.19,
+        "out30": 431345533.11,
+        "net7": -54846554.86,
+        "net30": -249602673.92,
         "maxOut30": 40393859.66,
         "maxOutDay": "2026-10-23",
         "maxOutTx": "0x95b8e09238fb0992fb84bf9327f948a6d7ea83be0ff6e1ad6beaeea44223696b",
-        "supplyUsd": 1132165514.44,
-        "supplyDay": "2026-11-15",
+        "supplyUsd": 1126707011.51,
+        "supplyDay": "2026-11-16",
         "flagsChecked": true,
         "flags": [
           {
             "kind": "outflow",
-            "share": 0.2146824831095211
+            "share": 0.2215329019616942
           }
         ],
-        "updatedAt": "2026-11-15T12:16:03.240Z",
+        "updatedAt": "2026-11-16T13:08:54.851Z",
         "tokenSymbols": [
           "syrupUSDC",
           "syrupUSDT"
@@ -98,40 +98,40 @@
       "one_liner": "BlackRock's tokenized US Treasury fund. Daily redemptions, SEC-registered, Securitize as transfer agent.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 2530717950,
+      "tvl": 2531216075,
       "tvlSource": "defillama",
       "apyBase": 3.84413,
       "apyReward": null,
       "apyBase7d": null,
-      "apyMean30d": 3.40139,
+      "apyMean30d": 3.42052,
       "poolCount": 9,
       "symbol": "BUIDL",
       "poolChain": "Aptos",
       "flows": {
         "status": "full",
         "since": null,
-        "asOf": "2026-11-14",
-        "in30": 486876.11,
+        "asOf": "2026-11-15",
+        "in30": 468417.45,
         "out30": 26043030.02,
         "net7": -2359669.37,
-        "net30": -25556153.91,
+        "net30": -25574612.57,
         "maxOut30": 21500000,
         "maxOutDay": "2026-10-21",
         "maxOutTx": "0x16771a05f1acea9ac8065bf37fe8b3f8674fa47719c88349ecc52ca4b784289f",
         "supplyUsd": 170275395.78,
-        "supplyDay": "2026-11-15",
+        "supplyDay": "2026-11-16",
         "flagsChecked": true,
         "flags": [
           {
             "kind": "outflow",
-            "share": 0.15008717961452894
+            "share": 0.15019558435448394
           },
           {
             "kind": "big-redemption",
             "share": 0.12626604038605793
           }
         ],
-        "updatedAt": "2026-11-15T12:16:03.240Z",
+        "updatedAt": "2026-11-16T13:08:54.851Z",
         "tokenSymbols": [
           "BUIDL"
         ],
@@ -169,30 +169,30 @@
       "one_liner": "Ondo's US Treasury-backed yield tokens. USDY is permissionless on supported chains; OUSG is permissioned. Daily redemptions.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 2430054852,
+      "tvl": 2424788802,
       "tvlSource": "defillama",
       "apyBase": 3.75,
       "apyReward": null,
       "apyBase7d": 3.75,
-      "apyMean30d": 3.73643,
+      "apyMean30d": 3.73777,
       "poolCount": 11,
       "symbol": "USDY",
       "poolChain": "Ethereum",
       "flows": {
         "status": "full",
         "since": null,
-        "asOf": "2026-11-14",
-        "in30": 67109172.44,
-        "out30": 43754192.1,
-        "net7": 868926.88,
-        "net30": 23354980.34,
+        "asOf": "2026-11-15",
+        "in30": 65880220.49,
+        "out30": 42632935.53,
+        "net7": 3372519.5,
+        "net30": 23247284.97,
         "maxOut30": 5515095.38,
         "maxOutDay": "2026-10-29",
         "maxOutTx": "0xdb9418f19a51ccde250e3c13159649b42155e874a5c3cb4963dff7ee6822fa60",
-        "supplyUsd": 1415079659.28,
-        "supplyDay": "2026-11-15",
+        "supplyUsd": 1409279045.48,
+        "supplyDay": "2026-11-16",
         "flagsChecked": true,
-        "updatedAt": "2026-11-15T12:16:03.240Z",
+        "updatedAt": "2026-11-16T13:08:54.851Z",
         "tokenSymbols": [
           "USDY",
           "OUSG"
@@ -232,40 +232,40 @@
       "one_liner": "Short-duration US Treasury fund via Hashnote. Institutional-grade, regulated wrapper, now under Circle.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 2016294800,
+      "tvl": 2016779057,
       "tvlSource": "defillama",
-      "apyBase": 3.30317,
+      "apyBase": 3.55775,
       "apyReward": null,
-      "apyBase7d": 3.4243,
-      "apyMean30d": 3.42638,
+      "apyBase7d": 3.32252,
+      "apyMean30d": 3.42786,
       "poolCount": 2,
       "symbol": "USYC",
       "poolChain": "BSC",
       "flows": {
         "status": "full",
         "since": null,
-        "asOf": "2026-11-14",
-        "in30": 742429.95,
-        "out30": 4439963.36,
+        "asOf": "2026-11-15",
+        "in30": 717766.05,
+        "out30": 4439963.35,
         "net7": 151985.53,
-        "net30": -3697533.42,
+        "net30": -3722197.3,
         "maxOut30": 3699707.53,
         "maxOutDay": "2026-10-30",
         "maxOutTx": "0x8e3c50660256d14402bb72973eeb0a016032259d7312b81a4cad901c23c2074a",
-        "supplyUsd": 35567891.94,
-        "supplyDay": "2026-11-15",
+        "supplyUsd": 35570884.96,
+        "supplyDay": "2026-11-16",
         "flagsChecked": true,
         "flags": [
           {
             "kind": "outflow",
-            "share": 0.10395705841296227
+            "share": 0.10464168389578594
           },
           {
             "kind": "big-redemption",
-            "share": 0.10401818404851262
+            "share": 0.10400943170345081
           }
         ],
-        "updatedAt": "2026-11-15T12:16:03.240Z",
+        "updatedAt": "2026-11-16T13:08:54.851Z",
         "tokenSymbols": [
           "USYC"
         ],
@@ -296,30 +296,30 @@
       "one_liner": "Delta-neutral basis trade — earns funding rates, NOT backed by real-world assets. Often appears in RWA listings but is a synthetic yield product.",
       "mislabel": true,
       "lane": "main",
-      "tvl": 1189335434,
+      "tvl": 1183979464,
       "tvlSource": "defillama",
-      "apyBase": 5.28196,
+      "apyBase": 5.30646,
       "apyReward": null,
       "apyBase7d": null,
-      "apyMean30d": 5.05459,
+      "apyMean30d": 5.06757,
       "poolCount": 1,
       "symbol": "SUSDE",
       "poolChain": "Ethereum",
       "flows": {
         "status": "full",
         "since": null,
-        "asOf": "2026-11-14",
-        "in30": 730977129.42,
-        "out30": 553283107.3,
-        "net7": -16507439.7,
-        "net30": 177694022.11,
+        "asOf": "2026-11-15",
+        "in30": 712505795.92,
+        "out30": 537446728.82,
+        "net7": -95010680.65,
+        "net30": 175059067.1,
         "maxOut30": 14986725,
         "maxOutDay": "2026-10-23",
         "maxOutTx": "0x0a63ba468d701c622d98a6d9f6b825e681779a91164441035092e230d35e2de5",
-        "supplyUsd": 4882277026.75,
-        "supplyDay": "2026-11-15",
+        "supplyUsd": 4868683845.05,
+        "supplyDay": "2026-11-16",
         "flagsChecked": true,
-        "updatedAt": "2026-11-15T12:16:03.240Z",
+        "updatedAt": "2026-11-16T13:08:54.851Z",
         "tokenSymbols": [
           "USDe"
         ],
@@ -347,12 +347,12 @@
       "one_liner": "Real-world credit pools on-chain — invoices, trade finance, structured credit. Epoch-based redemptions; counterparty risk on each pool.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 666269925,
+      "tvl": 672223850,
       "tvlSource": "defillama",
-      "apyBase": 4.65194,
+      "apyBase": 5.32373,
       "apyReward": null,
-      "apyBase7d": 4.65194,
-      "apyMean30d": 4.8548,
+      "apyBase7d": 5.32373,
+      "apyMean30d": 4.86976,
       "poolCount": 29,
       "symbol": "USAT",
       "poolChain": "Ethereum",
@@ -379,36 +379,36 @@
       "one_liner": "Yield from Figure's home-equity loans (HELOCs), passed on through Hastra's PRIME token. Real US consumer credit from a listed lender; redemption terms are not clearly published.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 655822091,
+      "tvl": 642358744,
       "tvlSource": "defillama",
-      "apyBase": 6.14296,
+      "apyBase": 6.13191,
       "apyReward": null,
       "apyBase7d": null,
-      "apyMean30d": 6.27331,
+      "apyMean30d": 6.27492,
       "poolCount": 5,
       "symbol": "PRIME",
       "poolChain": "Ethereum",
       "flows": {
         "status": "full",
         "since": null,
-        "asOf": "2026-11-14",
-        "in30": 88378227.47,
-        "out30": 133508965.3,
-        "net7": 1533638.73,
-        "net30": -45130737.84,
+        "asOf": "2026-11-15",
+        "in30": 86025263.05,
+        "out30": 145257894.28,
+        "net7": -9527337.5,
+        "net30": -59232631.22,
         "maxOut30": 8276783.32,
         "maxOutDay": "2026-11-02",
         "maxOutTx": "0xa7f476a1026308b458232a01073a207b40139bc139379f009bdf67bdd70c4f34",
-        "supplyUsd": 410966134.77,
-        "supplyDay": "2026-11-15",
+        "supplyUsd": 410571418.42,
+        "supplyDay": "2026-11-16",
         "flagsChecked": true,
         "flags": [
           {
             "kind": "outflow",
-            "share": 0.10981619657177014
+            "share": 0.14426876436701797
           }
         ],
-        "updatedAt": "2026-11-15T12:16:03.240Z",
+        "updatedAt": "2026-11-16T13:08:54.851Z",
         "tokenSymbols": [
           "PRIME",
           "AUTO"
@@ -444,30 +444,30 @@
       "one_liner": "Treasury-backed stablecoin with yield redistribution via USUAL governance token. T-bill backing is real, but protocol structure is newer.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 499243772,
+      "tvl": 499036510,
       "tvlSource": "defillama",
-      "apyBase": 10.92518,
-      "apyReward": 17.52466,
+      "apyBase": 10.91549,
+      "apyReward": 17.67729,
       "apyBase7d": null,
-      "apyMean30d": 29.495,
+      "apyMean30d": 29.40075,
       "poolCount": 5,
       "symbol": "USUALX",
       "poolChain": "Ethereum",
       "flows": {
         "status": "full",
         "since": null,
-        "asOf": "2026-11-14",
-        "in30": 5207970.78,
+        "asOf": "2026-11-15",
+        "in30": 5207970.79,
         "out30": 8944253.48,
         "net7": -1719584.72,
         "net30": -3736282.7,
         "maxOut30": 26472.35,
         "maxOutDay": "2026-11-10",
         "maxOutTx": "0x1a25e4a708d91901057b0cb3851a18dd608ca4b18daeb67d746a9be8fbc58d86",
-        "supplyUsd": 537703947.62,
-        "supplyDay": "2026-11-15",
+        "supplyUsd": 537816952.01,
+        "supplyDay": "2026-11-16",
         "flagsChecked": true,
-        "updatedAt": "2026-11-15T12:16:03.240Z",
+        "updatedAt": "2026-11-16T13:08:54.851Z",
         "tokenSymbols": [
           "USD0"
         ],
@@ -495,40 +495,40 @@
       "one_liner": "Invesco's tokenized short-term Treasury bond ETF. Institutional pedigree, Securitize-distributed.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 457858628,
+      "tvl": 462015041,
       "tvlSource": "defillama",
-      "apyBase": 3.38315,
+      "apyBase": 3.50172,
       "apyReward": null,
-      "apyBase7d": 3.6991,
-      "apyMean30d": 3.5959,
+      "apyBase7d": 3.66402,
+      "apyMean30d": 3.59357,
       "poolCount": 3,
       "symbol": "USTB",
       "poolChain": "Ethereum",
       "flows": {
         "status": "full",
         "since": null,
-        "asOf": "2026-11-14",
-        "in30": 201843110.73,
-        "out30": 361908272.86,
-        "net7": 8372222.38,
-        "net30": -160065162.14,
+        "asOf": "2026-11-15",
+        "in30": 203352183.55,
+        "out30": 349977611.73,
+        "net7": 15922752.71,
+        "net30": -146625428.18,
         "maxOut30": 45023650,
         "maxOutDay": "2026-10-30",
         "maxOutTx": "0x853bf62f5f3c741aab9ff94a6f2a8ec46bed5f30b47cb1a7a646a2327c2dda16",
-        "supplyUsd": 450175831.65,
-        "supplyDay": "2026-11-15",
+        "supplyUsd": 454972438.06,
+        "supplyDay": "2026-11-16",
         "flagsChecked": true,
         "flags": [
           {
             "kind": "outflow",
-            "share": 0.3555614293082198
+            "share": 0.32227321023305466
           },
           {
             "kind": "big-redemption",
-            "share": 0.10001347659068466
+            "share": 0.09895907143811944
           }
         ],
-        "updatedAt": "2026-11-15T12:16:03.240Z",
+        "updatedAt": "2026-11-16T13:08:54.851Z",
         "tokenSymbols": [
           "USTB"
         ],
@@ -556,12 +556,12 @@
       "one_liner": "Loans to AI companies, backed by their GPUs (70-80% loan-to-value, Delaware SPV), with the unlent cash in T-bills. Withdrawals go through a queue, not on demand.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 440121629,
+      "tvl": 439910987,
       "tvlSource": "defillama",
       "apyBase": 6.77,
       "apyReward": null,
       "apyBase7d": null,
-      "apyMean30d": 6.51783,
+      "apyMean30d": 6.52864,
       "poolCount": 1,
       "symbol": "SUSDAI",
       "poolChain": "Arbitrum",
@@ -586,12 +586,12 @@
       "one_liner": "Euro and USD Treasury-backed tokens. EU-regulated issuer, multiple backing strategies including T-bills and basis yield.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 439093365,
+      "tvl": 433631134,
       "tvlSource": "defillama",
       "apyBase": 7.48,
       "apyReward": null,
       "apyBase7d": null,
-      "apyMean30d": 7.21156,
+      "apyMean30d": 7.24,
       "poolCount": 30,
       "symbol": "USDC",
       "poolChain": "Base",
@@ -616,30 +616,30 @@
       "one_liner": "Reinsurance-backed yield protocol. Novel backing type (reinsurance premiums). Limited track record, higher risk.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 376883651,
+      "tvl": 373078457,
       "tvlSource": "defillama",
       "apyBase": 6.90676,
       "apyReward": null,
       "apyBase7d": null,
-      "apyMean30d": 6.85185,
+      "apyMean30d": 6.85137,
       "poolCount": 2,
       "symbol": "REUSD",
       "poolChain": "Ethereum",
       "flows": {
         "status": "full",
         "since": null,
-        "asOf": "2026-11-14",
-        "in30": 63235963.28,
-        "out30": 18131538.18,
-        "net7": 1160391.73,
-        "net30": 45104425.1,
+        "asOf": "2026-11-15",
+        "in30": 59394300.7,
+        "out30": 29364769.24,
+        "net7": -11722428.78,
+        "net30": 30029531.46,
         "maxOut30": 982963.51,
         "maxOutDay": "2026-11-02",
         "maxOutTx": "0x713fed6ed71a13ee454a0b96c86f3572cc37772e3a69fda92e6bb18d58c74313",
-        "supplyUsd": 376837458.65,
-        "supplyDay": "2026-11-15",
+        "supplyUsd": 372369389.93,
+        "supplyDay": "2026-11-16",
         "flagsChecked": true,
-        "updatedAt": "2026-11-15T12:16:03.240Z",
+        "updatedAt": "2026-11-16T13:08:54.851Z",
         "tokenSymbols": [
           "reUSD",
           "reUSDe"
@@ -672,7 +672,7 @@
       "one_liner": "Payment financing and receivables on Solana. Newer protocol, growing TVL but limited track record. Private credit risk.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 357321324.1353385,
+      "tvl": 366809987.4442208,
       "tvlSource": "defillama",
       "apyBase": null,
       "apyReward": null,
@@ -702,7 +702,7 @@
       "one_liner": "Marketed as 'institutional USDe' with BUIDL backing, but yield is still from basis trades. Not a real-world asset despite the packaging.",
       "mislabel": true,
       "lane": "main",
-      "tvl": 317909289.3058327,
+      "tvl": 317852866.9620685,
       "tvlSource": "defillama",
       "apyBase": null,
       "apyReward": null,
@@ -714,28 +714,28 @@
       "flows": {
         "status": "full",
         "since": null,
-        "asOf": "2026-11-14",
+        "asOf": "2026-11-15",
         "in30": 13328358.73,
-        "out30": 171078357.38,
+        "out30": 171028382.23,
         "net7": -98688495.08,
-        "net30": -157749998.64,
+        "net30": -157700023.49,
         "maxOut30": 99906700,
         "maxOutDay": "2026-11-12",
         "maxOutTx": "0x2b7d8db6a8d761b16fb212cd85e48f2b8809c658dec9d226d98fd6fa67c077b6",
-        "supplyUsd": 317807271.17,
-        "supplyDay": "2026-11-15",
+        "supplyUsd": 317800907.88,
+        "supplyDay": "2026-11-16",
         "flagsChecked": true,
         "flags": [
           {
             "kind": "outflow",
-            "share": 0.49637001085975274
+            "share": 0.49622269659796187
           },
           {
             "kind": "big-redemption",
-            "share": 0.3143625368716014
+            "share": 0.3143688313105881
           }
         ],
-        "updatedAt": "2026-11-15T12:16:03.240Z",
+        "updatedAt": "2026-11-16T13:08:54.851Z",
         "tokenSymbols": [
           "USDtb"
         ],
@@ -763,7 +763,7 @@
       "one_liner": "Reinsurance: the token's value rises as premiums are earned and falls when claims are paid (storms, disasters). The collateral is held in yield-bearing dollars (sUSDe, sUSDS, T-bills, syrupUSDC), so it also carries their risk.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 273002264,
+      "tvl": 269028392,
       "tvlSource": "defillama",
       "apyBase": 11.02,
       "apyReward": null,
@@ -775,38 +775,6 @@
       "flows": {
         "status": "untracked",
         "reason": "chain"
-      }
-    },
-    {
-      "slug": "opentrade",
-      "name": "OpenTrade vaults",
-      "issuer": "OpenTrade",
-      "backing_type": "government-debt",
-      "trust_tier": 3,
-      "tier_overrides": null,
-      "wrapper": "on-chain-pool",
-      "jurisdiction": "Cayman Islands",
-      "redemption": "daily",
-      "chains": [
-        "avalanche",
-        "ethereum",
-        "plume"
-      ],
-      "one_liner": "Stablecoin vaults backed by short US T-bills and money market funds, held through bankruptcy-remote SPVs. Mostly sold white-label inside fintech apps, not bought directly.",
-      "mislabel": false,
-      "lane": "main",
-      "tvl": 241599293.86884236,
-      "tvlSource": "defillama",
-      "apyBase": null,
-      "apyReward": null,
-      "apyBase7d": null,
-      "apyMean30d": null,
-      "poolCount": 0,
-      "symbol": null,
-      "poolChain": null,
-      "flows": {
-        "status": "untracked",
-        "reason": "no-token"
       }
     },
     {
@@ -840,25 +808,25 @@
           "name": "Smaller Nest vaults (T-bills, credit, basis carry)"
         }
       ],
-      "tvl": 171237485,
+      "tvl": 173017381,
       "tvlSource": "defillama",
       "apyBase": 11.59264,
       "apyReward": null,
       "apyBase7d": null,
-      "apyMean30d": 11.27031,
+      "apyMean30d": 11.27809,
       "poolCount": 28,
       "symbol": "NOPAL",
       "poolChain": "Ethereum",
       "flows": {
         "status": "full",
         "since": null,
-        "asOf": "2026-11-14",
+        "asOf": "2026-11-15",
         "noPrice": true,
         "symbols": [
           "nETHERFI",
           "nCLO"
         ],
-        "updatedAt": "2026-11-15T12:16:03.240Z",
+        "updatedAt": "2026-11-16T13:08:54.851Z",
         "tokenSymbols": [
           "nOPAL",
           "nETHERFI",
@@ -948,19 +916,19 @@
       "one_liner": "Tokenized credit funds — Apollo CLO, Hamilton Lane senior credit. Institutional managers, Securitize as platform. Accredited investors only.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 168631399,
+      "tvl": 168555485,
       "tvlSource": "defillama",
       "apyBase": 4.06472,
       "apyReward": null,
       "apyBase7d": null,
-      "apyMean30d": 4.22182,
+      "apyMean30d": 4.22996,
       "poolCount": 7,
       "symbol": "STAC",
       "poolChain": "Ethereum",
       "flows": {
         "status": "full",
         "since": null,
-        "asOf": "2026-11-14",
+        "asOf": "2026-11-15",
         "in30": 18826761.34,
         "out30": 25895691.72,
         "net7": -7219095.6,
@@ -968,16 +936,16 @@
         "maxOut30": 25895691.72,
         "maxOutDay": "2026-11-10",
         "maxOutTx": "0x2a03c98f899b53f4f1a81497446eb241c8a31651fe1aa5ae26bc760980600468",
-        "supplyUsd": 126622923.8,
-        "supplyDay": "2026-11-15",
+        "supplyUsd": 126619600.73,
+        "supplyDay": "2026-11-16",
         "flagsChecked": true,
         "flags": [
           {
             "kind": "big-redemption",
-            "share": 0.20451029673060406
+            "share": 0.20451566400593948
           }
         ],
-        "updatedAt": "2026-11-15T12:16:03.240Z",
+        "updatedAt": "2026-11-16T13:08:54.851Z",
         "tokenSymbols": [
           "STAC",
           "ACRED"
@@ -1013,7 +981,7 @@
       "one_liner": "A dollar token earning a hedged gold carry trade (long physical gold, short CME gold futures, plus gold lending) and T-bills through Theo's thBILL. Minting and redeeming is for whitelisted firms only.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 138584313.71133915,
+      "tvl": 138592242.5655894,
       "tvlSource": "defillama",
       "apyBase": null,
       "apyReward": null,
@@ -1043,30 +1011,30 @@
       "one_liner": "A 'dollar' backed mostly (~82%) by Strategy's STRC preferred shares; the yield is their dividend. It lost up to 30% of its value when STRC fell, so it does not behave like a dollar.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 132779865,
+      "tvl": 132936884,
       "tvlSource": "defillama",
-      "apyBase": 13.25004,
+      "apyBase": 13.31196,
       "apyReward": null,
       "apyBase7d": null,
-      "apyMean30d": 13.12933,
+      "apyMean30d": 13.14022,
       "poolCount": 1,
       "symbol": "APXUSD",
       "poolChain": "Ethereum",
       "flows": {
         "status": "full",
         "since": null,
-        "asOf": "2026-11-14",
+        "asOf": "2026-11-15",
         "in30": 0,
-        "out30": 14764018.5,
+        "out30": 11582546.5,
         "net7": 0,
-        "net30": -14764018.5,
+        "net30": -11582546.5,
         "maxOut30": 3181472,
-        "maxOutDay": "2026-10-16",
-        "maxOutTx": "0x1225853e19c9d48e4f6f54f5353fb3906d27df1145765a6197915db08fe57c8f",
-        "supplyUsd": 275778027.33,
-        "supplyDay": "2026-11-15",
+        "maxOutDay": "2026-10-27",
+        "maxOutTx": "0xa631b313adbacda7e0accaaa45dc91aef420159a18c3da6b3cb642f6a61a513d",
+        "supplyUsd": 276286080.68,
+        "supplyDay": "2026-11-16",
         "flagsChecked": true,
-        "updatedAt": "2026-11-15T12:16:03.240Z",
+        "updatedAt": "2026-11-16T13:08:54.851Z",
         "tokenSymbols": [
           "apxUSD"
         ],
@@ -1094,7 +1062,7 @@
       "one_liner": "Loans to large crypto trading firms, run by a Finnish asset manager. Deposits in AUSD on Monad; loan data checked live through Accountable. Real credit risk, but the borrowers are crypto firms, not the real economy.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 106400151.75641267,
+      "tvl": 106369585.86673379,
       "tvlSource": "defillama",
       "apyBase": null,
       "apyReward": null,
@@ -1136,7 +1104,7 @@
           "name": "Superstate USTB"
         }
       ],
-      "tvl": 92502740.99986747,
+      "tvl": 92050906.8762102,
       "tvlSource": "defillama",
       "apyBase": null,
       "apyReward": null,
@@ -1148,18 +1116,18 @@
       "flows": {
         "status": "full",
         "since": null,
-        "asOf": "2026-11-14",
-        "in30": 56349818.47,
-        "out30": 59530201.32,
-        "net7": -1075809.32,
-        "net30": -3180382.84,
+        "asOf": "2026-11-15",
+        "in30": 59155390.61,
+        "out30": 61638673.95,
+        "net7": 33132.7,
+        "net30": -2483283.34,
         "maxOut30": 1094082.7,
         "maxOutDay": "2026-10-30",
         "maxOutTx": "0x8cd8cc9890a5c4e3b956314534b350ac34070b7bc0881930b288237c01c11535",
-        "supplyUsd": 85016143.64,
-        "supplyDay": "2026-11-15",
+        "supplyUsd": 80489914.84,
+        "supplyDay": "2026-11-16",
         "flagsChecked": true,
-        "updatedAt": "2026-11-15T12:16:03.240Z",
+        "updatedAt": "2026-11-16T13:08:54.851Z",
         "tokenSymbols": [
           "frxUSD"
         ],
@@ -1218,12 +1186,12 @@
           "name": "Smaller crypto vaults (SUI, BLUE, BTC, basis, concentrated liquidity)"
         }
       ],
-      "tvl": 74871567,
+      "tvl": 72857132,
       "tvlSource": "defillama",
       "apyBase": 9.333,
       "apyReward": null,
       "apyBase7d": null,
-      "apyMean30d": 10.91393,
+      "apyMean30d": 10.86507,
       "poolCount": 27,
       "symbol": "USDC",
       "poolChain": "Ethereum",
@@ -1248,7 +1216,7 @@
       "one_liner": "Not something you can buy: the old MakerDAO real-world loan vaults that back USDS (e.g. New Silver real-estate loans, Fortunafi). Shown so you know USDS holds them.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 61313969.50226874,
+      "tvl": 61306072.46152549,
       "tvlSource": "defillama",
       "apyBase": null,
       "apyReward": null,
@@ -1282,36 +1250,36 @@
       "one_liner": "VanEck's tokenized US T-bill fund, issued through Securitize. Daily redemptions, institutional investors only.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 55435457,
+      "tvl": 56446779,
       "tvlSource": "defillama",
       "apyBase": 3.79297,
       "apyReward": null,
       "apyBase7d": null,
-      "apyMean30d": 3.52623,
+      "apyMean30d": 3.54006,
       "poolCount": 4,
       "symbol": "VBILL",
       "poolChain": "Ethereum",
       "flows": {
         "status": "full",
         "since": null,
-        "asOf": "2026-11-14",
-        "in30": 7075226.36,
+        "asOf": "2026-11-15",
+        "in30": 7072972.52,
         "out30": 409489.96,
         "net7": 21072.88,
-        "net30": 6665736.4,
+        "net30": 6663482.56,
         "maxOut30": 409489.96,
         "maxOutDay": "2026-10-21",
         "maxOutTx": "0x2a76e6659e860b614b168abbd85fd68d5491664285dece822ba8a0094176dc3d",
-        "supplyUsd": 28762264.29,
-        "supplyDay": "2026-11-15",
+        "supplyUsd": 29762264.29,
+        "supplyDay": "2026-11-16",
         "flagsChecked": true,
         "flags": [
           {
             "kind": "inflow",
-            "share": 0.23175283881935135
+            "share": 0.22389030939141766
           }
         ],
-        "updatedAt": "2026-11-15T12:16:03.240Z",
+        "updatedAt": "2026-11-16T13:08:54.851Z",
         "tokenSymbols": [
           "VBILL"
         ],
@@ -1350,23 +1318,23 @@
       "apyBase": 3.5427,
       "apyReward": null,
       "apyBase7d": 3.40334,
-      "apyMean30d": 3.66864,
+      "apyMean30d": 3.66418,
       "poolCount": 2,
       "symbol": "TBL",
       "poolChain": "XRPL",
       "flows": {
         "status": "full",
         "since": null,
-        "asOf": "2026-11-14",
-        "in30": 2222582.53,
-        "out30": 3164608.14,
+        "asOf": "2026-11-15",
+        "in30": 2222572.53,
+        "out30": 3134600.1,
         "net7": -49895.08,
-        "net30": -942025.62,
+        "net30": -912027.58,
         "maxOut30": 1777120,
         "maxOutDay": "2026-11-03",
         "maxOutTx": "0x60e0ab8ce72c9983e55cad9ad54033a210900dd605e5ed263e75de05e3429b95",
         "supplyUsd": 19914423.58,
-        "supplyDay": "2026-11-15",
+        "supplyDay": "2026-11-16",
         "flagsChecked": true,
         "flags": [
           {
@@ -1374,7 +1342,7 @@
             "share": 0.08923783272402402
           }
         ],
-        "updatedAt": "2026-11-15T12:16:03.240Z",
+        "updatedAt": "2026-11-16T13:08:54.851Z",
         "tokenSymbols": [
           "TBILL"
         ],
@@ -1407,7 +1375,7 @@
       "one_liner": "Mostly the Janus Henderson Anemoy Treasury Fund (JTRSY): 0-3 month US T-bills in a BVI-regulated fund, daily USDC redemption, non-US professional investors only. The same issuer also runs smaller credit funds (Apollo credit, AAA CLO).",
       "mislabel": false,
       "lane": "main",
-      "tvl": 27928689.599775698,
+      "tvl": 31030014.146630686,
       "tvlSource": "defillama",
       "apyBase": null,
       "apyReward": null,
@@ -1419,7 +1387,7 @@
       "flows": {
         "status": "full",
         "since": null,
-        "asOf": "2026-11-14",
+        "asOf": "2026-11-15",
         "in30": 9510492.64,
         "out30": 313072505.49,
         "net7": -23862879.22,
@@ -1428,7 +1396,7 @@
         "maxOutDay": "2026-10-29",
         "maxOutTx": "0x7b251d783f64b345610031c3575326619d768b82895a9f362d90e24deb9152d9",
         "supplyUsd": 23262047.95,
-        "supplyDay": "2026-11-15",
+        "supplyDay": "2026-11-16",
         "flagsChecked": true,
         "flags": [
           {
@@ -1440,7 +1408,7 @@
             "share": 5.812951906979593
           }
         ],
-        "updatedAt": "2026-11-15T12:16:03.240Z",
+        "updatedAt": "2026-11-16T13:08:54.851Z",
         "tokenSymbols": [
           "JTRSY"
         ],
@@ -1473,19 +1441,19 @@
       "one_liner": "Claims US Treasury backing but opaque issuer structure. Proceed with caution — transparency far below institutional standards.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 8446878,
+      "tvl": 8351626,
       "tvlSource": "defillama",
       "apyBase": null,
       "apyReward": null,
       "apyBase7d": null,
-      "apyMean30d": 3.92335,
+      "apyMean30d": 3.94968,
       "poolCount": 2,
       "symbol": "STUSDT",
       "poolChain": "Tron",
       "flows": {
         "status": "full",
         "since": null,
-        "asOf": "2026-11-14",
+        "asOf": "2026-11-15",
         "in30": 0,
         "out30": 1817148.3,
         "net7": -1816679.23,
@@ -1494,7 +1462,7 @@
         "maxOutDay": "2026-11-13",
         "maxOutTx": "0xd4d43682c6e68200fdf2825e443c0dcb7fede82ea765fcec1b5bfd5905238979",
         "supplyUsd": 18674.03,
-        "supplyDay": "2026-11-15",
+        "supplyDay": "2026-11-16",
         "flagsChecked": true,
         "flags": [
           {
@@ -1506,7 +1474,7 @@
             "share": 97.12570482921602
           }
         ],
-        "updatedAt": "2026-11-15T12:16:03.240Z",
+        "updatedAt": "2026-11-16T13:08:54.851Z",
         "tokenSymbols": [
           "stUSDT"
         ],
@@ -1538,12 +1506,12 @@
       "one_liner": "Two kinds of product: rcUSD, a dollar token backed by tokenized money market funds and stablecoins, and fixed-term pools of emerging-market consumer credit (VRPC). R25 keeps an undisclosed spread.",
       "mislabel": false,
       "lane": "main",
-      "tvl": 8295587,
+      "tvl": 8296807,
       "tvlSource": "defillama",
-      "apyBase": 8.33018,
+      "apyBase": 8.33027,
       "apyReward": null,
       "apyBase7d": null,
-      "apyMean30d": 8.31958,
+      "apyMean30d": 8.31838,
       "poolCount": 1,
       "symbol": "RCUSDP",
       "poolChain": "Sui",
@@ -1572,7 +1540,7 @@
         "one_liner": "Tokenized US rental properties. Each token is a share in an LLC holding a single property. Rental yield distributed weekly.",
         "mislabel": false,
         "lane": "real-estate",
-        "tvl": 155070561.42419165,
+        "tvl": 155059823.54166833,
         "tvlSource": "defillama",
         "apyBase": null,
         "apyReward": null,
@@ -1603,7 +1571,7 @@
         "one_liner": "Fractional US rental real estate. Similar model to RealT but on Algorand. Rental income distributed to token holders.",
         "mislabel": false,
         "lane": "real-estate",
-        "tvl": 101153111.2354102,
+        "tvl": 101156148.349552,
         "tvlSource": "defillama",
         "apyBase": null,
         "apyReward": null,
@@ -1636,7 +1604,7 @@
         "one_liner": "Tokenized US equities — TSLA, NVDA, etc. on-chain. Not a yield product; equity exposure only.",
         "mislabel": false,
         "lane": "equity",
-        "tvl": 865969357.9415655,
+        "tvl": 913704873.5502989,
         "tvlSource": "coingecko",
         "apyBase": null,
         "apyReward": null,
@@ -1658,7 +1626,7 @@
     {
       "slug": "brickken",
       "name": "Brickken",
-      "tvl": 42554477.798189625,
+      "tvl": 42550777.00675052,
       "chains": [],
       "apyBase": null,
       "category": "RWA",
@@ -1671,7 +1639,7 @@
     {
       "slug": "tangible-rwa",
       "name": "Tangible RWA",
-      "tvl": 41436185.43352219,
+      "tvl": 41377405.03607581,
       "chains": [],
       "apyBase": null,
       "category": "RWA",
@@ -1684,7 +1652,7 @@
     {
       "slug": "kaio",
       "name": "KAIO",
-      "tvl": 34658364.677351564,
+      "tvl": 34655589.08092083,
       "chains": [],
       "apyBase": null,
       "category": "RWA",
@@ -1697,7 +1665,7 @@
     {
       "slug": "matrixdock-stbt",
       "name": "MatrixDock STBT",
-      "tvl": 23598717,
+      "tvl": 23601045,
       "chains": [
         "Ethereum"
       ],
@@ -1712,7 +1680,7 @@
     {
       "slug": "goldfinger",
       "name": "GoldFinger",
-      "tvl": 23539197.88301231,
+      "tvl": 23535172.10869827,
       "chains": [],
       "apyBase": null,
       "category": "RWA",
@@ -1725,11 +1693,11 @@
     {
       "slug": "gaib",
       "name": "GAIB",
-      "tvl": 15420941,
+      "tvl": 15708418,
       "chains": [
         "Ethereum"
       ],
-      "apyBase": 10.53698,
+      "apyBase": 10.54803,
       "category": "RWA",
       "url": "https://defillama.com/protocol/gaib",
       "flows": {
@@ -1753,7 +1721,7 @@
     {
       "slug": "paimon",
       "name": "Paimon",
-      "tvl": 14123728.94069705,
+      "tvl": 14123081.865250433,
       "chains": [],
       "apyBase": null,
       "category": "RWA",
@@ -1764,22 +1732,9 @@
       }
     },
     {
-      "slug": "estate-protocol",
-      "name": "Estate Protocol",
-      "tvl": 13945568.863170711,
-      "chains": [],
-      "apyBase": null,
-      "category": "RWA",
-      "url": "https://defillama.com/protocol/estate-protocol",
-      "flows": {
-        "status": "untracked",
-        "reason": "not-reviewed"
-      }
-    },
-    {
       "slug": "clearpool-tpool",
       "name": "Clearpool TPOOL",
-      "tvl": 13861597.806716245,
+      "tvl": 13859135.910029026,
       "chains": [],
       "apyBase": null,
       "category": "RWA",
@@ -1807,11 +1762,11 @@
     {
       "slug": "openeden-usdo",
       "name": "OpenEden USDO",
-      "tvl": 12761614,
+      "tvl": 12747756,
       "chains": [
         "Ethereum"
       ],
-      "apyBase": 3.44921,
+      "apyBase": 3.44889,
       "category": "RWA",
       "url": "https://defillama.com/protocol/openeden-usdo",
       "flows": {
@@ -1822,11 +1777,11 @@
     {
       "slug": "theo-network-thbill",
       "name": "Theo Network thBill",
-      "tvl": 10999931,
+      "tvl": 11004529,
       "chains": [
         "Ethereum"
       ],
-      "apyBase": 3.07404,
+      "apyBase": 3.58404,
       "category": "RWA",
       "url": "https://defillama.com/protocol/theo-network-thbill",
       "flows": {
@@ -1835,22 +1790,9 @@
       }
     },
     {
-      "slug": "uranium.io",
-      "name": "Uranium.io",
-      "tvl": 10405471.619162465,
-      "chains": [],
-      "apyBase": null,
-      "category": "RWA",
-      "url": "https://defillama.com/protocol/uranium.io",
-      "flows": {
-        "status": "untracked",
-        "reason": "not-reviewed"
-      }
-    },
-    {
       "slug": "binaryx-platform",
       "name": "Binaryx Platform",
-      "tvl": 8997707.71100503,
+      "tvl": 8996362.49908212,
       "chains": [],
       "apyBase": null,
       "category": "RWA",
@@ -1863,7 +1805,7 @@
     {
       "slug": "solv-rwa",
       "name": "Solv RWA",
-      "tvl": 7604648.02256516,
+      "tvl": 7594031.263588014,
       "chains": [],
       "apyBase": null,
       "category": "RWA",
@@ -1876,7 +1818,7 @@
     {
       "slug": "defa-by-invoicemate",
       "name": "Defa By InvoiceMate",
-      "tvl": 7189086.721104336,
+      "tvl": 7188296.074874835,
       "chains": [],
       "apyBase": null,
       "category": "RWA",
@@ -1889,11 +1831,11 @@
     {
       "slug": "vault-street",
       "name": "Vault Street",
-      "tvl": 7004813,
+      "tvl": 6635442,
       "chains": [
         "Ethereum"
       ],
-      "apyBase": 8.47787,
+      "apyBase": 8.47395,
       "category": "RWA",
       "url": "https://defillama.com/protocol/vault-street",
       "flows": {
@@ -1904,7 +1846,7 @@
     {
       "slug": "mansory",
       "name": "Mansory",
-      "tvl": 5227107.215748275,
+      "tvl": 5229767.5122791305,
       "chains": [],
       "apyBase": null,
       "category": "RWA",
@@ -1915,15 +1857,22 @@
       }
     }
   ],
-  "dropped": [],
+  "dropped": [
+    {
+      "slug": "opentrade",
+      "name": "OpenTrade vaults",
+      "tvl": 0,
+      "reason": "no TVL on DefiLlama"
+    }
+  ],
   "stats": {
-    "mainStageCount": 29,
+    "mainStageCount": 28,
     "secondaryCount": 3,
     "unclassifiedCount": 0,
     "coverage": {
-      "overLine": 28,
-      "classifiedOverLine": 28,
-      "classifiedTvlShare": 0.9830429540350881
+      "overLine": 27,
+      "classifiedOverLine": 27,
+      "classifiedTvlShare": 0.9841187553964552
     }
   }
 }
